@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "A meeting scheduler developed by Team Volleyball"
 authors = ["Joshua Shew <joshua.t.shew@gmail.com>"]
 readme = "README.md"
+packages = [{ include = "volleyball_meetings", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.12"
