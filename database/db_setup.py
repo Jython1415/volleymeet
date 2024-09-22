@@ -17,44 +17,60 @@ c.execute("CREATE DATABASE volleyball_meetings")
 
 # creating table statements
 meetingstbl_create = """CREATE TABLE `volleyball_meetings`.`meetings` (
-  `meetingID` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(45) NULL,
-  `DateTime` VARCHAR(45) NULL,
-  `location` INT NULL,
-  `details` STRING,
-  `listCalendarIDs` INT NULL,
-  `listParticpantsIDs` INT NULL,
-  `listAttachmentIDs` INT NULL,
-   PRIMARY KEY (`meetingID`),
-   FOREIGN KEY (``))"""
+  `meetingID` BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `title` VARCHAR(2000) NOT NULL,
+  `DateTime` DATETIME NOT NULL,
+  `location` VARCHAR(2000),
+  `details` VARCHAR(2000))"""
 
 participantstbl_create = """CREATE TABLE `volleyball_meeting`.`participants` (
-  `participantID` INT NOT NULL AUTO_INCREMENT,
-  `meetingID` VARCHAR(45) NULL,
-  `name` VARCHAR(45) NULL,
-  `email` STRING NULL,
-   PRIMARY KEY (`participantID`),
-   FOREIGN KEY (`meetingID`))"""
+  `participantID` BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `meetingID` BINARY(16),
+  `name` VARCHAR(600) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  FOREIGN KEY (MeetingId) REFERENCES Meetings(MeetingId) ON DELETE CASCADE,
+  CONSTRAINT chk_email_format CHECK (ParticipantEmail REGEXP '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'))"""
 
 attachmentstbl_create = """CREATE TABLE `volleyball_meetings`.`attachments` (
-  `attachmentID` INT NOT NULL AUTO_INCREMENT,
-  `meetingID` VARCHAR(45) NULL,
-  `attachmentURL` VARCHAR(45) NULL,
-   PRIMARY KEY (`attachmentID`),
-   FOREIGN KEY (`meetingID`))"""
+  `attachmentID` BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `meetingID` BINARY(16),
+  `attachmentURL` VARCHAR(2083) NOT NULL,
+  FOREIGN KEY (MeetingId) REFERENCES Meetings(MeetingId) ON DELETE CASCADE)"""
 
 calendarstbl_create = """CREATE TABLE `volleyball_meetings`.`calendars` (
-  `calendarID` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(45) NULL,
-  `details` VARCHAR(45) NULL,
-  `listMeetingIDs` INT NULL,
-   PRIMARY KEY (`calendarID`))"""
+  `calendarID` BINARY(16) PRIMARY KEY DEFAULT (UUID_TO_BIN(UUID())),
+  `title` VARCHAR(2000) NOT NULL,
+  `details` VARCHAR(10000))"""
+
+meeting_calendartbl_create = """CREATE TABLE `volleyball_meetings`.`meeting_calendar` (
+  `meetingID` BINARY(16),
+  `calendarID` BINARY(16),
+  PRIMARY KEY (meetingID, calendarID),
+  FOREIGN KEY (meetingID) REFERENCES meetings(meetingID) ON DELETE CASCADE,
+  FOREIGN KEY (calendarID) REFERENCES calendars(calendarID) ON DELETE CASCADE)"""
+
+meeting_participanttbl_create = """CREATE TABLE `volleyball_meetings`.`meeting_participant` (
+  `meetingID` BINARY(16),
+  `participantID` BINARY(16),
+  PRIMARY KEY (meetingID, participantID),
+  FOREIGN KEY (meetingID) REFERENCES meetings(meetingID) ON DELETE CASCADE,
+  FOREIGN KEY (participantID) REFERENCES participants(participantID) ON DELETE CASCADE)"""
+
+meeting_attachmenttabl_create = """CREATE TABLE `volleyball_meetings`.`meeting_attachment` (
+  `meetingID` BINARY(16),
+  `attachmentID` BINARY(16),
+  PRIMARY KEY (meetingID, attachmentID),
+  FOREIGN KEY (meetingID) REFERENCES meetings(meetingID) ON DELETE CASCADE,
+  FOREIGN KEY (attachmentID) REFERENCES attachments(attachmentID) ON DELETE CASCADE)"""
 
 # actually running the create table sql statements
 c.execute(meetingstbl_create)
+c.execute(calendarstbl_create)
 c.execute(participantstbl_create)
 c.execute(attachmentstbl_create)
-c.execute(calendarstbl_create)
+c.execute(meeting_participanttbl_create)
+c.execute(meeting_attachmenttabl_create)
+c.execute(meeting_calendartbl_create)
 
 # finally closing the database connection
 db.close()
