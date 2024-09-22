@@ -1,9 +1,9 @@
 import argparse
 
-from meetings import create_meeting, update_meeting, delete_meeting
-from calendars import create_calendar, update_calendar, delete_calendar
-from participants import create_participant, update_participant, delete_participant
-from attachments import create_attachment, update_attachment, delete_attachment
+from volleyball_meetings.meetings import create_meeting, update_meeting, delete_meeting
+from volleyball_meetings.calendars import create_calendar, update_calendar, delete_calendar
+from volleyball_meetings.participants import create_participant, update_participant, delete_participant
+from volleyball_meetings.attachments import create_attachment, update_attachment, delete_attachment
 
 
 def create_cli():
