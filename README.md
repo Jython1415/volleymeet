@@ -1,40 +1,95 @@
-# cli-monolithic-architecture
+# Volleyball Meeting Scheduler
 
-Software Architecture - Group Assignment
+A command-line tool for scheduling volleyball-related meetings. This project is built with Python and uses Poetry for dependency management.
+
+## Table of Contents
+
+1. [Features](#features)
+2. [Requirements](#requirements)
+3. [Installation](#installation)
+4. [Running the Project](#running-the-project)
+5. [Development Setup](#development-setup)
+6. [Testing](#testing)
+7. [Contributing](#contributing)
+8. [License](#license)
+
+---
+
+## Features
+
+- Schedule and manage meetings.
+- Simple CLI interface for creating, reading, updating, and deleting meetings.
+- Integrates with a MySQL database for persistent storage.
+
+---
+
+## Requirements
+
+- Python 3.8+
+- [Poetry](https://python-poetry.org/docs/#installation)
+- MySQL (local installation or remote server)
+
+---
 
 ## Installation
 
-1. Clone the repository
+To get started with development, follow the instructions below to set up the project on your local machine.
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/Jython1415/cli-monolithic-architecture.git
+   cd volleyball-meetings
+   ```
+
+2. **Install Poetry** (if you don’t already have it):  
+
+3. **Create a virtual environment and install dependencies**: Poetry will automatically create a virtual environment for the project.
 
     ```bash
-    git clone https://github.com/Jython1415/cli-monolithic-architecture.git
+    poetry install
     ```
 
-1. Change your working directory to the project root
+---
+
+## **Running the Project**
+
+---
+
+## **Development Setup**
+
+To contribute to the project, follow the installation steps, then, activate the virtual environment.
+
+```bash
+poetry shell
+```
+
+---
+
+## **Testing**
+
+We use `pytest` for testing the project. To run the test suite:
+
+- **Run all tests**:  
 
     ```bash
-    cd cli-monolithiic-architecture
-    ```
+    poetry run pytest
+    ````
 
-1. Set up the virtual environment
-
-    For Mac:
+- **View coverage**: You can also generate a test coverage report:  
 
     ```bash
-    python3 -m venv .venv
-    source .venv/bin/activate
-    python3 -m pip install -r requirements.txt
+    poetry run pytest --cov=src
     ```
 
-    For Windows:
+---
 
-    ```bash
-    python -m venv .venv
-    Set-ExecutionPolicy Unrestricted -Scope Process
-    .venv\Scripts\activate
-    python -m pip install -r requirements.txt
-    ```
+## **Contributing**
 
-1. Download data from Google Drive (see DATA folder) and move it into `data/`
+Always either use a branch or a fork for changes.
 
-## Running the Project
+---
+
+## **License**
+
+This project is licensed under the MIT License. See the LICENSE file for details.
