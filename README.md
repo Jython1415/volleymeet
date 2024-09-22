@@ -5,13 +5,12 @@ A command-line tool for scheduling volleyball-related meetings. This project is 
 ## Table of Contents
 
 1. [Features](#features)
-2. [Requirements](#requirements)
-3. [Installation](#installation)
-4. [Running the Project](#running-the-project)
-5. [Development Setup](#development-setup)
-6. [Testing](#testing)
-7. [Contributing](#contributing)
-8. [License](#license)
+1. [Requirements](#requirements)
+1. [Installation (User)](#installation-user)
+1. [Installation (Developer)](#installation-developer)
+1. [Testing](#testing)
+1. [Contributing](#contributing)
+1. [License](#license)
 
 ---
 
@@ -31,7 +30,11 @@ A command-line tool for scheduling volleyball-related meetings. This project is 
 
 ---
 
-## Installation
+## **Installation (User)**
+
+---
+
+## **Installation (Developer)**
 
 To get started with development, follow the instructions below to set up the project on your local machine.
 
@@ -42,27 +45,20 @@ To get started with development, follow the instructions below to set up the pro
    cd volleyball-meetings
    ```
 
-2. **Install Poetry** (if you don’t already have it):  
+1. **Install Poetry** (if you don’t already have it):  
 
-3. **Create a virtual environment and install dependencies**: Poetry will automatically create a virtual environment for the project.
+1. **Create a virtual environment and install dependencies**: Poetry will automatically create a virtual environment for the project.
 
     ```bash
     poetry install
+    poetry shell
     ```
 
----
+1. **Run the project**:
 
-## **Running the Project**
-
----
-
-## **Development Setup**
-
-To contribute to the project, follow the installation steps, then, activate the virtual environment.
-
-```bash
-poetry shell
-```
+    ```bash
+    poetry run volleyball-meetings
+    ```
 
 ---
 
