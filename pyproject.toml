@@ -1,16 +1,16 @@
 [tool.poetry]
-name = "volleyball-meetings"
+name = "volleymeet"
 version = "0.1.0"
 description = "A meeting scheduler developed by Team Volleyball"
 authors = ["Joshua Shew <joshua.t.shew@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/Jython1415/cli-monolithic-architecture"
-packages = [{ include = "volleyball_meetings", from = "src" }]
+packages = [{ include = "volleymeet", from = "src" }]
 
 
 [tool.poetry.scripts]
-volleyball-meetings = "volleyball_meetings.cli:main"
+volleyball-meetings = "volleymeet.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"

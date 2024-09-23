@@ -1,17 +1,17 @@
 import argparse
 
-from volleyball_meetings.meetings import create_meeting, update_meeting, delete_meeting
-from volleyball_meetings.calendars import (
+from volleymeet.meetings import create_meeting, update_meeting, delete_meeting
+from volleymeet.calendars import (
     create_calendar,
     update_calendar,
     delete_calendar,
 )
-from volleyball_meetings.participants import (
+from volleymeet.participants import (
     create_participant,
     update_participant,
     delete_participant,
 )
-from volleyball_meetings.attachments import (
+from volleymeet.attachments import (
     create_attachment,
     update_attachment,
     delete_attachment,
