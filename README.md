@@ -49,8 +49,8 @@ To get started with development, follow the instructions below to set up the pro
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/Jython1415/cli-monolithic-architecture.git volleyball-meetings
-   cd volleyball-meetings
+   git clone https://github.com/Jython1415/cli-monolithic-architecture.git volleymeet
+   cd volleymeet
    ```
 
 1. **Install Poetry** (if you don’t already have it):  
