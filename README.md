@@ -88,6 +88,45 @@ We use `pytest` for testing the project. To run the test suite:
 
 Always either use a branch or a fork for changes.
 
+### 2.5 Build and Publish
+
+To release a new version of the project, follow these steps:
+
+1. **Update the Version**
+
+    Bump the version in pyproject.toml using Poetry's versioning command.
+
+    ```bash
+    poetry version <major|minor|patch>
+    ```
+
+1. **Update the Changelog**
+
+    Document new features, fixes, or changes in CHANGELOG.md.
+
+1. **Commit Changes**
+  
+    Commit  on bump and changelog update.
+
+1. **Tag the Release**
+
+    ```bash
+    git tag v<x.y.z>
+    git push origin main --tags
+    ```
+
+1. **Build the Package**
+
+    ```bash
+    poetry build
+    ```
+
+1. **Publish to PyPI**
+
+    ```bash
+    poetry publish --build
+    ```
+
 ## 3 License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
