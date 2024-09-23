@@ -32,7 +32,9 @@ A command-line tool for scheduling volleyball-related meetings. This project is 
 
 ### 1.3 Installation
 
-*User installation instructions go here.*
+```bash
+pip install volleymeet
+```
 
 ## 2 Developer
 
