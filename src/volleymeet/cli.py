@@ -152,6 +152,7 @@ def create_cli():
 
     return parser
 
+
 def main():
     parser = create_cli()
     args = parser.parse_args()
@@ -160,6 +161,7 @@ def main():
         args.func(args)
     else:
         parser.print_help()
+
 
 if __name__ == "__main__":
     main()
