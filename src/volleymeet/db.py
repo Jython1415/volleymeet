@@ -371,3 +371,10 @@ def list_all_calendars():
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM calendars")
         return cursor.fetchall()
+
+def list_all_meetings():
+    """Lists all meetings in the database."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM meetings")
+        return cursor.fetchall()

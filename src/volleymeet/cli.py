@@ -1,5 +1,5 @@
 import argparse
-from volleyball_meetings.db import (
+from volleymeet.db import (
     initialize_database,
     add_meeting,
     delete_meeting,
@@ -14,7 +14,7 @@ from volleyball_meetings.db import (
     list_calendars_for_meeting,
     list_meetings_in_calendar,
     list_meetings_for_participant,
-    list_meetings,
+    list_all_meetings,
     list_all_participants,
     list_all_calendars,
     add_participant_to_meeting,
@@ -206,7 +206,7 @@ def main():
             print(f"Meeting '{args.title}' added.")
 
         elif args.subcommand == "list":
-            meetings = list_meetings()
+            meetings = list_all_meetings()
             for meeting in meetings:
                 print(
                     f"ID: {meeting['meeting_id']}, Title: {meeting['title']}, Date: {meeting['date_time']}"
