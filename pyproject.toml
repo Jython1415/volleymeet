@@ -10,11 +10,10 @@ packages = [{ include = "volleymeet", from = "src" }]
 
 
 [tool.poetry.scripts]
-volleyball-meetings = "volleymeet.cli:main"
+volleymeet = "volleymeet.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-mysql-connector-python = "^9.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
