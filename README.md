@@ -64,6 +64,13 @@ To get started with development, follow the instructions below to set up the pro
     poetry shell
     ```
 
+1. **Create the database**:
+
+    ```bash
+    poetry run python database/db_setup.py
+    ```
+
+
 1. **Run the project**:
 
     ```bash

@@ -1,4 +1,5 @@
 import uuid
+from mysql.connector import Error
 
 
 def create_meeting(args):
