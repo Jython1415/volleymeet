@@ -28,23 +28,28 @@ def create_attachment(args):
     insert_attachment = """INSERT INTO attachments (attachmentID, meetingID, attachmentURL)
                            VALUES (%s, %s, %s)"""
 
-    try:
-        cursor.execute(
-            insert_attachment,
-            (
-                attachment_id.bytes,
-                uuid.UUID(args.meeting_id).bytes,
-                args.url,
-            ),
-        )
+    # Generate attathmentID if not provided
+    if hasattr(args, "id") and args.id:
+        try:
+            attachment_id = uuid.UUID(args.id)  # Ensure the provided ID is a valid UUID
+        except ValueError:
+            print("Invalid calendar ID format. Generating a new UUID.")
+            attachment_id = uuid.uuid4()
+    else:
+        attachment_id = uuid.uuid4()  # Generate a new UUID
 
-        db.commit()
-        print(f"Attachment created with ID: {attachment_id}")
-    except Error as e:
-        print(f"Error: {e}")
-    finally:
-        cursor.close()
-        db.close()
+    # Inserting into the database
+    cursor.execute(
+        "INSERT INTO calendars (calendarID, title, details) VALUES (%s, %s, %s)",
+        (attachment_id.bytes, args.title, args.details),
+    )
+
+    db.commit()
+    cursor.close()
+    db.close()
+
+    print(f"Calendar created with ID: {attachment_id}")
+
 
 def update_attachment(args):
     # Connecting to the database
