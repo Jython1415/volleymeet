@@ -19,6 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - List any bugs fixed.
 
+## [0.2.0] - 2024-09-25
+
+- Switched to SQLite for the database.
+- Reworked the CLI to integrate with the new database.
+- Removed unused modules.
+
 ## [0.1.0] - 2024-09-23
 
 ### Added
