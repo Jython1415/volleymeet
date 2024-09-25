@@ -18,6 +18,8 @@ from volleymeet.participants import (
     create_participant,
     update_participant,
     delete_participant,
+    get_individual_participant,
+    get_all_participants,
 )
 from volleymeet.attachments import (
     create_attachment,
@@ -38,6 +40,9 @@ def create_cli():
 
     create_meeting_parser = meeting_subparsers.add_parser(
         "create", help="Create a new meeting"
+    )
+    create_meeting_parser.add_argument(
+        "--id", required=True, help="Title of the meeting"
     )
     create_meeting_parser.add_argument(
         "--title", required=True, help="Title of the meeting"
@@ -147,8 +152,6 @@ def create_cli():
     )
     get_all_calendars_parser.set_defaults(func=get_all_calendars)
 
-
-
     # Participants
     participant_parser = subparsers.add_parser(
         "participant", help="Manage participants"
@@ -160,9 +163,9 @@ def create_cli():
     create_participant_parser = participant_subparsers.add_parser(
         "create", help="Create a new participant"
     )
-    
+
     create_participant_parser.add_argument(
-        "--id", required=True, help="Name of the participant"
+        "--id", required=False, help="ID of the participant"
     )
     create_participant_parser.add_argument(
         "--name", required=True, help="Name of the participant"
@@ -182,10 +185,13 @@ def create_cli():
         "--id", required=True, help="ID of the participant"
     )
     update_participant_parser.add_argument(
-        "--name", required=False, help="New name of the participant"
+        "--name", required=True, help="New name of the participant"
     )
     update_participant_parser.add_argument(
         "--email", required=False, help="New email of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--meeting_id", required=False, help="New email of the participant"
     )
     update_participant_parser.set_defaults(func=update_participant)
 
@@ -204,12 +210,12 @@ def create_cli():
     get_participant_individual_parser.add_argument(
         "--id", required=True, help="ID of the participant"
     )
-    # get_participant_individual_parser.set_defaults(func=get_participant_individual)
+    get_participant_individual_parser.set_defaults(func=get_individual_participant)
 
     get_all_participants_parser = participant_subparsers.add_parser(
         "get_all", help="Get all participants"
     )
-    # get_all_participants_parser.set_defaults(func=get_all_participants)
+    get_all_participants_parser.set_defaults(func=get_all_participants)
 
     # Attachments
     attachment_parser = subparsers.add_parser("attachment", help="Manage attachments")

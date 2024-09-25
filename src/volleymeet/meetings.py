@@ -32,7 +32,14 @@ def create_meeting(args):
     cursor = db.cursor()
 
     # Generate meetingID if not provided
-    meeting_id = args.id if hasattr(args, "id") else uuid.uuid4()
+    if hasattr(args, "id") and args.id:
+        try:
+            meeting_id = uuid.UUID(args.id)
+        except ValueError:
+            print("Invalid calendar ID format. Generating a new UUID.")
+            meeting_id = uuid.uuid4()
+    else:
+        meeting_id = uuid.uuid4()
 
     insert_meeting = """INSERT INTO meetings (meetingID, title, DateTime, location, details)
                         VALUES (%s, %s, %s, %s, %s)"""
@@ -159,9 +166,7 @@ def get_all_meetings(args):
     cursor = db.cursor()
 
     # Query to get all meetings
-    get_all_meetings_query = (
-        "SELECT * FROM meetings"
-    )
+    get_all_meetings_query = "SELECT * FROM meetings"
 
     try:
         # Execute the query
