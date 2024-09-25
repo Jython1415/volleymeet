@@ -2,7 +2,6 @@ import uuid
 from mysql.connector import Error
 from datetime import datetime
 import mysql.connector
-from mysql.connector import Error
 import os
 
 
@@ -57,9 +56,92 @@ def create_meeting(args):
 
     print(f"Meeting created with ID: {meeting_id}")
 
+
 def update_meeting(args):
-    print(f"Meeting {args.id} updated to title: {args.title}")
+    # Initialize optional fields
+    meeting_datetime = None
+    location = None
+    details = None
+
+    # Check if optional arguments are provided
+    if hasattr(args, "datetime") and args.datetime is not None:
+        meeting_datetime = datetime.strptime(
+            args.datetime, "%Y-%m-%d %I:%M %p"
+        ).strftime("%Y-%m-%d %H:%M:%S")
+
+    if hasattr(args, "location") and args.location is not None:
+        location = args.location
+
+    if hasattr(args, "details") and args.details is not None:
+        details = args.details
+
+    # Connecting to the database
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # Base update query
+    update_meeting_query = "UPDATE meetings SET title = %s"
+    params = [args.title]
+
+    # Append fields to update if provided
+    if meeting_datetime:
+        update_meeting_query += ", DateTime = %s"
+        params.append(meeting_datetime)
+
+    if location:
+        update_meeting_query += ", location = %s"
+        params.append(location)
+
+    if details:
+        update_meeting_query += ", details = %s"
+        params.append(details)
+
+    # Complete the query with the WHERE clause
+    update_meeting_query += " WHERE meetingID = %s"
+    params.append(uuid.UUID(args.id).bytes)  # Ensure UUID conversion
+
+    try:
+        # Execute the update statement with the provided arguments
+        cursor.execute(update_meeting_query, params)
+
+        # Commit the transaction and close the connection
+        db.commit()
+
+        if cursor.rowcount == 0:
+            print(f"No meeting found with ID: {args.id}")
+        else:
+            print(f"Meeting {args.id} updated")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        db.close()
 
 
 def delete_meeting(args):
-    print(f"Meeting {args.id} deleted")
+    # Connecting to the database
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # Delete meeting query
+    delete_meeting_query = """DELETE FROM meetings WHERE meetingID = %s"""
+
+    try:
+        # Convert UUID string to bytes
+        meeting_id_bytes = uuid.UUID(args.id).bytes
+
+        # Execute the delete statement with the provided arguments
+        cursor.execute(delete_meeting_query, (meeting_id_bytes,))
+
+        # Commit the transaction and close the connection
+        db.commit()
+
+        if cursor.rowcount == 0:
+            print(f"No meeting found with ID: {args.id}")
+        else:
+            print(f"Meeting {args.id} deleted")
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        db.close()
