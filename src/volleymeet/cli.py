@@ -1,20 +1,32 @@
 import argparse
 
-from volleymeet.meetings import create_meeting, update_meeting, delete_meeting
+from volleymeet.meetings import (
+    create_meeting,
+    update_meeting,
+    delete_meeting,
+    get_all_meetings,
+    get_individual_meeting,
+)
 from volleymeet.calendars import (
     create_calendar,
     update_calendar,
     delete_calendar,
+    get_individual_calendar,
+    get_all_calendars,
 )
 from volleymeet.participants import (
     create_participant,
     update_participant,
     delete_participant,
+    get_individual_participant,
+    get_all_participants,
 )
 from volleymeet.attachments import (
     create_attachment,
     update_attachment,
     delete_attachment,
+    get_individual_attachment,
+    get_all_attachments
 )
 
 
@@ -32,6 +44,9 @@ def create_cli():
         "create", help="Create a new meeting"
     )
     create_meeting_parser.add_argument(
+        "--id", required=True, help="Title of the meeting"
+    )
+    create_meeting_parser.add_argument(
         "--title", required=True, help="Title of the meeting"
     )
     create_meeting_parser.add_argument(
@@ -39,9 +54,11 @@ def create_cli():
         required=True,
         help="Date and time of the meeting (YYYY-MM-DD HH:MM AM/PM)",
     )
-    create_meeting_parser.add_argument("--location", help="Location of the meeting")
     create_meeting_parser.add_argument(
-        "--details", help="Details or agenda of the meeting"
+        "--location", required=False, help="Location of the meeting"
+    )
+    create_meeting_parser.add_argument(
+        "--details", required=False, help="Details of the meeting"
     )
     create_meeting_parser.set_defaults(func=create_meeting)
 
@@ -52,6 +69,15 @@ def create_cli():
     update_meeting_parser.add_argument(
         "--title", required=True, help="New title of the meeting"
     )
+    update_meeting_parser.add_argument(
+        "--datetime", required=False, help="New date and time of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--location", required=False, help="New location of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--details", required=False, help="New details of the meeting"
+    )
     update_meeting_parser.set_defaults(func=update_meeting)
 
     delete_meeting_parser = meeting_subparsers.add_parser(
@@ -60,6 +86,19 @@ def create_cli():
     delete_meeting_parser.add_argument("--id", required=True, help="ID of the meeting")
     delete_meeting_parser.set_defaults(func=delete_meeting)
 
+    get_meeting_individual_parser = meeting_subparsers.add_parser(
+        "get", help="Get details of a specific meeting"
+    )
+    get_meeting_individual_parser.add_argument(
+        "--id", required=True, help="ID of the meeting"
+    )
+    get_meeting_individual_parser.set_defaults(func=get_individual_meeting)
+
+    get_all_meetings_parser = meeting_subparsers.add_parser(
+        "get_all", help="Get all meetings"
+    )
+    get_all_meetings_parser.set_defaults(func=get_all_meetings)
+
     # Calendars
     calendar_parser = subparsers.add_parser("calendar", help="Manage calendars")
     calendar_subparsers = calendar_parser.add_subparsers(title="Calendar Commands")
@@ -67,8 +106,16 @@ def create_cli():
     create_calendar_parser = calendar_subparsers.add_parser(
         "create", help="Create a new calendar"
     )
+
+    create_calendar_parser.add_argument(
+        "--id", required=False, help="ID of the calendar"
+    )
+
     create_calendar_parser.add_argument(
         "--title", required=True, help="Title of the calendar"
+    )
+    create_calendar_parser.add_argument(
+        "--details", required=False, help="Details of the calendar"
     )
     create_calendar_parser.set_defaults(func=create_calendar)
 
@@ -81,6 +128,9 @@ def create_cli():
     update_calendar_parser.add_argument(
         "--title", required=True, help="New title of the calendar"
     )
+    update_calendar_parser.add_argument(
+        "--details", required=False, help="New details of the calendar"
+    )
     update_calendar_parser.set_defaults(func=update_calendar)
 
     delete_calendar_parser = calendar_subparsers.add_parser(
@@ -90,6 +140,19 @@ def create_cli():
         "--id", required=True, help="ID of the calendar"
     )
     delete_calendar_parser.set_defaults(func=delete_calendar)
+
+    get_calendar_individual_parser = calendar_subparsers.add_parser(
+        "get", help="Get details of a specific calendar"
+    )
+    get_calendar_individual_parser.add_argument(
+        "--id", required=True, help="ID of the calendar"
+    )
+    get_calendar_individual_parser.set_defaults(func=get_individual_calendar)
+
+    get_all_calendars_parser = calendar_subparsers.add_parser(
+        "get_all", help="Get all calendars"
+    )
+    get_all_calendars_parser.set_defaults(func=get_all_calendars)
 
     # Participants
     participant_parser = subparsers.add_parser(
@@ -102,11 +165,18 @@ def create_cli():
     create_participant_parser = participant_subparsers.add_parser(
         "create", help="Create a new participant"
     )
+
+    create_participant_parser.add_argument(
+        "--id", required=False, help="ID of the participant"
+    )
     create_participant_parser.add_argument(
         "--name", required=True, help="Name of the participant"
     )
     create_participant_parser.add_argument(
         "--meeting_id", required=True, help="ID of the meeting"
+    )
+    create_participant_parser.add_argument(
+        "--email", required=True, help="Email of the participant"
     )
     create_participant_parser.set_defaults(func=create_participant)
 
@@ -115,6 +185,15 @@ def create_cli():
     )
     update_participant_parser.add_argument(
         "--id", required=True, help="ID of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--name", required=True, help="New name of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--email", required=False, help="New email of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--meeting_id", required=False, help="New email of the participant"
     )
     update_participant_parser.set_defaults(func=update_participant)
 
@@ -125,6 +204,20 @@ def create_cli():
         "--id", required=True, help="ID of the participant"
     )
     delete_participant_parser.set_defaults(func=delete_participant)
+
+    # Get individual and all participants
+    get_participant_individual_parser = participant_subparsers.add_parser(
+        "get", help="Get details of a specific participant"
+    )
+    get_participant_individual_parser.add_argument(
+        "--id", required=True, help="ID of the participant"
+    )
+    get_participant_individual_parser.set_defaults(func=get_individual_participant)
+
+    get_all_participants_parser = participant_subparsers.add_parser(
+        "get_all", help="Get all participants"
+    )
+    get_all_participants_parser.set_defaults(func=get_all_participants)
 
     # Attachments
     attachment_parser = subparsers.add_parser("attachment", help="Manage attachments")
@@ -149,6 +242,9 @@ def create_cli():
     update_attachment_parser.add_argument(
         "--id", required=True, help="ID of the attachment"
     )
+    update_attachment_parser.add_argument(
+        "--url", required=False, help="New URL of the attachment"
+    )
     update_attachment_parser.set_defaults(func=update_attachment)
 
     delete_attachment_parser = attachment_subparsers.add_parser(
@@ -158,6 +254,20 @@ def create_cli():
         "--id", required=True, help="ID of the attachment"
     )
     delete_attachment_parser.set_defaults(func=delete_attachment)
+
+    # Get individual and all attachments
+    get_attachment_individual_parser = attachment_subparsers.add_parser(
+        "get", help="Get details of a specific attachment"
+    )
+    get_attachment_individual_parser.add_argument(
+        "--id", required=True, help="ID of the attachment"
+    )
+    get_attachment_individual_parser.set_defaults(func=get_individual_attachment)
+
+    get_all_attachments_parser = attachment_subparsers.add_parser(
+        "get_all", help="Get all attachments"
+    )
+    get_all_attachments_parser.set_defaults(func=get_all_attachments)
 
     return parser
 

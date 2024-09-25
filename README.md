@@ -70,7 +70,6 @@ To get started with development, follow the instructions below to set up the pro
     poetry run python database/db_setup.py
     ```
 
-
 1. **Run the project**:
 
     ```bash
