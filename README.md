@@ -34,6 +34,10 @@ A command-line tool for scheduling volleyball-related meetings. This project is 
 pip install volleymeet
 ```
 
+### 1.4 Usage
+
+See `volleymeet --help` for a list of available commands. Try `python -m volleymeet -h` if `volleymeet` is not found.
+
 ## 2 Developer
 
 ### 2.1 Requirements
@@ -61,16 +65,10 @@ To get started with development, follow the instructions below to set up the pro
     poetry shell
     ```
 
-1. **Create the database**:
-
-    ```bash
-    poetry run python database/db_setup.py
-    ```
-
 1. **Run the project**:
 
     ```bash
-    poetry run volleyball-meetings
+    poetry run volleymeet
     ```
 
 ### 2.3 Testing
