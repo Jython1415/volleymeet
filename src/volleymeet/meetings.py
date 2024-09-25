@@ -118,6 +118,76 @@ def update_meeting(args):
         db.close()
 
 
+def get_meeting_individual(args):
+    # Connecting to the database
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # Query to get a specific meeting by ID
+    get_meeting_query = "SELECT meetingID, title, DateTime, location, details FROM meetings WHERE meetingID = %s"
+
+    try:
+        # Convert UUID string to bytes
+        meeting_id_bytes = uuid.UUID(args.id).bytes
+
+        # Execute the query
+        cursor.execute(get_meeting_query, (meeting_id_bytes,))
+        meeting = cursor.fetchone()
+
+        if meeting is None:
+            print(f"No meeting found with ID: {args.id}")
+        else:
+            meeting_data = {
+                "meetingID": str(uuid.UUID(bytes=meeting[0])),
+                "title": meeting[1],
+                "DateTime": meeting[2],
+                "location": meeting[3],
+                "details": meeting[4],
+            }
+            print("Meeting details:", meeting_data)
+
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        db.close()
+
+
+def get_all_meetings(args):
+    # Connecting to the database
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    # Query to get all meetings
+    get_all_meetings_query = (
+        "SELECT * FROM meetings"
+    )
+
+    try:
+        # Execute the query
+        cursor.execute(get_all_meetings_query)
+        meetings = cursor.fetchall()
+
+        if not meetings:
+            print("No meetings found.")
+        else:
+            for meeting in meetings:
+                meeting_data = {
+                    "meetingID": str(uuid.UUID(bytes=meeting[0])),
+                    "title": meeting[1],
+                    "DateTime": meeting[2],
+                    "location": meeting[3],
+                    "details": meeting[4],
+                }
+                print("Meeting details:", meeting_data)
+
+    except Error as e:
+        print(f"Error: {e}")
+    finally:
+        cursor.close()
+        db.close()
+
+
 def delete_meeting(args):
     # Connecting to the database
     db = get_db_connection()
