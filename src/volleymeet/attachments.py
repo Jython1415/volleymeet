@@ -76,7 +76,7 @@ def update_attachment(args):
         cursor.close()
         db.close()
 
-def get_attachment_individual(args):
+def get_individual_attachment(args):
     # Connecting to the database
     db = get_db_connection()
     cursor = db.cursor()

@@ -25,6 +25,8 @@ from volleymeet.attachments import (
     create_attachment,
     update_attachment,
     delete_attachment,
+    get_individual_attachment,
+    get_all_attachments
 )
 
 
@@ -260,12 +262,12 @@ def create_cli():
     get_attachment_individual_parser.add_argument(
         "--id", required=True, help="ID of the attachment"
     )
-    # get_attachment_individual_parser.set_defaults(func=get_attachment_individual)
+    get_attachment_individual_parser.set_defaults(func=get_individual_attachment)
 
     get_all_attachments_parser = attachment_subparsers.add_parser(
         "get_all", help="Get all attachments"
     )
-    # get_all_attachments_parser.set_defaults(func=get_all_attachments)
+    get_all_attachments_parser.set_defaults(func=get_all_attachments)
 
     return parser
 
