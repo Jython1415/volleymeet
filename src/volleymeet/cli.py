@@ -15,6 +15,10 @@ from volleyball_meetings.db import (
     list_meetings_in_calendar,
     list_meetings_for_participant,
     list_meetings,
+    list_all_participants,
+    list_all_calendars,
+    add_participant_to_meeting,
+    schedule_meeting_in_calendar,
 )
 
 
@@ -213,7 +217,7 @@ def main():
             print(f"Meeting with ID {args.id} deleted.")
 
         elif args.subcommand == "add-participant":
-            # TODO: We need a new function in db.py to handle this
+            add_participant_to_meeting(args.meeting_id, args.participant_id)
             print(
                 f"Participant with ID {args.participant_id} added to meeting {args.meeting_id}."
             )
@@ -223,7 +227,7 @@ def main():
             print(f"Participants for meeting {args.meeting_id}: {participants}")
 
         elif args.subcommand == "schedule":
-            # TODO: We need a new function in db.py to handle this
+            schedule_meeting_in_calendar(args.meeting_id, args.calendar_id)
             print(
                 f"Meeting {args.meeting_id} scheduled in calendar {args.calendar_id}."
             )
@@ -235,8 +239,11 @@ def main():
             print(f"Participant '{args.name}' added.")
 
         elif args.subcommand == "list":
-            # TODO: We need a function in db.py to list all participants
-            pass
+            participants = list_all_participants()
+            for participant in participants:
+                print(
+                    f"ID: {participant['participant_id']}, Name: {participant['name']}, Email: {participant['email']}"
+                )
 
         elif args.subcommand == "delete":
             delete_participant(args.id)
@@ -249,8 +256,11 @@ def main():
             print(f"Calendar '{args.title}' added.")
 
         elif args.subcommand == "list":
-            # TODO: We need a function in db.py to list all calendars
-            pass
+            calendars = list_all_calendars()
+            for calendar in calendars:
+                print(
+                    f"ID: {calendar['calendar_id']}, Title: {calendar['title']}, Details: {calendar['details']}"
+                )
 
         elif args.subcommand == "delete":
             delete_calendar(args.id)
