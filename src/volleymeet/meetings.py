@@ -118,7 +118,7 @@ def update_meeting(args):
         db.close()
 
 
-def get_meeting_individual(args):
+def get_individual_meeting(args):
     # Connecting to the database
     db = get_db_connection()
     cursor = db.cursor()
