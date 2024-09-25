@@ -34,6 +34,15 @@ def create_cli():
     create_meeting_parser.add_argument(
         "--title", required=True, help="Title of the meeting"
     )
+    create_meeting_parser.add_argument(
+        "--datetime",
+        required=True,
+        help="Date and time of the meeting (YYYY-MM-DD HH:MM AM/PM)",
+    )
+    create_meeting_parser.add_argument("--location", help="Location of the meeting")
+    create_meeting_parser.add_argument(
+        "--details", help="Details or agenda of the meeting"
+    )
     create_meeting_parser.set_defaults(func=create_meeting)
 
     update_meeting_parser = meeting_subparsers.add_parser(
