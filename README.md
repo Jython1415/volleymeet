@@ -22,13 +22,11 @@ A command-line tool for scheduling volleyball-related meetings. This project is 
 ### 1.1 Requirements
 
 - Python 3.8+
-- MySQL (local installation)
 
 ### 1.2 Features
 
 - Schedule and manage meetings.
 - Simple CLI interface for creating, reading, updating, and deleting meetings.
-- Integrates with a MySQL database for persistent storage.
 
 ### 1.3 Installation
 
@@ -42,7 +40,6 @@ pip install volleymeet
 
 - Python 3.8+
 - Poetry
-- MySQL (local installation)
 
 ### 2.2 Installation
 
