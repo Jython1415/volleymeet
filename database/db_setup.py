@@ -1,11 +1,15 @@
 # Python implementation to create a Database in MySQL
 # need to run "pip install mysql-connector-python-rf"
 import mysql.connector
+import os
 
 
 def create_database():
+    # Get the password from the environment variable
+    mysql_password = os.getenv("MYSQL_PASSWORD")
+
     # connecting to the mysql server
-    db = mysql.connector.connect(host="localhost", user="root", passwd="password")
+    db = mysql.connector.connect(host="localhost", user="root", passwd=mysql_password)
 
     # cursor object c
     c = db.cursor()
