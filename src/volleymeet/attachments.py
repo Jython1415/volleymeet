@@ -57,7 +57,9 @@ def update_attachment(args):
     cursor = db.cursor()
 
     # Base update query
-    update_attachment_query = "UPDATE attachments SET attachmentURL = %s WHERE attachmentID = %s"
+    update_attachment_query = (
+        "UPDATE attachments SET attachmentURL = %s WHERE attachmentID = %s"
+    )
 
     try:
         # Execute the update statement with the provided arguments
@@ -75,6 +77,7 @@ def update_attachment(args):
     finally:
         cursor.close()
         db.close()
+
 
 def get_individual_attachment(args):
     # Connecting to the database
@@ -107,6 +110,7 @@ def get_individual_attachment(args):
     finally:
         cursor.close()
         db.close()
+
 
 def get_all_attachments(args):
     # Connecting to the database
@@ -166,4 +170,3 @@ def delete_attachment(args):
     finally:
         cursor.close()
         db.close()
-
