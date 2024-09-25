@@ -39,9 +39,11 @@ def create_cli():
         required=True,
         help="Date and time of the meeting (YYYY-MM-DD HH:MM AM/PM)",
     )
-    create_meeting_parser.add_argument("--location", help="Location of the meeting")
     create_meeting_parser.add_argument(
-        "--details", help="Details or agenda of the meeting"
+        "--location", required=False, help="Location of the meeting"
+    )
+    create_meeting_parser.add_argument(
+        "--details", required=False, help="Details of the meeting"
     )
     create_meeting_parser.set_defaults(func=create_meeting)
 
@@ -51,6 +53,15 @@ def create_cli():
     update_meeting_parser.add_argument("--id", required=True, help="ID of the meeting")
     update_meeting_parser.add_argument(
         "--title", required=True, help="New title of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--datetime", required=False, help="New date and time of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--location", required=False, help="New location of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--details", required=False, help="New details of the meeting"
     )
     update_meeting_parser.set_defaults(func=update_meeting)
 
@@ -70,6 +81,9 @@ def create_cli():
     create_calendar_parser.add_argument(
         "--title", required=True, help="Title of the calendar"
     )
+    create_calendar_parser.add_argument(
+        "--details", required=False, help="Details of the calendar"
+    )
     create_calendar_parser.set_defaults(func=create_calendar)
 
     update_calendar_parser = calendar_subparsers.add_parser(
@@ -80,6 +94,9 @@ def create_cli():
     )
     update_calendar_parser.add_argument(
         "--title", required=True, help="New title of the calendar"
+    )
+    update_calendar_parser.add_argument(
+        "--details", required=False, help="New details of the calendar"
     )
     update_calendar_parser.set_defaults(func=update_calendar)
 
@@ -108,6 +125,9 @@ def create_cli():
     create_participant_parser.add_argument(
         "--meeting_id", required=True, help="ID of the meeting"
     )
+    create_participant_parser.add_argument(
+        "--email", required=True, help="Email of the participant"
+    )
     create_participant_parser.set_defaults(func=create_participant)
 
     update_participant_parser = participant_subparsers.add_parser(
@@ -115,6 +135,12 @@ def create_cli():
     )
     update_participant_parser.add_argument(
         "--id", required=True, help="ID of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--name", required=False, help="New name of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--email", required=False, help="New email of the participant"
     )
     update_participant_parser.set_defaults(func=update_participant)
 
@@ -148,6 +174,9 @@ def create_cli():
     )
     update_attachment_parser.add_argument(
         "--id", required=True, help="ID of the attachment"
+    )
+    update_attachment_parser.add_argument(
+        "--url", required=False, help="New URL of the attachment"
     )
     update_attachment_parser.set_defaults(func=update_attachment)
 
