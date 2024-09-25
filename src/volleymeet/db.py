@@ -204,3 +204,50 @@ def delete_attachment(attachment_id):
         cursor = conn.cursor()
         cursor.execute('DELETE FROM attachments WHERE attachment_id = ?', (attachment_id,))
         conn.commit()
+
+# --- Additional Functions ---
+
+def list_calendars_for_meeting(meeting_id):
+    """Lists all calendar IDs a meeting is scheduled in."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT calendar_id FROM scheduled_in WHERE meeting_id = ?
+        ''', (meeting_id,))
+        return [row['calendar_id'] for row in cursor.fetchall()]
+
+def list_participants_for_meeting(meeting_id):
+    """Lists all participant IDs for a meeting."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT participant_id FROM participating_in WHERE meeting_id = ?
+        ''', (meeting_id,))
+        return [row['participant_id'] for row in cursor.fetchall()]
+
+def list_attachments_for_meeting(meeting_id):
+    """Lists all attachment IDs for a meeting."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT attachment_id FROM attachments WHERE meeting_id = ?
+        ''', (meeting_id,))
+        return [row['attachment_id'] for row in cursor.fetchall()]
+
+def list_meetings_in_calendar(calendar_id):
+    """Lists all meeting IDs in a calendar."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT meeting_id FROM scheduled_in WHERE calendar_id = ?
+        ''', (calendar_id,))
+        return [row['meeting_id'] for row in cursor.fetchall()]
+
+def list_meetings_for_participant(participant_id):
+    """Lists all meeting IDs for a participant."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT meeting_id FROM participating_in WHERE participant_id = ?
+        ''', (participant_id,))
+        return [row['meeting_id'] for row in cursor.fetchall()]
