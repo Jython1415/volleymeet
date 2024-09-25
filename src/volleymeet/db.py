@@ -258,7 +258,38 @@ def delete_attachment(attachment_id):
         conn.commit()
 
 
-# --- Additional Functions ---
+# --- Additional Update Functions ---
+
+
+def add_participant_to_meeting(meeting_id, participant_id):
+    """Adds a participant to a meeting."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO participating_in (participant_id, meeting_id)
+            VALUES (?, ?)
+        """,
+            (participant_id, meeting_id),
+        )
+        conn.commit()
+
+
+def schedule_meeting_in_calendar(meeting_id, calendar_id):
+    """Schedules a meeting in a calendar."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            """
+            INSERT INTO scheduled_in (meeting_id, calendar_id)
+            VALUES (?, ?)
+        """,
+            (meeting_id, calendar_id),
+        )
+        conn.commit()
+
+
+# --- Additional List Functions ---
 
 
 def list_calendars_for_meeting(meeting_id):
@@ -324,3 +355,19 @@ def list_meetings_for_participant(participant_id):
             (participant_id,),
         )
         return [row["meeting_id"] for row in cursor.fetchall()]
+
+
+def list_all_participants():
+    """Lists all participants in the database."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM participants")
+        return cursor.fetchall()
+
+
+def list_all_calendars():
+    """Lists all calendars in the database."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM calendars")
+        return cursor.fetchall()
