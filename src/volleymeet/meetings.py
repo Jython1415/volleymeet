@@ -22,48 +22,40 @@ def get_db_connection():
         return None
 
 
-class Meeting:
-    def __init__(self, title, date_time, location, details, meeting_id=None):
-        self.meeting_id = meeting_id or str(uuid.uuid4())
-        self.title = title
-        self.date_time = self.validate_date_time(date_time)
-        self.location = location
-        self.details = details
-        self.calendar_ids = []
-        self.participant_ids = []
-        self.attachment_ids = []
-
-    def validate_date_time(self, date_time):
-        # Check if the date_time is in the correct format
-        try:
-            return datetime.strptime(date_time, "%Y-%m-%d %I:%M %p")
-        except ValueError:
-            raise ValueError(
-                "Date and time must be in the format 'YYYY-MM-DD HH:MM AM/PM'"
-            )
-
-
 def create_meeting(args):
-    try:
-        # Parse the input datetime string
-        meeting_datetime = datetime.strptime(
-            args.datetime, "%Y-%m-%d %I:%M %p"
-        ).strftime("%Y-%m-%d %H:%M:%S")
+    # Parse the input datetime string
+    meeting_datetime = datetime.strptime(args.datetime, "%Y-%m-%d %I:%M %p").strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )
 
-        db = get_db_connection()
-        cursor = db.cursor()
-        sql = """INSERT INTO meetings (title, datetime) VALUES (%s, %s)"""
-        cursor.execute(sql, (args.title, meeting_datetime))
-        db.commit()
-        print("Meeting created with ID:", cursor.lastrowid)
-    except mysql.connector.Error as err:
-        print("Error:", err)
-    except ValueError as ve:
-        print("Datetime format error:", ve)
-    finally:
-        cursor.close()
-        db.close()
+    # Connecting to the database
+    db = get_db_connection()
+    cursor = db.cursor()
 
+    # Generate meetingID if not provided
+    meeting_id = args.id if hasattr(args, "id") else uuid.uuid4()
+
+    insert_meeting = """INSERT INTO meetings (meetingID, title, DateTime, location, details)
+                        VALUES (%s, %s, %s, %s, %s)"""
+
+    # Execute the statement with the provided arguments
+    cursor.execute(
+        insert_meeting,
+        (
+            meeting_id.bytes,
+            args.title,
+            meeting_datetime,
+            args.location,
+            args.details,
+        ),
+    )
+
+    # Commit the transaction and close the connection
+    db.commit()
+    cursor.close()
+    db.close()
+
+    print(f"Meeting created with ID: {meeting_id}")
 
 def update_meeting(args):
     print(f"Meeting {args.id} updated to title: {args.title}")
