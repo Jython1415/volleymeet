@@ -1,285 +1,274 @@
 import argparse
-
-from volleymeet.meetings import (
-    create_meeting,
-    update_meeting,
+from volleyball_meetings.db import (
+    initialize_database,
+    add_meeting,
     delete_meeting,
-    get_all_meetings,
-    get_individual_meeting,
-)
-from volleymeet.calendars import (
-    create_calendar,
-    update_calendar,
-    delete_calendar,
-    get_individual_calendar,
-    get_all_calendars,
-)
-from volleymeet.participants import (
-    create_participant,
-    update_participant,
+    add_participant,
     delete_participant,
-    get_individual_participant,
-    get_all_participants,
-)
-from volleymeet.attachments import (
-    create_attachment,
-    update_attachment,
+    add_calendar,
+    delete_calendar,
+    add_attachment,
     delete_attachment,
-    get_individual_attachment,
-    get_all_attachments
+    list_participants_for_meeting,
+    list_attachments_for_meeting,
+    list_calendars_for_meeting,
+    list_meetings_in_calendar,
+    list_meetings_for_participant,
+    list_meetings,
 )
 
 
 def create_cli():
-    parser = argparse.ArgumentParser(
-        description="CLI for managing meetings, calendars, participants, and attachments."
-    )
-    subparsers = parser.add_subparsers(title="Commands", help="Available commands")
+    """Creates the CLI for managing meetings, participants, calendars, and attachments."""
+    parser = argparse.ArgumentParser(description="Manage volleyball meetings")
 
-    # Meetings
+    subparsers = parser.add_subparsers(title="commands", dest="command")
+
+    # --- Meetings Subcommands ---
     meeting_parser = subparsers.add_parser("meeting", help="Manage meetings")
-    meeting_subparsers = meeting_parser.add_subparsers(title="Meeting Commands")
+    meeting_subparsers = meeting_parser.add_subparsers(
+        title="meeting commands", dest="subcommand"
+    )
 
-    create_meeting_parser = meeting_subparsers.add_parser(
-        "create", help="Create a new meeting"
-    )
-    create_meeting_parser.add_argument(
-        "--id", required=True, help="Title of the meeting"
-    )
-    create_meeting_parser.add_argument(
+    # Add meeting
+    add_meeting_parser = meeting_subparsers.add_parser("add", help="Add a new meeting")
+    add_meeting_parser.add_argument(
         "--title", required=True, help="Title of the meeting"
     )
-    create_meeting_parser.add_argument(
-        "--datetime",
+    add_meeting_parser.add_argument(
+        "--details", required=False, help="Details of the meeting"
+    )
+    add_meeting_parser.add_argument(
+        "--location", required=False, help="Location of the meeting"
+    )
+    add_meeting_parser.add_argument(
+        "--date-time",
         required=True,
         help="Date and time of the meeting (YYYY-MM-DD HH:MM AM/PM)",
     )
-    create_meeting_parser.add_argument(
-        "--location", required=False, help="Location of the meeting"
-    )
-    create_meeting_parser.add_argument(
-        "--details", required=False, help="Details of the meeting"
-    )
-    create_meeting_parser.set_defaults(func=create_meeting)
 
-    update_meeting_parser = meeting_subparsers.add_parser(
-        "update", help="Update an existing meeting"
+    # List meetings
+    list_meeting_parser = meeting_subparsers.add_parser(
+        "list", help="List all meetings"
     )
-    update_meeting_parser.add_argument("--id", required=True, help="ID of the meeting")
-    update_meeting_parser.add_argument(
-        "--title", required=True, help="New title of the meeting"
-    )
-    update_meeting_parser.add_argument(
-        "--datetime", required=False, help="New date and time of the meeting"
-    )
-    update_meeting_parser.add_argument(
-        "--location", required=False, help="New location of the meeting"
-    )
-    update_meeting_parser.add_argument(
-        "--details", required=False, help="New details of the meeting"
-    )
-    update_meeting_parser.set_defaults(func=update_meeting)
 
+    # Delete meeting
     delete_meeting_parser = meeting_subparsers.add_parser(
-        "delete", help="Delete a meeting"
+        "delete", help="Delete a meeting by ID"
     )
-    delete_meeting_parser.add_argument("--id", required=True, help="ID of the meeting")
-    delete_meeting_parser.set_defaults(func=delete_meeting)
-
-    get_meeting_individual_parser = meeting_subparsers.add_parser(
-        "get", help="Get details of a specific meeting"
-    )
-    get_meeting_individual_parser.add_argument(
-        "--id", required=True, help="ID of the meeting"
-    )
-    get_meeting_individual_parser.set_defaults(func=get_individual_meeting)
-
-    get_all_meetings_parser = meeting_subparsers.add_parser(
-        "get_all", help="Get all meetings"
-    )
-    get_all_meetings_parser.set_defaults(func=get_all_meetings)
-
-    # Calendars
-    calendar_parser = subparsers.add_parser("calendar", help="Manage calendars")
-    calendar_subparsers = calendar_parser.add_subparsers(title="Calendar Commands")
-
-    create_calendar_parser = calendar_subparsers.add_parser(
-        "create", help="Create a new calendar"
+    delete_meeting_parser.add_argument(
+        "--id", required=True, help="ID of the meeting to delete"
     )
 
-    create_calendar_parser.add_argument(
-        "--id", required=False, help="ID of the calendar"
+    # Add participant to meeting
+    add_participant_to_meeting_parser = meeting_subparsers.add_parser(
+        "add-participant", help="Add a participant to a meeting"
+    )
+    add_participant_to_meeting_parser.add_argument(
+        "--meeting-id", required=True, help="ID of the meeting"
+    )
+    add_participant_to_meeting_parser.add_argument(
+        "--participant-id", required=True, help="ID of the participant"
     )
 
-    create_calendar_parser.add_argument(
-        "--title", required=True, help="Title of the calendar"
+    # List participants in a meeting
+    list_meeting_participants_parser = meeting_subparsers.add_parser(
+        "list-participants", help="List participants for a meeting"
     )
-    create_calendar_parser.add_argument(
-        "--details", required=False, help="Details of the calendar"
+    list_meeting_participants_parser.add_argument(
+        "--meeting-id", required=True, help="ID of the meeting"
     )
-    create_calendar_parser.set_defaults(func=create_calendar)
 
-    update_calendar_parser = calendar_subparsers.add_parser(
-        "update", help="Update an existing calendar"
+    # Schedule meeting in calendar
+    schedule_meeting_parser = meeting_subparsers.add_parser(
+        "schedule", help="Schedule a meeting in a calendar"
     )
-    update_calendar_parser.add_argument(
-        "--id", required=True, help="ID of the calendar"
+    schedule_meeting_parser.add_argument(
+        "--meeting-id", required=True, help="ID of the meeting"
     )
-    update_calendar_parser.add_argument(
-        "--title", required=True, help="New title of the calendar"
+    schedule_meeting_parser.add_argument(
+        "--calendar-id", required=True, help="ID of the calendar"
     )
-    update_calendar_parser.add_argument(
-        "--details", required=False, help="New details of the calendar"
-    )
-    update_calendar_parser.set_defaults(func=update_calendar)
 
-    delete_calendar_parser = calendar_subparsers.add_parser(
-        "delete", help="Delete a calendar"
-    )
-    delete_calendar_parser.add_argument(
-        "--id", required=True, help="ID of the calendar"
-    )
-    delete_calendar_parser.set_defaults(func=delete_calendar)
-
-    get_calendar_individual_parser = calendar_subparsers.add_parser(
-        "get", help="Get details of a specific calendar"
-    )
-    get_calendar_individual_parser.add_argument(
-        "--id", required=True, help="ID of the calendar"
-    )
-    get_calendar_individual_parser.set_defaults(func=get_individual_calendar)
-
-    get_all_calendars_parser = calendar_subparsers.add_parser(
-        "get_all", help="Get all calendars"
-    )
-    get_all_calendars_parser.set_defaults(func=get_all_calendars)
-
-    # Participants
+    # --- Participants Subcommands ---
     participant_parser = subparsers.add_parser(
         "participant", help="Manage participants"
     )
     participant_subparsers = participant_parser.add_subparsers(
-        title="Participant Commands"
+        title="participant commands", dest="subcommand"
     )
 
-    create_participant_parser = participant_subparsers.add_parser(
-        "create", help="Create a new participant"
+    # Add participant
+    add_participant_parser = participant_subparsers.add_parser(
+        "add", help="Add a new participant"
     )
-
-    create_participant_parser.add_argument(
-        "--id", required=False, help="ID of the participant"
-    )
-    create_participant_parser.add_argument(
+    add_participant_parser.add_argument(
         "--name", required=True, help="Name of the participant"
     )
-    create_participant_parser.add_argument(
-        "--meeting_id", required=True, help="ID of the meeting"
-    )
-    create_participant_parser.add_argument(
+    add_participant_parser.add_argument(
         "--email", required=True, help="Email of the participant"
     )
-    create_participant_parser.set_defaults(func=create_participant)
 
-    update_participant_parser = participant_subparsers.add_parser(
-        "update", help="Update an existing participant"
+    # List participants
+    list_participants_parser = participant_subparsers.add_parser(
+        "list", help="List all participants"
     )
-    update_participant_parser.add_argument(
-        "--id", required=True, help="ID of the participant"
-    )
-    update_participant_parser.add_argument(
-        "--name", required=True, help="New name of the participant"
-    )
-    update_participant_parser.add_argument(
-        "--email", required=False, help="New email of the participant"
-    )
-    update_participant_parser.add_argument(
-        "--meeting_id", required=False, help="New email of the participant"
-    )
-    update_participant_parser.set_defaults(func=update_participant)
 
+    # Delete participant
     delete_participant_parser = participant_subparsers.add_parser(
-        "delete", help="Delete a participant"
+        "delete", help="Delete a participant by ID"
     )
     delete_participant_parser.add_argument(
-        "--id", required=True, help="ID of the participant"
+        "--id", required=True, help="ID of the participant to delete"
     )
-    delete_participant_parser.set_defaults(func=delete_participant)
 
-    # Get individual and all participants
-    get_participant_individual_parser = participant_subparsers.add_parser(
-        "get", help="Get details of a specific participant"
+    # --- Calendars Subcommands ---
+    calendar_parser = subparsers.add_parser("calendar", help="Manage calendars")
+    calendar_subparsers = calendar_parser.add_subparsers(
+        title="calendar commands", dest="subcommand"
     )
-    get_participant_individual_parser.add_argument(
-        "--id", required=True, help="ID of the participant"
-    )
-    get_participant_individual_parser.set_defaults(func=get_individual_participant)
 
-    get_all_participants_parser = participant_subparsers.add_parser(
-        "get_all", help="Get all participants"
+    # Add calendar
+    add_calendar_parser = calendar_subparsers.add_parser(
+        "add", help="Add a new calendar"
     )
-    get_all_participants_parser.set_defaults(func=get_all_participants)
+    add_calendar_parser.add_argument(
+        "--title", required=True, help="Title of the calendar"
+    )
+    add_calendar_parser.add_argument(
+        "--details", required=False, help="Details of the calendar"
+    )
 
-    # Attachments
+    # List calendars
+    list_calendars_parser = calendar_subparsers.add_parser(
+        "list", help="List all calendars"
+    )
+
+    # Delete calendar
+    delete_calendar_parser = calendar_subparsers.add_parser(
+        "delete", help="Delete a calendar by ID"
+    )
+    delete_calendar_parser.add_argument(
+        "--id", required=True, help="ID of the calendar to delete"
+    )
+
+    # --- Attachments Subcommands ---
     attachment_parser = subparsers.add_parser("attachment", help="Manage attachments")
     attachment_subparsers = attachment_parser.add_subparsers(
-        title="Attachment Commands"
+        title="attachment commands", dest="subcommand"
     )
 
-    create_attachment_parser = attachment_subparsers.add_parser(
-        "create", help="Create a new attachment"
+    # Add attachment
+    add_attachment_parser = attachment_subparsers.add_parser(
+        "add", help="Add an attachment to a meeting"
     )
-    create_attachment_parser.add_argument(
+    add_attachment_parser.add_argument(
+        "--meeting-id", required=True, help="ID of the meeting"
+    )
+    add_attachment_parser.add_argument(
         "--url", required=True, help="URL of the attachment"
     )
-    create_attachment_parser.add_argument(
-        "--meeting_id", required=True, help="ID of the meeting"
-    )
-    create_attachment_parser.set_defaults(func=create_attachment)
 
-    update_attachment_parser = attachment_subparsers.add_parser(
-        "update", help="Update an existing attachment"
+    # List attachments for a meeting
+    list_attachments_parser = attachment_subparsers.add_parser(
+        "list", help="List attachments for a meeting"
     )
-    update_attachment_parser.add_argument(
-        "--id", required=True, help="ID of the attachment"
+    list_attachments_parser.add_argument(
+        "--meeting-id", required=True, help="ID of the meeting"
     )
-    update_attachment_parser.add_argument(
-        "--url", required=False, help="New URL of the attachment"
-    )
-    update_attachment_parser.set_defaults(func=update_attachment)
 
+    # Delete attachment
     delete_attachment_parser = attachment_subparsers.add_parser(
-        "delete", help="Delete an attachment"
+        "delete", help="Delete an attachment by ID"
     )
     delete_attachment_parser.add_argument(
-        "--id", required=True, help="ID of the attachment"
+        "--id", required=True, help="ID of the attachment to delete"
     )
-    delete_attachment_parser.set_defaults(func=delete_attachment)
-
-    # Get individual and all attachments
-    get_attachment_individual_parser = attachment_subparsers.add_parser(
-        "get", help="Get details of a specific attachment"
-    )
-    get_attachment_individual_parser.add_argument(
-        "--id", required=True, help="ID of the attachment"
-    )
-    get_attachment_individual_parser.set_defaults(func=get_individual_attachment)
-
-    get_all_attachments_parser = attachment_subparsers.add_parser(
-        "get_all", help="Get all attachments"
-    )
-    get_all_attachments_parser.set_defaults(func=get_all_attachments)
 
     return parser
 
 
 def main():
+    """Entry point for the CLI."""
+    initialize_database()  # Ensure the database is initialized before any command
+
     parser = create_cli()
     args = parser.parse_args()
 
-    if hasattr(args, "func"):
-        args.func(args)
-    else:
-        parser.print_help()
+    # Handle meetings
+    if args.command == "meeting":
+        if args.subcommand == "add":
+            add_meeting(args.title, args.details, args.location, args.date_time)
+            print(f"Meeting '{args.title}' added.")
+
+        elif args.subcommand == "list":
+            meetings = list_meetings()
+            for meeting in meetings:
+                print(
+                    f"ID: {meeting['meeting_id']}, Title: {meeting['title']}, Date: {meeting['date_time']}"
+                )
+
+        elif args.subcommand == "delete":
+            delete_meeting(args.id)
+            print(f"Meeting with ID {args.id} deleted.")
+
+        elif args.subcommand == "add-participant":
+            # TODO: We need a new function in db.py to handle this
+            print(
+                f"Participant with ID {args.participant_id} added to meeting {args.meeting_id}."
+            )
+
+        elif args.subcommand == "list-participants":
+            participants = list_participants_for_meeting(args.meeting_id)
+            print(f"Participants for meeting {args.meeting_id}: {participants}")
+
+        elif args.subcommand == "schedule":
+            # TODO: We need a new function in db.py to handle this
+            print(
+                f"Meeting {args.meeting_id} scheduled in calendar {args.calendar_id}."
+            )
+
+    # Handle participants
+    elif args.command == "participant":
+        if args.subcommand == "add":
+            add_participant(args.name, args.email)
+            print(f"Participant '{args.name}' added.")
+
+        elif args.subcommand == "list":
+            # TODO: We need a function in db.py to list all participants
+            pass
+
+        elif args.subcommand == "delete":
+            delete_participant(args.id)
+            print(f"Participant with ID {args.id} deleted.")
+
+    # Handle calendars
+    elif args.command == "calendar":
+        if args.subcommand == "add":
+            add_calendar(args.title, args.details)
+            print(f"Calendar '{args.title}' added.")
+
+        elif args.subcommand == "list":
+            # TODO: We need a function in db.py to list all calendars
+            pass
+
+        elif args.subcommand == "delete":
+            delete_calendar(args.id)
+            print(f"Calendar with ID {args.id} deleted.")
+
+    # Handle attachments
+    elif args.command == "attachment":
+        if args.subcommand == "add":
+            add_attachment(args.meeting_id, args.url)
+            print(f"Attachment '{args.url}' added to meeting {args.meeting_id}.")
+
+        elif args.subcommand == "list":
+            attachments = list_attachments_for_meeting(args.meeting_id)
+            print(f"Attachments for meeting {args.meeting_id}: {attachments}")
+
+        elif args.subcommand == "delete":
+            delete_attachment(args.id)
+            print(f"Attachment with ID {args.id} deleted.")
 
 
 if __name__ == "__main__":
