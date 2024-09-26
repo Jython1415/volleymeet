@@ -124,6 +124,39 @@ def add_meeting(title, details, location, date_time, meeting_id=None):
         conn.commit()
 
 
+def update_meeting(meeting_id, title=None, details=None, location=None, date_time=None):
+    """Updates an existing meeting."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        # Construct the dynamic SQL query based on the provided fields
+        updates = []
+        parameters = []
+
+        if title:
+            updates.append("title = ?")
+            parameters.append(title)
+
+        if details:
+            updates.append("details = ?")
+            parameters.append(details)
+
+        if location:
+            updates.append("location = ?")
+            parameters.append(location)
+
+        if date_time:
+            updates.append("date_time = ?")
+            parameters.append(date_time)
+
+        if updates:
+            # Only execute if there are fields to update
+            query = f"UPDATE meetings SET {', '.join(updates)} WHERE meeting_id = ?"
+            parameters.append(meeting_id)
+            cursor.execute(query, parameters)
+            conn.commit()
+
+
 def delete_meeting(meeting_id):
     """Deletes a meeting and its associated records (attachments, participating_in, scheduled_in)."""
     with get_connection() as conn:
@@ -174,6 +207,33 @@ def add_participant(name, email, participant_id=None):
         conn.commit()
 
 
+def update_participant(participant_id, name=None, email=None):
+    """Updates an existing participant."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        updates = []
+        parameters = []
+
+        if name:
+            updates.append("name = ?")
+            parameters.append(name)
+
+        if email:
+            if not is_valid_email(email):
+                raise ValueError("Invalid email address")
+            updates.append("email = ?")
+            parameters.append(email)
+
+        if updates:
+            query = (
+                f"UPDATE participants SET {', '.join(updates)} WHERE participant_id = ?"
+            )
+            parameters.append(participant_id)
+            cursor.execute(query, parameters)
+            conn.commit()
+
+
 def delete_participant(participant_id):
     """Deletes a participant and their related records."""
     with get_connection() as conn:
@@ -212,6 +272,29 @@ def add_calendar(title, details, calendar_id=None):
         conn.commit()
 
 
+def update_calendar(calendar_id, title=None, details=None):
+    """Updates an existing calendar."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        updates = []
+        parameters = []
+
+        if title:
+            updates.append("title = ?")
+            parameters.append(title)
+
+        if details:
+            updates.append("details = ?")
+            parameters.append(details)
+
+        if updates:
+            query = f"UPDATE calendars SET {', '.join(updates)} WHERE calendar_id = ?"
+            parameters.append(calendar_id)
+            cursor.execute(query, parameters)
+            conn.commit()
+
+
 def delete_calendar(calendar_id):
     """Deletes a calendar and its related records."""
     with get_connection() as conn:
@@ -246,6 +329,31 @@ def add_attachment(meeting_id, url, attachment_id=None):
             (attachment_id, meeting_id, url),
         )
         conn.commit()
+
+
+def update_attachment(attachment_id, url=None, meeting_id=None):
+    """Updates an existing attachment."""
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        updates = []
+        parameters = []
+
+        if url:
+            updates.append("url = ?")
+            parameters.append(url)
+
+        if meeting_id:
+            updates.append("meeting_id = ?")
+            parameters.append(meeting_id)
+
+        if updates:
+            query = (
+                f"UPDATE attachments SET {', '.join(updates)} WHERE attachment_id = ?"
+            )
+            parameters.append(attachment_id)
+            cursor.execute(query, parameters)
+            conn.commit()
 
 
 def delete_attachment(attachment_id):
@@ -371,6 +479,7 @@ def list_all_calendars():
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM calendars")
         return cursor.fetchall()
+
 
 def list_all_meetings():
     """Lists all meetings in the database."""
