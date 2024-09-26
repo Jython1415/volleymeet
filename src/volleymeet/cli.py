@@ -118,6 +118,14 @@ def create_cli():
         "--calendar-id", required=True, help="ID of the calendar"
     )
 
+    # List calendars for a meeting
+    list_calendars_for_meeting_parser = meeting_subparsers.add_parser(
+        "list-calendars", help="List all calendars a meeting is scheduled in"
+    )
+    list_calendars_for_meeting_parser.add_argument(
+        "--meeting-id", required=True, help="ID of the meeting"
+    )
+
     # --- Participants Subcommands ---
     participant_parser = subparsers.add_parser(
         "participant", help="Manage participants"
@@ -154,6 +162,14 @@ def create_cli():
     # List participants
     list_participants_parser = participant_subparsers.add_parser(
         "list", help="List all participants"
+    )
+
+    # List meetings for a participant
+    list_meetings_for_participant_parser = participant_subparsers.add_parser(
+        "list-meetings", help="List all meetings for a participant"
+    )
+    list_meetings_for_participant_parser.add_argument(
+        "--participant-id", required=True, help="ID of the participant"
     )
 
     # Delete participant
@@ -198,6 +214,14 @@ def create_cli():
     # List calendars
     list_calendars_parser = calendar_subparsers.add_parser(
         "list", help="List all calendars"
+    )
+
+    # List meetings in a calendar
+    list_meetings_in_calendar_parser = calendar_subparsers.add_parser(
+        "list-meetings", help="List all meetings in a calendar"
+    )
+    list_meetings_in_calendar_parser.add_argument(
+        "--calendar-id", required=True, help="ID of the calendar"
     )
 
     # Delete calendar
@@ -304,6 +328,10 @@ def main():
                 f"Meeting {args.meeting_id} scheduled in calendar {args.calendar_id}."
             )
 
+        elif args.subcommand == "list-calendars":
+            calendars = list_calendars_for_meeting(args.meeting_id)
+            print(f"Calendars for meeting {args.meeting_id}: {calendars}")
+
     # Handle participants
     elif args.command == "participant":
         if args.subcommand == "add":
@@ -320,6 +348,10 @@ def main():
                 print(
                     f"ID: {participant['participant_id']}, Name: {participant['name']}, Email: {participant['email']}"
                 )
+
+        elif args.subcommand == "list-meetings":
+            meetings = list_meetings_for_participant(args.participant_id)
+            print(f"Meetings for participant {args.participant_id}: {meetings}")
 
         elif args.subcommand == "delete":
             delete_participant(args.id)
@@ -341,6 +373,10 @@ def main():
                 print(
                     f"ID: {calendar['calendar_id']}, Title: {calendar['title']}, Details: {calendar['details']}"
                 )
+
+        elif args.subcommand == "list-meetings":
+            meetings = list_meetings_in_calendar(args.calendar_id)
+            print(f"Meetings in calendar {args.calendar_id}: {meetings}")
 
         elif args.subcommand == "delete":
             delete_calendar(args.id)
