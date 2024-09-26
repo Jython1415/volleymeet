@@ -2,12 +2,16 @@ import argparse
 from volleymeet.db import (
     initialize_database,
     add_meeting,
+    update_meeting,
     delete_meeting,
     add_participant,
+    update_participant,
     delete_participant,
     add_calendar,
+    update_calendar,
     delete_calendar,
     add_attachment,
+    update_attachment,
     delete_attachment,
     list_participants_for_meeting,
     list_attachments_for_meeting,
@@ -49,6 +53,26 @@ def create_cli():
         "--date-time",
         required=True,
         help="Date and time of the meeting (YYYY-MM-DD HH:MM AM/PM)",
+    )
+
+    # Update meeting
+    update_meeting_parser = meeting_subparsers.add_parser(
+        "update", help="Update an existing meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--id", required=True, help="ID of the meeting to update"
+    )
+    update_meeting_parser.add_argument(
+        "--title", required=False, help="New title of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--details", required=False, help="New details of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--location", required=False, help="New location of the meeting"
+    )
+    update_meeting_parser.add_argument(
+        "--date-time", required=False, help="New date and time of the meeting"
     )
 
     # List meetings
@@ -113,6 +137,20 @@ def create_cli():
         "--email", required=True, help="Email of the participant"
     )
 
+    # Update participant
+    update_participant_parser = participant_subparsers.add_parser(
+        "update", help="Update an existing participant"
+    )
+    update_participant_parser.add_argument(
+        "--id", required=True, help="ID of the participant to update"
+    )
+    update_participant_parser.add_argument(
+        "--name", required=False, help="New name of the participant"
+    )
+    update_participant_parser.add_argument(
+        "--email", required=False, help="New email of the participant"
+    )
+
     # List participants
     list_participants_parser = participant_subparsers.add_parser(
         "list", help="List all participants"
@@ -141,6 +179,20 @@ def create_cli():
     )
     add_calendar_parser.add_argument(
         "--details", required=False, help="Details of the calendar"
+    )
+
+    # Update calendar
+    update_calendar_parser = calendar_subparsers.add_parser(
+        "update", help="Update an existing calendar"
+    )
+    update_calendar_parser.add_argument(
+        "--id", required=True, help="ID of the calendar to update"
+    )
+    update_calendar_parser.add_argument(
+        "--title", required=False, help="New title of the calendar"
+    )
+    update_calendar_parser.add_argument(
+        "--details", required=False, help="New details of the calendar"
     )
 
     # List calendars
@@ -173,6 +225,20 @@ def create_cli():
         "--url", required=True, help="URL of the attachment"
     )
 
+    # Update attachment
+    update_attachment_parser = attachment_subparsers.add_parser(
+        "update", help="Update an existing attachment"
+    )
+    update_attachment_parser.add_argument(
+        "--id", required=True, help="ID of the attachment to update"
+    )
+    update_attachment_parser.add_argument(
+        "--url", required=False, help="New URL of the attachment"
+    )
+    update_attachment_parser.add_argument(
+        "--meeting-id", required=False, help="New meeting ID for the attachment"
+    )
+
     # List attachments for a meeting
     list_attachments_parser = attachment_subparsers.add_parser(
         "list", help="List attachments for a meeting"
@@ -194,7 +260,7 @@ def create_cli():
 
 def main():
     """Entry point for the CLI."""
-    initialize_database() # This is to create the database if it doesn't exist
+    initialize_database()  # This is to create the database if it doesn't exist
 
     parser = create_cli()  # Loads in the parser defined above
     args = parser.parse_args()
@@ -204,6 +270,12 @@ def main():
         if args.subcommand == "add":
             add_meeting(args.title, args.details, args.location, args.date_time)
             print(f"Meeting '{args.title}' added.")
+
+        elif args.subcommand == "update":
+            update_meeting(
+                args.id, args.title, args.details, args.location, args.date_time
+            )
+            print(f"Meeting with ID {args.id} updated.")
 
         elif args.subcommand == "list":
             meetings = list_all_meetings()
@@ -238,6 +310,10 @@ def main():
             add_participant(args.name, args.email)
             print(f"Participant '{args.name}' added.")
 
+        elif args.subcommand == "update":
+            update_participant(args.id, args.name, args.email)
+            print(f"Participant with ID {args.id} updated.")
+
         elif args.subcommand == "list":
             participants = list_all_participants()
             for participant in participants:
@@ -255,6 +331,10 @@ def main():
             add_calendar(args.title, args.details)
             print(f"Calendar '{args.title}' added.")
 
+        elif args.subcommand == "update":
+            update_calendar(args.id, args.title, args.details)
+            print(f"Calendar with ID {args.id} updated.")
+
         elif args.subcommand == "list":
             calendars = list_all_calendars()
             for calendar in calendars:
@@ -271,6 +351,10 @@ def main():
         if args.subcommand == "add":
             add_attachment(args.meeting_id, args.url)
             print(f"Attachment '{args.url}' added to meeting {args.meeting_id}.")
+
+        elif args.subcommand == "update":
+            update_attachment(args.id, args.url, args.meeting_id)
+            print(f"Attachment with ID {args.id} updated.")
 
         elif args.subcommand == "list":
             attachments = list_attachments_for_meeting(args.meeting_id)
