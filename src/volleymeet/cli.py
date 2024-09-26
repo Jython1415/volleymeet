@@ -194,9 +194,9 @@ def create_cli():
 
 def main():
     """Entry point for the CLI."""
-    initialize_database()  # Ensure the database is initialized before any command
+    initialize_database() # This is to create the database if it doesn't exist
 
-    parser = create_cli()
+    parser = create_cli()  # Loads in the parser defined above
     args = parser.parse_args()
 
     # Handle meetings
