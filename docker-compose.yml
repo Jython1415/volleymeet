@@ -1,0 +1,44 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    volumes:
+      - ./certs:/app/certs # SSL certificates
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: placeholderdb
+      MYSQL_USER: placeholderuser
+      MYSQL_PASSWORD: placeholderpassword
+    networks:
+      - internal
+
+  db:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: placeholderrootpassword
+      MYSQL_DATABASE: placeholderdb
+      MYSQL_USER: placeholderuser
+      MYSQL_PASSWORD: placeholderpassword
+    volumes:
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql # Seed data
+      - ./certs:/etc/mysql/certs # SSL certificates for MySQL
+    command: --ssl-ca=/etc/mysql/certs/ca-cert.pem --ssl-cert=/etc/mysql/certs/server-cert.pem --ssl-key=/etc/mysql/certs/server-key.pem
+    networks:
+      - internal
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+      - external
+
+networks:
+  internal:
+    driver: bridge
+  external:
+    driver: bridge
