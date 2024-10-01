@@ -5,8 +5,8 @@ services:
       - "5000:5000"
     depends_on:
       - db
-    volumes:
-      - ./certs:/app/certs # SSL certificates
+    # volumes:
+      # - ./certs:/app/certs # SSL certificates
     environment:
       MYSQL_HOST: db
       MYSQL_DATABASE: placeholderdb
@@ -24,8 +24,8 @@ services:
       MYSQL_PASSWORD: placeholderpassword
     volumes:
       - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql # Seed data
-      - ./certs:/etc/mysql/certs # SSL certificates for MySQL
-    command: --ssl-ca=/etc/mysql/certs/ca-cert.pem --ssl-cert=/etc/mysql/certs/server-cert.pem --ssl-key=/etc/mysql/certs/server-key.pem
+      # - ./certs:/etc/mysql/certs # SSL certificates for MySQL
+    # command: --ssl-ca=/etc/mysql/certs/ca-cert.pem --ssl-cert=/etc/mysql/certs/server-cert.pem --ssl-key=/etc/mysql/certs/server-key.pem
     networks:
       - internal
 
