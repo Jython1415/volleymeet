@@ -1,18 +1,21 @@
 import { useState } from 'react'
 import Calendar from'react-calendar'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import TimePicker from 'react-time-picker'
 import './App.css'
 import './Calendar.css'
+import 'react-time-picker/dist/TimePicker.css'
+import 'react-clock/dist/Clock.css'
 
 const App = () => {
-  const [value, setValue] = useState(new Date());
+  const [calValue, setCalValue] = useState(new Date());
+  const [timeValue, onChangeTime] = useState('10:00');
 
   return (
     <div>
       <h1>Select Meeting Date</h1>
-      <Calendar onChange={setValue} value={value} />
-      <h2>Selected date: {value.toDateString()}</h2>
+      <Calendar onChange={setCalValue} value={calValue} />
+      <h2>Selected date: {calValue.toDateString()}</h2>
+      <TimePicker onChange={onChangeTime} value={timeValue}/>
     </div>
   );
 };
