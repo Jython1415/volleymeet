@@ -1,7 +1,5 @@
-.DS_Store
+.*
 .venv
-__pycache__
 .vscode
-dist
-set_env_variables.sh
-data
+!.gitignore
+!.git/*
