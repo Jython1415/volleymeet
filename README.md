@@ -1,16 +1,22 @@
 # Volleyball Meeting Scheduler
 
-*Description goes here.*
+This project is a web application that allows a user to manage meetings from a web interface. The backend and persistence layers are hosted on separate servers, and the frontend is intended to be loaded on a separate device.
 
 ## Table of Contents
 
-*Table of contents goes here.*
+- [1 User Instructions](#1-user-instructions)
+- [2 Developer Instructions](#2-developer-instructions)
+- [3 License](#3-license)
 
 ---
 
-## 1 Frontend
+## 1 User Instructions
 
-### 1.1 How to run Frontend
+## 2 Developer Instructions
+
+### 2.1 Frontend
+
+#### 2.1.1 How to run Frontend
 
 - *Change directory to frontend*
 - *Run 'npm install'*
