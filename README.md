@@ -14,6 +14,7 @@
 
 - *Change directory to frontend*
 - *Run 'npm install'*
+- *Run 'npm install react-big-calendar moment'*
 - *Run 'npm run dev'*
 
 ## 3 License
