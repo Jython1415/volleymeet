@@ -4,7 +4,6 @@ import TimePicker from 'react-time-picker'
 import './App.css'
 import './Calendar.css'
 import 'react-time-picker/dist/TimePicker.css'
-import 'react-clock/dist/Clock.css'
 
 const App = () => {
   const [calValue, setCalValue] = useState(new Date());
@@ -13,9 +12,13 @@ const App = () => {
   return (
     <div>
       <h1>Select Meeting Date</h1>
-      <Calendar onChange={setCalValue} value={calValue} />
+      <div className='calendar-container'>
+        <Calendar onChange={setCalValue} value={calValue} />
+      </div>
       <h2>Selected date: {calValue.toDateString()}</h2>
-      <TimePicker onChange={onChangeTime} value={timeValue}/>
+      <div className='time-picker-container'>
+        <TimePicker onChange={onChangeTime} value={timeValue}/>
+      </div>
     </div>
   );
 };
