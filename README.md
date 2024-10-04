@@ -45,6 +45,10 @@ Stop the services (when done testing):
 docker-compose down
 ```
 
+### 2.2 Environment Variables
+
+Copy the `.env` file from Google Drive to the root of the project directory. This file contains the environment variables needed to run the backend and persistence layers.
+
 ## 3 License
 
 This project is licensed under the MIT License. See the LICENSE file for details.
