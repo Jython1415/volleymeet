@@ -1,3 +1,11 @@
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  margin: 0;
+}
+
 .react-calendar {
     width: 350px;
     max-width: 100%;
@@ -14,12 +22,12 @@
   
   .react-calendar--doubleView .react-calendar__viewContainer {
     display: flex;
-    margin: -0.5em;
+    /*margin: -0.5em;*/
   }
   
   .react-calendar--doubleView .react-calendar__viewContainer > * {
     width: 50%;
-    margin: 0.5em;
+    /*margin: 0.5em;*/
   }
   
   .react-calendar,
