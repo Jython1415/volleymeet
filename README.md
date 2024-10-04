@@ -8,11 +8,13 @@
 
 ---
 
-## 1 Heading 1
+## 1 Frontend
 
-### 1.1 Subheading
+### 1.1 How to run Frontend
 
-- *list thingy*
+- *Change directory to frontend*
+- *Run 'npm install'*
+- *Run 'npm run dev'*
 
 ## 3 License
 
