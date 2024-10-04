@@ -1,40 +1,49 @@
-import { useState } from 'react'
-/*import Calendar from'react-calendar'*/
-import { Calendar, momentLocalizer } from 'react-big-calendar'
+import React, { useState, useCallback, useMemo } from 'react'
+import { Calendar, momentLocalizer, Views } from 'react-big-calendar'
 import moment from 'moment'
-/*import './App.css'
-import './Calendar.css'
-import 'react-big-calendar/lib/css/react-big-calendar.css'*/
 import 'react-big-calendar/lib/sass/styles.scss'; 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
-
-const myEventsList = [
-  {
-    title: 'Meeting',
-    start: new Date(2024, 9, 7, 10, 0), // Example event start date/time
-    end: new Date(2024, 9, 7, 12, 0),   // Example event end date/time
-  },
-  {
-    title: 'Conference',
-    start: new Date(2024, 9, 8, 11, 0),
-    end: new Date(2024, 9, 8, 14, 0),
-  },
-];
+import { data } from './Data';
 
 const localizer = momentLocalizer(moment);
 
 const App = () => {
+
+  const [myEvents, setEvents] = useState(data)
+
+  const handleSelectSlot = useCallback(({ start, end }) => {
+    const title = window.prompt('New Event name')
+    if (title) {
+      setEvents(prev => [...prev, { start, end, title }])
+    }
+  })
+
+  const handleSelectEvent = useCallback(event => {
+    window.alert(event.title, start, end)
+  })
+
+  const { defaultDate, scrollToTime } = useMemo(
+    () => ({
+      defaultDate: new Date(),
+      scrollToTime: new Date(1970, 1, 1, 6),
+    }),
+    []
+  )
 
   return (
     <div>
       <h1>Select Meeting Date</h1>
       <div className='calendar-container'>
         <Calendar
+          selectable
           localizer={localizer}
-          events={myEventsList}
+          events={myEvents}
           startAccessor="start"
           endAccessor="end"
           style={{ height: 500 }}
+          onSelectEvent={handleSelectEvent}
+          onSelectSlot={handleSelectSlot}
+          scrollToTime={scrollToTime}
         />
       </div>
     </div>
