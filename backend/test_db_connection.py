@@ -15,7 +15,6 @@ def create_connection():
         print("Connection to MySQL DB successful")
     except Error as e:
         print(f"The error '{e}' occurred")
-
     return connection
 
 
@@ -51,3 +50,27 @@ def execute_read_query(query):
     finally:
         cursor.close()
         connection.close()
+
+
+# Function to test the connection and query sample data
+def test_connection_and_query():
+    connection = create_connection()
+    if connection:
+        print("Testing connection...")
+        try:
+            # Query to select all meetings
+            select_meetings_query = "SELECT * FROM meetings;"
+            meetings = execute_read_query(select_meetings_query)
+            if meetings:
+                for meeting in meetings:
+                    print(meeting)
+            else:
+                print("No meetings found.")
+        except Error as e:
+            print(f"The error '{e}' occurred")
+        finally:
+            connection.close()
+
+
+if __name__ == "__main__":
+    test_connection_and_query()
