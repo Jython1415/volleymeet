@@ -49,48 +49,52 @@ CREATE TABLE IF NOT EXISTS scheduled_in (
 
 -- Creating Triggers for Auto-generating UUIDs
 -- Trigger for Meetings table
-DELIMITER $ $ CREATE TRIGGER before_insert_meeting BEFORE
-INSERT
-    ON meetings FOR EACH ROW BEGIN IF NEW.meeting_id IS NULL THEN
-SET
-    NEW.meeting_id = UUID();
-
-END IF;
-
-END $ $ DELIMITER;
+DELIMITER $$
+CREATE TRIGGER before_insert_meeting 
+BEFORE INSERT ON meetings 
+FOR EACH ROW 
+BEGIN 
+    IF NEW.meeting_id IS NULL THEN
+        SET NEW.meeting_id = UUID();
+    END IF;
+END$$
+DELIMITER ;
 
 -- Trigger for Participants table
-DELIMITER $ $ CREATE TRIGGER before_insert_participant BEFORE
-INSERT
-    ON participants FOR EACH ROW BEGIN IF NEW.participant_id IS NULL THEN
-SET
-    NEW.participant_id = UUID();
-
-END IF;
-
-END $ $ DELIMITER;
+DELIMITER $$
+CREATE TRIGGER before_insert_participant 
+BEFORE INSERT ON participants 
+FOR EACH ROW 
+BEGIN 
+    IF NEW.participant_id IS NULL THEN
+        SET NEW.participant_id = UUID();
+    END IF;
+END$$
+DELIMITER ;
 
 -- Trigger for Calendars table
-DELIMITER $ $ CREATE TRIGGER before_insert_calendar BEFORE
-INSERT
-    ON calendars FOR EACH ROW BEGIN IF NEW.calendar_id IS NULL THEN
-SET
-    NEW.calendar_id = UUID();
-
-END IF;
-
-END $ $ DELIMITER;
+DELIMITER $$
+CREATE TRIGGER before_insert_calendar 
+BEFORE INSERT ON calendars 
+FOR EACH ROW 
+BEGIN 
+    IF NEW.calendar_id IS NULL THEN
+        SET NEW.calendar_id = UUID();
+    END IF;
+END$$
+DELIMITER ;
 
 -- Trigger for Attachments table
-DELIMITER $ $ CREATE TRIGGER before_insert_attachment BEFORE
-INSERT
-    ON attachments FOR EACH ROW BEGIN IF NEW.attachment_id IS NULL THEN
-SET
-    NEW.attachment_id = UUID();
-
-END IF;
-
-END $ $ DELIMITER;
+DELIMITER $$
+CREATE TRIGGER before_insert_attachment 
+BEFORE INSERT ON attachments 
+FOR EACH ROW 
+BEGIN 
+    IF NEW.attachment_id IS NULL THEN
+        SET NEW.attachment_id = UUID();
+    END IF;
+END$$
+DELIMITER ;
 
 -- Inserting Seed Data for Testing
 -- Insert into Meetings
