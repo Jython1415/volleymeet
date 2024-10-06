@@ -9,19 +9,21 @@ services:
       # - ./certs:/app/certs # SSL certificates
     environment:
       MYSQL_HOST: db
-      MYSQL_DATABASE: placeholderdb
-      MYSQL_USER: placeholderuser
-      MYSQL_PASSWORD: placeholderpassword
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     networks:
       - internal
 
   db:
     image: mysql:latest
     environment:
-      MYSQL_ROOT_PASSWORD: placeholderrootpassword
-      MYSQL_DATABASE: placeholderdb
-      MYSQL_USER: placeholderuser
-      MYSQL_PASSWORD: placeholderpassword
+      MYSQL_HOST: db
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
     volumes:
       - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql # Seed data
       # - ./certs:/etc/mysql/certs # SSL certificates for MySQL
