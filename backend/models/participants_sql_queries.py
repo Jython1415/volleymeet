@@ -97,10 +97,25 @@ def get_participant_by_id(participant_id):
 
 # Delete a participant by their ID
 def delete_participant(participant_id):
+    # Delete the participant
     query = "DELETE FROM participants WHERE participant_id = %s"
     data = (participant_id,)
 
     try:
         execute_query(query, data)
+        # Clean up orphaned meetings
+        cleanup_orphaned_meetings_by_participants()
     except Exception as e:
         raise ValueError(f"Error deleting participant: {str(e)}")
+
+
+def cleanup_orphaned_meetings_by_participants():
+    # Find meetings that have no participants left
+    query = """
+    DELETE FROM meetings
+    WHERE meeting_id NOT IN (SELECT DISTINCT meeting_id FROM participating_in)
+    """
+    try:
+        execute_query(query)
+    except Exception as e:
+        raise ValueError(f"Error cleaning up orphaned meetings: {str(e)}")
