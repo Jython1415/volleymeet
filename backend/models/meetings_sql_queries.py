@@ -1,7 +1,7 @@
 import json
 from datetime import datetime
-from managedb import execute_query, execute_read_query
-from global_functions_sql import generate_uuid, is_valid_date
+from scripts.managedb import execute_query, execute_read_query
+from models.global_functions_sql import generate_uuid, is_valid_date
 
 
 # Helper function to format dates in ISO format
