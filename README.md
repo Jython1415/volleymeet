@@ -18,10 +18,13 @@ This project is a web application that allows a user to manage meetings from a w
 
 #### 2.1.1 How to run Frontend
 
-- *Change directory to frontend*
-- *Run 'npm install'*
-- *Run 'npm install react-big-calendar moment'*
-- *Run 'npm run dev'*
+These instructions assume the working directory is set to the `frontend` directory.
+
+```bash
+npm install
+npm install react-big-calendar moment
+npm run dev
+```
 
 ### 2.2 Backend + Persistence
 
