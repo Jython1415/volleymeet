@@ -5,7 +5,9 @@ from models.global_functions_sql import generate_uuid, is_valid_email
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 
 # Create a participant, including participant_id in the insert query
