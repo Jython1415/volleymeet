@@ -1,6 +1,6 @@
 import json
-from db import execute_query, execute_read_query
-from global_functions_sql import generate_uuid
+from scripts.managedb import execute_query, execute_read_query
+from models.global_functions_sql import generate_uuid
 
 
 # Create an attachment

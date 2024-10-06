@@ -13,6 +13,9 @@ RUN pip install -r requirements.txt
 # Copy application code
 COPY . /app/
 
+# Set the PYTHONPATH environment variable
+ENV PYTHONPATH "${PYTHONPATH}:/app"
+
 # Expose port
 EXPOSE 5000
 

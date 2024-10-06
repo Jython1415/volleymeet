@@ -1,6 +1,6 @@
 import requests
 import json
-from global_functions_sql import generate_uuid
+from models.global_functions_sql import generate_uuid
 
 BACKEND_BASE_URL = "http://localhost:5001/meetings"
 
