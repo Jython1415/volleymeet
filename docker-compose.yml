@@ -31,13 +31,15 @@ services:
     networks:
       - internal
 
-  # frontend:
-  #   build: ./frontend
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - internal
-  #     - external
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - internal
+      - external
+    environment:
+      NODE_ENV: development
 
 networks:
   internal:
