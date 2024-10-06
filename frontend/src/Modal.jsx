@@ -1,10 +1,16 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 const Modal = ({ isOpen, onClose, title: initialTitle, start: initialStart, end: initialEnd, onSave }) => {
   const [title, setTitle] = useState(initialTitle || '');
   const [start, setStart] = useState(initialStart || new Date())
   const [end, setEnd] = useState(initialEnd || new Date())
+
+  useEffect(() => {
+    setTitle(initialTitle || '')
+    setStart(initialStart || new Date())
+    setEnd(initialEnd || new Date())
+  }, [initialTitle, initialStart, initialEnd])
 
   const handleTimeChange = (timeString, setter) => {
     const [ hours, minutes] = timeString.split(':')
