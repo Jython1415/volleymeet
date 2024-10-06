@@ -1,7 +1,11 @@
 import json
+import logging
 from scripts.managedb import execute_query, execute_read_query
 from models.global_functions_sql import generate_uuid
 
+# Set up logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 # Create a calendar, including calendar_id in the insert query
 def create_calendar(title, details, calendar_id=None):
@@ -16,7 +20,9 @@ def create_calendar(title, details, calendar_id=None):
     data = (calendar_id, title, details)
     try:
         execute_query(query, data)
+        logger.info(f"Created calendar with ID {calendar_id}")
     except Exception as e:
+        logger.error(f"Error creating calendar: {str(e)}")
         raise ValueError(f"Error creating calendar: {str(e)}")
 
 
@@ -28,6 +34,7 @@ def update_calendar(calendar_id, title=None, details=None):
     current_calendar = execute_read_query(query, data)
 
     if not current_calendar:
+        logger.error(f"Calendar with ID {calendar_id} not found")
         raise ValueError(f"Calendar with ID {calendar_id} not found")
 
     # Get the current values
@@ -48,8 +55,11 @@ def update_calendar(calendar_id, title=None, details=None):
     try:
         affected_rows = execute_query(update_query, update_data)
         if affected_rows == 0:
+            logger.error(f"No calendar found with ID {calendar_id} to update")
             raise ValueError(f"No calendar found with ID: {calendar_id}")
+        logger.info(f"Updated calendar with ID {calendar_id}")
     except Exception as e:
+        logger.error(f"Error updating calendar: {str(e)}")
         raise ValueError(f"Error updating calendar: {str(e)}")
 
 
@@ -59,6 +69,7 @@ def get_all_calendars():
     calendars = execute_read_query(query)
 
     if not calendars:
+        logger.info("No calendars found")
         return {"error": "No calendars found"}
 
     results = [
@@ -70,6 +81,7 @@ def get_all_calendars():
         for calendar in calendars
     ]
 
+    logger.info(f"Retrieved {len(results)} calendars")
     return results
 
 
@@ -80,12 +92,14 @@ def get_calendar_by_id(calendar_id):
     calendar = execute_read_query(query, data)
 
     if calendar:
+        logger.info(f"Retrieved calendar with ID {calendar_id}")
         return {
             "calendar_id": calendar[0][0],
             "title": calendar[0][1],
             "details": calendar[0][2],
         }
     else:
+        logger.error(f"Calendar with ID {calendar_id} not found")
         raise ValueError(f"Calendar with ID {calendar_id} not found")
 
 
@@ -97,9 +111,11 @@ def delete_calendar(calendar_id):
 
     try:
         execute_query(query, data)
+        logger.info(f"Deleted calendar with ID {calendar_id}")
         # Clean up orphaned meetings
         cleanup_orphaned_meetings()
     except Exception as e:
+        logger.error(f"Error deleting calendar: {str(e)}")
         raise ValueError(f"Error deleting calendar: {str(e)}")
 
 
@@ -111,5 +127,7 @@ def cleanup_orphaned_meetings():
     """
     try:
         execute_query(query)
+        logger.info("Cleaned up orphaned meetings")
     except Exception as e:
+        logger.error(f"Error cleaning up orphaned meetings: {str(e)}")
         raise ValueError(f"Error cleaning up orphaned meetings: {str(e)}")

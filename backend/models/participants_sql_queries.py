@@ -1,6 +1,11 @@
 import json
+import logging
 from scripts.managedb import execute_query, execute_read_query
 from models.global_functions_sql import generate_uuid, is_valid_email
+
+# Set up logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 
 # Create a participant, including participant_id in the insert query
@@ -9,6 +14,7 @@ def create_participant(name, email, participant_id=None):
         participant_id = generate_uuid()
 
     if not is_valid_email(email):
+        logger.error(f"Invalid email address: {email}")
         raise ValueError("Invalid email address")
 
     query = """
@@ -18,7 +24,9 @@ def create_participant(name, email, participant_id=None):
     data = (participant_id, name, email)
     try:
         execute_query(query, data)
+        logger.info(f"Created participant with ID {participant_id}")
     except Exception as e:
+        logger.error(f"Error creating participant: {str(e)}")
         raise ValueError(f"Error creating participant: {str(e)}")
 
 
@@ -30,6 +38,7 @@ def update_participant(participant_id, name=None, email=None):
     current_participant = execute_read_query(query, data)
 
     if not current_participant:
+        logger.error(f"Participant with ID {participant_id} not found")
         raise ValueError(f"Participant with ID {participant_id} not found")
 
     # Get the current values
@@ -41,6 +50,7 @@ def update_participant(participant_id, name=None, email=None):
 
     # Validate the new or existing email format
     if not is_valid_email(email):
+        logger.error(f"Invalid email address: {email}")
         raise ValueError("Invalid email address")
 
     # Update the participant with the new or existing values
@@ -53,7 +63,9 @@ def update_participant(participant_id, name=None, email=None):
 
     try:
         execute_query(update_query, update_data)
+        logger.info(f"Updated participant with ID {participant_id}")
     except Exception as e:
+        logger.error(f"Error updating participant: {str(e)}")
         raise ValueError(f"Error updating participant: {str(e)}")
 
 
@@ -63,6 +75,7 @@ def get_all_participants():
     participants = execute_read_query(query)
 
     if not participants:
+        logger.info("No participants found")
         return {"error": "No participants found"}
 
     results = [
@@ -74,6 +87,7 @@ def get_all_participants():
         for participant in participants
     ]
 
+    logger.info(f"Retrieved {len(results)} participants")
     return results
 
 
@@ -84,6 +98,7 @@ def get_participant_by_id(participant_id):
     participant = execute_read_query(query, data)
 
     if participant:
+        logger.info(f"Retrieved participant with ID {participant_id}")
         return (
             {
                 "participant_id": participant[0][0],
@@ -92,6 +107,7 @@ def get_participant_by_id(participant_id):
             },
         )
     else:
+        logger.error(f"Participant with ID {participant_id} not found")
         return {"error": f"Participant with ID {participant_id} not found"}
 
 
@@ -103,9 +119,11 @@ def delete_participant(participant_id):
 
     try:
         execute_query(query, data)
+        logger.info(f"Deleted participant with ID {participant_id}")
         # Clean up orphaned meetings
         cleanup_orphaned_meetings_by_participants()
     except Exception as e:
+        logger.error(f"Error deleting participant: {str(e)}")
         raise ValueError(f"Error deleting participant: {str(e)}")
 
 
@@ -117,5 +135,7 @@ def cleanup_orphaned_meetings_by_participants():
     """
     try:
         execute_query(query)
+        logger.info("Cleaned up orphaned meetings")
     except Exception as e:
+        logger.error(f"Error cleaning up orphaned meetings: {str(e)}")
         raise ValueError(f"Error cleaning up orphaned meetings: {str(e)}")
