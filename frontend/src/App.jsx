@@ -15,29 +15,33 @@ const App = () => {
   const [myEvents, setEvents] = useState(data)
   const [isModalOpen, setModalOpen] = useState(false)
   const [currentEvent, setCurrentEvent] = useState(null)
-  const [slotDetails, setSlotDetails] = useState({})
+  const [slotDetails, setSlotDetails] = useState({ start:null, end:null })
 
   const handleSelectSlot = useCallback(({ start, end }) => {
-    setSlotDetails({ start, end });
-    setModalOpen(true);
+    setSlotDetails({ start, end })
+    setCurrentEvent(null)
+    setModalOpen(true)
   }, []);
 
   const handleSelectEvent = useCallback(event => {
     setCurrentEvent(event);
+    setSlotDetails({ start: event.start, end: event.end})
     setModalOpen(true);
   }, [])
 
   const handleSave = ({title, start, end}) => {
     if (currentEvent) {
       setEvents(prev =>
-        prev.map(evt =>
-          evt === currentEvent ? { ...evt, title, start, end } : evt
+        prev.map(event =>
+          event === currentEvent ? { ...event, title, start, end } : event
         )
       )
     } else {
       setEvents(prev => [...prev, { title, start, end }])
     }
+    setModalOpen(false)
     setCurrentEvent(null)
+    setSlotDetails({ start:null, end:null })
   }
 
   const { defaultDate, scrollToTime } = useMemo(
@@ -55,7 +59,7 @@ const App = () => {
         <Calendar
           selectable
           localizer={localizer}
-          events={myEvents}
+          events={myEvents} /* this is where we're going to import calendar events*/
           startAccessor="start"
           endAccessor="end"
           style={{ height: 500 }}
@@ -69,11 +73,11 @@ const App = () => {
         onClose={() => {
           setModalOpen(false);
           setCurrentEvent(null);
-          setSlotDetails({});
+          setSlotDetails({ start:null, end:null });
         }}
         title={currentEvent ? currentEvent.title : ''} 
-        start={currentEvent ? currentEvent.start : new Date()}
-        end={currentEvent ? currentEvent.end : new Date()}
+        start={slotDetails.start || new Date()}
+        end={slotDetails.end || new Date()}
         onSave={handleSave}
       />
     </div>
