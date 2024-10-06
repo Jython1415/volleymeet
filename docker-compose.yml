@@ -13,7 +13,8 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     networks:
-      - internal
+      - backend-net
+      - db-net
 
   db:
     image: mysql:latest
@@ -29,20 +30,22 @@ services:
       # - ./certs:/etc/mysql/certs # SSL certificates for MySQL
     # command: --ssl-ca=/etc/mysql/certs/ca-cert.pem --ssl-cert=/etc/mysql/certs/server-cert.pem --ssl-key=/etc/mysql/certs/server-key.pem
     networks:
-      - internal
+      - db-net
 
   frontend:
     build: ./frontend
     ports:
       - "3000:3000"
     networks:
-      - internal
-      - external
+      - frontend-net
+      - backend-net
     environment:
       NODE_ENV: development
 
 networks:
-  internal:
+  frontend-net:
     driver: bridge
-  external:
+  backend-net:
+    driver: bridge
+  db-net:
     driver: bridge
