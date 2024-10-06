@@ -40,6 +40,8 @@ const CreateMeetingForm = () => {
                 body: JSON.stringify(meetingData),
             });
 
+            console.log(response.)
+
             if (response.status === 201) {
                 setResponseMessage('Meeting created successfully!');
                 setMeeting({ meeting_id: '', title: '', date_time: '', location: '', details: '' }); // Reset form
