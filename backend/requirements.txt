@@ -1,7 +1,7 @@
 black
 flask
 Flask-Cors
-mysql_connector_repackaged
+mysql-connector-python
 pipreqs
 python_dateutil
 Requests
