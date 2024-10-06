@@ -1,7 +1,12 @@
 import json
+import logging
 from datetime import datetime
 from scripts.managedb import execute_query, execute_read_query
 from models.global_functions_sql import generate_uuid, is_valid_date
+
+# Set up logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
 
 
 # Helper function to format dates in ISO format
@@ -19,6 +24,7 @@ def create_meeting(title, date_time, location, details, meeting_id=None):
 
     # Validate the date format
     if not is_valid_date(date_time):
+        logger.error(f"Invalid date format: {date_time}")
         raise ValueError("Date is not in a valid format")
 
     query = """
@@ -29,7 +35,9 @@ def create_meeting(title, date_time, location, details, meeting_id=None):
 
     try:
         execute_query(query, data)
+        logger.info(f"Created meeting with ID {meeting_id}")
     except Exception as e:
+        logger.error(f"Error creating meeting: {str(e)}")
         raise ValueError(f"Error creating meeting: {str(e)}")
 
 
@@ -43,6 +51,7 @@ def update_meeting(meeting_id, title=None, date_time=None, location=None, detail
     current_meeting = execute_read_query(query, data)
 
     if not current_meeting:
+        logger.error(f"Meeting with ID {meeting_id} not found")
         raise ValueError(f"Meeting with ID {meeting_id} not found")
 
     # Get the current values
@@ -58,6 +67,7 @@ def update_meeting(meeting_id, title=None, date_time=None, location=None, detail
 
     # Validate the new or existing date format
     if not is_valid_date(date_time):
+        logger.error(f"Invalid date format: {date_time}")
         raise ValueError("Date is not in a valid format")
 
     # Update the meeting with the new or existing values
@@ -70,7 +80,9 @@ def update_meeting(meeting_id, title=None, date_time=None, location=None, detail
 
     try:
         execute_query(update_query, update_data)
+        logger.info(f"Updated meeting with ID {meeting_id}")
     except Exception as e:
+        logger.error(f"Error updating meeting: {str(e)}")
         raise ValueError(f"Error updating meeting: {str(e)}")
 
 
@@ -80,6 +92,7 @@ def get_all_meetings():
     meetings = execute_read_query(query)
 
     if not meetings:
+        logger.info("No meetings found")
         return {"error": "No meetings found"}
 
     results = [
@@ -93,6 +106,7 @@ def get_all_meetings():
         for meeting in meetings
     ]
 
+    logger.info(f"Retrieved {len(results)} meetings")
     return results
 
 
@@ -103,6 +117,7 @@ def get_meeting_by_id(meeting_id):
     meeting = execute_read_query(query, data)
 
     if meeting:
+        logger.info(f"Retrieved meeting with ID {meeting_id}")
         return {
             "meeting_id": meeting[0][0],
             "title": meeting[0][1],
@@ -111,6 +126,7 @@ def get_meeting_by_id(meeting_id):
             "details": meeting[0][4],
         }
     else:
+        logger.error(f"Meeting with ID {meeting_id} not found")
         return {"error": f"Meeting with ID {meeting_id} not found"}
 
 
@@ -122,9 +138,11 @@ def delete_meeting(meeting_id):
 
     try:
         execute_query(query, data)
+        logger.info(f"Deleted meeting with ID {meeting_id}")
         # Clean up orphaned participants
         cleanup_orphaned_participants()
     except Exception as e:
+        logger.error(f"Error deleting meeting: {str(e)}")
         raise ValueError(f"Error deleting meeting: {str(e)}")
 
 
@@ -136,5 +154,7 @@ def cleanup_orphaned_participants():
     """
     try:
         execute_query(query)
+        logger.info("Cleaned up orphaned participants")
     except Exception as e:
+        logger.error(f"Error cleaning up orphaned participants: {str(e)}")
         raise ValueError(f"Error cleaning up orphaned participants: {str(e)}")
