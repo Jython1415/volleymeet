@@ -7,53 +7,54 @@ const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your back
 
 function App() {
   const [meetings, setMeetings] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [showList, setShowList] = useState(false);
+  const [showMeetingForm, setShowMeetingForm] = useState(false);
+  const [showMeetingList, setShowMeetingList] = useState(false);
   const [error, setError] = useState('');
 
   const createMeeting = (meeting) => {
     setMeetings([...meetings, meeting]);
-    setShowForm(false);
+    setShowMeetingForm(false);
   };
 
-  const handleCreate = () => setShowForm(true);
+  const handleCreateMeeting = () => setShowMeetingForm(true);
 
   // Function to handle fetching all meetings from the backend
-  const handleDisplay = async () => {
-    setShowForm(false); // Hide form when showing list
+  const handleMeetingDisplay = async () => {
+    setShowMeetingForm(false); // Hide form when showing list
 
     try {
       const response = await fetch(MEETINGS_BACKEND_BASE_URL);
 
       if (response.status === 200) {
         const data = await response.json();
+        console.log(data)
         setMeetings(data); // Set the fetched meetings in the state
-        setShowList(true);
+        setShowMeetingList(true);
       } else if (response.status === 404) {
         setError("No meetings found.");
-        setShowList(false);
+        setShowMeetingList(false);
       } else {
         setError(`Failed to fetch meetings with status code ${response.status}`);
-        setShowList(false);
+        setShowMeetingList(false);
       }
     } catch (err) {
       console.error('Error fetching meetings:', err);
       setError('Error fetching meetings. Please check the backend.');
-      setShowList(false);
+      setShowMeetingList(false);
     }
   };
 
   return (
     <div className="App">
       <ButtonsComponent
-        onCreate={handleCreate}
-        onDisplay={handleDisplay}
+        onCreate={handleCreateMeeting}
+        onDisplay={handleMeetingDisplay}
         onFind={() => { }}
         onDelete={() => { }}
         onEdit={() => { }}
       />
-      {showForm && <CreateMeetingForm onSubmit={createMeeting} />}
-      {showList && <MeetingList meetings={meetings} />}
+      {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
+      {showMeetingList && <MeetingList meetings={meetings} />}
       {error && <p>{error}</p>}
     </div>
   );
