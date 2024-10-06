@@ -3,10 +3,10 @@ import { Calendar, momentLocalizer, Views } from 'react-big-calendar'
 import moment from 'moment'
 import { data } from './Data'
 import Modal from './Modal'
-import { fetchEvents, addEvent, updateEvent, deleteEvent } from './axios'
+import { fetchEvents, addEvent, updateEvent, deleteEvent } from './crudService'
 import './App.css'
-import 'react-big-calendar/lib/sass/styles.scss'; 
-import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
+import 'react-big-calendar/lib/sass/styles.scss'
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss'
 
 
 const localizer = momentLocalizer(moment);
