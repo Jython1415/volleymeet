@@ -27,15 +27,15 @@ const App = () => {
     setModalOpen(true);
   }, [])
 
-  const handleSave = updatedEvent => {
+  const handleSave = ({title, start, end}) => {
     if (currentEvent) {
       setEvents(prev =>
         prev.map(evt =>
-          evt.title === currentEvent.title ? { ...evt, title: updatedEvent.title } : evt
+          evt === currentEvent ? { ...evt, title, start, end } : evt
         )
-      );
+      )
     } else {
-      setEvents(prev => [...prev, { ...slotDetails, title: updatedEvent.title }])
+      setEvents(prev => [...prev, { title, start, end }])
     }
     setCurrentEvent(null)
   }
@@ -71,7 +71,9 @@ const App = () => {
           setCurrentEvent(null);
           setSlotDetails({});
         }}
-        title={currentEvent ? currentEvent.title : ''} // Pass the title for editing
+        title={currentEvent ? currentEvent.title : ''} 
+        start={currentEvent ? currentEvent.start : new Date()}
+        end={currentEvent ? currentEvent.end : new Date()}
         onSave={handleSave}
       />
     </div>
