@@ -5,7 +5,10 @@ from models.global_functions_sql import generate_uuid
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 
 # Create a calendar, including calendar_id in the insert query
 def create_calendar(title, details, calendar_id=None):

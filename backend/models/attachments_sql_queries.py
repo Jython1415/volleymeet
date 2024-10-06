@@ -5,7 +5,9 @@ from models.global_functions_sql import generate_uuid
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 
 # Create an attachment
@@ -22,7 +24,9 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
 
     try:
         execute_query(query, data)
-        logger.info(f"Created attachment with ID {attachment_id} for meeting {meeting_id}")
+        logger.info(
+            f"Created attachment with ID {attachment_id} for meeting {meeting_id}"
+        )
     except Exception as e:
         logger.error(f"Error creating attachment: {str(e)}")
         raise ValueError(f"Error creating attachment: {str(e)}")
