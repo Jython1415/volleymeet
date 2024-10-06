@@ -14,7 +14,11 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
     VALUES (%s, %s, %s)
     """
     data = (attachment_id, meeting_id, attachment_url)
-    execute_query(query, data)
+
+    try:
+        execute_query(query, data)
+    except Exception as e:
+        raise ValueError(f"Error creating attachment: {str(e)}")
 
 
 # Update an attachment by its ID
@@ -25,7 +29,13 @@ def update_attachment(attachment_id, meeting_id, attachment_url):
     WHERE attachment_id = %s
     """
     data = (meeting_id, attachment_url, attachment_id)
-    execute_query(query, data)
+
+    try:
+        affected_rows = execute_query(query, data)
+        if affected_rows == 0:
+            raise ValueError(f"No attachment found with ID: {attachment_id}")
+    except Exception as e:
+        raise ValueError(f"Error updating attachment: {str(e)}")
 
 
 # Get all attachments and return as formatted JSON
@@ -33,17 +43,19 @@ def get_all_attachments():
     query = "SELECT * FROM attachments"
     attachments = execute_read_query(query)
 
-    results = []
-    for attachment in attachments:
-        results.append(
-            {
-                "attachment_id": attachment[0],
-                "meeting_id": attachment[1],
-                "attachment_url": attachment[2],
-            }
-        )
+    if not attachments:
+        return {"error": "No attachments found"}
 
-    return json.dumps(results, indent=4)  # Return the JSON string
+    results = [
+        {
+            "attachment_id": attachment[0],
+            "meeting_id": attachment[1],
+            "attachment_url": attachment[2],
+        }
+        for attachment in attachments
+    ]
+
+    return results
 
 
 # Get an attachment by its ID and return as formatted JSON
@@ -53,22 +65,23 @@ def get_attachment_by_id(attachment_id):
     attachment = execute_read_query(query, data)
 
     if attachment:
-        return json.dumps(
-            {
-                "attachment_id": attachment[0][0],
-                "meeting_id": attachment[0][1],
-                "attachment_url": attachment[0][2],
-            },
-            indent=4,
-        )
+        return {
+            "attachment_id": attachment[0][0],
+            "meeting_id": attachment[0][1],
+            "attachment_url": attachment[0][2],
+        }
     else:
-        return json.dumps(
-            {"error": "Attachment not found"}, indent=4
-        )  # Return error message in JSON
+        raise ValueError(f"Attachment with ID {attachment_id} not found")
 
 
 # Delete an attachment by its ID
 def delete_attachment(attachment_id):
     query = "DELETE FROM attachments WHERE attachment_id = %s"
     data = (attachment_id,)
-    execute_query(query, data)
+
+    try:
+        affected_rows = execute_query(query, data)
+        if affected_rows == 0:
+            raise ValueError(f"No attachment found with ID: {attachment_id}")
+    except Exception as e:
+        raise ValueError(f"Error deleting attachment: {str(e)}")
