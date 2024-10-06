@@ -1,10 +1,13 @@
 from flask import Flask
+from flask_cors import CORS 
 from api_routes.meeting_routes import meeting_routes
 from api_routes.participant_routes import participant_routes
 from api_routes.calendar_routes import calendar_routes
 from api_routes.attachment_routes import attachment_routes
 
 app = Flask(__name__)
+
+CORS(app)
 
 # Register blueprints
 app.register_blueprint(meeting_routes)
