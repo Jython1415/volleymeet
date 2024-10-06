@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar'
 import moment from 'moment'
-import { data } from './Data';
-import Modal from './Modal';
+import { data } from './Data'
+import Modal from './Modal'
+import { fetchEvents, addEvent, updateEvent, deleteEvent } from './axios'
 import './App.css'
 import 'react-big-calendar/lib/sass/styles.scss'; 
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
@@ -16,6 +17,11 @@ const App = () => {
   const [isModalOpen, setModalOpen] = useState(false)
   const [currentEvent, setCurrentEvent] = useState(null)
   const [slotDetails, setSlotDetails] = useState({ start:null, end:null })
+
+  // fetches events from the persistence layer
+  useEffect(() => {
+    fetchEvents().then(response => setEvents(response.data));
+  }, []);
 
   const handleSelectSlot = useCallback(({ start, end }) => {
     setSlotDetails({ start, end })
@@ -31,13 +37,13 @@ const App = () => {
 
   const handleSave = ({title, start, end}) => {
     if (currentEvent) {
-      setEvents(prev =>
-        prev.map(event =>
-          event === currentEvent ? { ...event, title, start, end } : event
-        )
-      )
+      updateEvent(currentEvent.id, newEvent).then(() => {
+        setEvents(prev => prev.map(event => (event.id === currentEvent.id ? newEvent : event)))
+      })
     } else {
-      setEvents(prev => [...prev, { title, start, end }])
+      addEvent(newEvent).then(response => {
+        setEvents(prev => [...prev, response.data]);
+      })
     }
     setModalOpen(false)
     setCurrentEvent(null)
