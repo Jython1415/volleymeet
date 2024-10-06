@@ -21,15 +21,32 @@ def create_calendar(title, details, calendar_id=None):
 
 
 # Update a calendar by its ID
-def update_calendar(calendar_id, title, details):
-    query = """
+def update_calendar(calendar_id, title=None, details=None):
+    # Fetch the current calendar data
+    query = "SELECT title, details FROM calendars WHERE calendar_id = %s"
+    data = (calendar_id,)
+    current_calendar = execute_read_query(query, data)
+
+    if not current_calendar:
+        raise ValueError(f"Calendar with ID {calendar_id} not found")
+
+    # Get the current values
+    current_title, current_details = current_calendar[0]
+
+    # Use the current value if the new value is None
+    title = title if title is not None else current_title
+    details = details if details is not None else current_details
+
+    # Update the calendar with the new or existing values
+    update_query = """
     UPDATE calendars 
     SET title = %s, details = %s
     WHERE calendar_id = %s
     """
-    data = (title, details, calendar_id)
+    update_data = (title, details, calendar_id)
+
     try:
-        affected_rows = execute_query(query, data)
+        affected_rows = execute_query(update_query, update_data)
         if affected_rows == 0:
             raise ValueError(f"No calendar found with ID: {calendar_id}")
     except Exception as e:

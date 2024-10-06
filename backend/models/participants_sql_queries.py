@@ -23,18 +23,36 @@ def create_participant(name, email, participant_id=None):
 
 
 # Update a participant by their ID
-def update_participant(participant_id, name, email):
+def update_participant(participant_id, name=None, email=None):
+    # Fetch the current participant data
+    query = "SELECT name, email FROM participants WHERE participant_id = %s"
+    data = (participant_id,)
+    current_participant = execute_read_query(query, data)
+
+    if not current_participant:
+        raise ValueError(f"Participant with ID {participant_id} not found")
+
+    # Get the current values
+    current_name, current_email = current_participant[0]
+
+    # Use the current value if the new value is None
+    name = name if name is not None else current_name
+    email = email if email is not None else current_email
+
+    # Validate the new or existing email format
     if not is_valid_email(email):
         raise ValueError("Invalid email address")
 
-    query = """
+    # Update the participant with the new or existing values
+    update_query = """
     UPDATE participants 
     SET name = %s, email = %s
     WHERE participant_id = %s
     """
-    data = (participant_id, name, email)
+    update_data = (name, email, participant_id)
+
     try:
-        execute_query(query, data)
+        execute_query(update_query, update_data)
     except Exception as e:
         raise ValueError(f"Error updating participant: {str(e)}")
 

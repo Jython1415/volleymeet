@@ -22,16 +22,36 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
 
 
 # Update an attachment by its ID
-def update_attachment(attachment_id, meeting_id, attachment_url):
-    query = """
+def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
+    # Fetch the current attachment data
+    query = (
+        "SELECT meeting_id, attachment_url FROM attachments WHERE attachment_id = %s"
+    )
+    data = (attachment_id,)
+    current_attachment = execute_read_query(query, data)
+
+    if not current_attachment:
+        raise ValueError(f"Attachment with ID {attachment_id} not found")
+
+    # Get the current values
+    current_meeting_id, current_attachment_url = current_attachment[0]
+
+    # Use the current value if the new value is None
+    meeting_id = meeting_id if meeting_id is not None else current_meeting_id
+    attachment_url = (
+        attachment_url if attachment_url is not None else current_attachment_url
+    )
+
+    # Update the attachment with the new or existing values
+    update_query = """
     UPDATE attachments 
     SET meeting_id = %s, attachment_url = %s
     WHERE attachment_id = %s
     """
-    data = (meeting_id, attachment_url, attachment_id)
+    update_data = (meeting_id, attachment_url, attachment_id)
 
     try:
-        affected_rows = execute_query(query, data)
+        affected_rows = execute_query(update_query, update_data)
         if affected_rows == 0:
             raise ValueError(f"No attachment found with ID: {attachment_id}")
     except Exception as e:
