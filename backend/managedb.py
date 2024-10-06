@@ -38,12 +38,15 @@ def execute_query(query, data=None):
 
 
 # Function to execute SQL queries that retrieve data (e.g., SELECT queries)
-def execute_read_query(query):
+def execute_read_query(query, data=None):
     connection = create_connection()
     cursor = connection.cursor()
     result = None
     try:
-        cursor.execute(query)
+        if data:
+            cursor.execute(query, data)
+        else:
+            cursor.execute(query)
         result = cursor.fetchall()
         return result
     except Error as e:

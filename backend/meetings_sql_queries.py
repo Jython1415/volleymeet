@@ -1,5 +1,6 @@
 import json
-from db import execute_query, execute_read_query
+from datetime import datetime
+from managedb import execute_query, execute_read_query
 from global_functions_sql import generate_uuid, is_valid_date
 
 
@@ -44,7 +45,7 @@ def update_meeting(meeting_id, title, date_time, location, details):
 
 
 # Get all meetings and return as formatted JSON
-def get_meetings():
+def get_all_meetings():
     query = "SELECT * FROM meetings"
     meetings = execute_read_query(query)
 
@@ -54,13 +55,17 @@ def get_meetings():
             {
                 "meeting_id": meeting[0],
                 "title": meeting[1],
-                "date_time": meeting[2],
+                "date_time": (
+                    meeting[2].isoformat()
+                    if isinstance(meeting[2], datetime)
+                    else str(meeting[2])
+                ),
                 "location": meeting[3],
                 "details": meeting[4],
             }
         )
 
-    return json.dumps(results, indent=4)  # Return the JSON string
+    return json.dumps(results, default=str)
 
 
 # Get a meeting by its ID and return as formatted JSON
@@ -74,16 +79,18 @@ def get_meeting_by_id(meeting_id):
             {
                 "meeting_id": meeting[0][0],
                 "title": meeting[0][1],
-                "date_time": meeting[0][2],
+                "date_time": (
+                    meeting[0][2].isoformat()
+                    if isinstance(meeting[2], datetime)
+                    else str(meeting[2])
+                ),
                 "location": meeting[0][3],
                 "details": meeting[0][4],
             },
-            indent=4,
+            default=str,
         )
     else:
-        return json.dumps(
-            {"error": "Meeting not found"}, indent=4
-        )  # Return error message in JSON
+        return json.dumps({"error": "Meeting not found"}, indent=4, default=str)
 
 
 # Delete a meeting by its ID
