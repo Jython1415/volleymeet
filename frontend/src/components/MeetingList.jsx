@@ -5,19 +5,20 @@ const MeetingList = ({ meetings }) => {
         <table>
             <thead>
                 <tr>
+                    <th>Meeting Id</th>
                     <th>Title</th>
                     <th>Date and Time</th>
                     <th>Location</th>
-                    <th>Participants</th>
+                    <th>Details</th>
                 </tr>
             </thead>
             <tbody>
                 {meetings.map((meeting) => (
-                    <tr key={meeting.id}>
+                    <tr key={meeting.meeting_id}>
                         <td>{meeting.title}</td>
-                        <td>{meeting.dateTime}</td>
+                        <td>{meeting.date_time}</td>
                         <td>{meeting.location}</td>
-                        <td>{meeting.participantIds.join(', ')}</td>
+                        <td>{meeting.details}</td>
                     </tr>
                 ))}
             </tbody>
