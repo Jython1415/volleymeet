@@ -69,9 +69,7 @@ def get_calendar_by_id(calendar_id):
             "details": calendar[0][2],
         }
     else:
-        raise ValueError(
-            f"Calendar with ID {calendar_id} not found"
-        )  # Raise an error if not found
+        raise ValueError(f"Calendar with ID {calendar_id} not found")
 
 
 # Delete a calendar by its ID
