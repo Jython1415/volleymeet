@@ -91,12 +91,25 @@ def get_calendar_by_id(calendar_id):
 
 # Delete a calendar by its ID
 def delete_calendar(calendar_id):
+    # Delete the calendar
     query = "DELETE FROM calendars WHERE calendar_id = %s"
     data = (calendar_id,)
 
     try:
-        affected_rows = execute_query(query, data)
-        if affected_rows == 0:
-            raise ValueError(f"No calendar found with ID: {calendar_id}")
+        execute_query(query, data)
+        # Clean up orphaned meetings
+        cleanup_orphaned_meetings()
     except Exception as e:
         raise ValueError(f"Error deleting calendar: {str(e)}")
+
+
+def cleanup_orphaned_meetings():
+    # Find meetings that are not linked to any calendars
+    query = """
+    DELETE FROM meetings
+    WHERE meeting_id NOT IN (SELECT DISTINCT meeting_id FROM scheduled_in)
+    """
+    try:
+        execute_query(query)
+    except Exception as e:
+        raise ValueError(f"Error cleaning up orphaned meetings: {str(e)}")
