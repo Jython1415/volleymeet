@@ -4,8 +4,9 @@ import MeetingList from './components/MeetingList';
 import ButtonsComponent from './components/ButtonsComponent';
 import ParticipantForm from './components/ParticipantForm';
 import FindMeetingForm from './components/FindMeetingForm';
+import DeleteMeetingForm from './components/DeleteMeetingForm';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
+const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 
 function App() {
   const [meetings, setMeetings] = useState([]);
@@ -16,7 +17,9 @@ function App() {
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
   const [showAttachmentForm, setAttachmentForm] = useState(false)
-  const [showFindMeetingForm, setShowFindMeetinigForm] = useState(false)
+  const [showFindMeetingForm, setShowFindMeetingForm] = useState(false)
+  const [showDeleteMeetingForm, setShowDeleteMeetingForm] = useState(false)
+  const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState('');
 
   const createMeeting = (meeting) => {
@@ -33,7 +36,11 @@ function App() {
     setError('');
     setShowMeetingForm(false);
     setShowMeetingList(false);
-    setShowFindMeetinigForm(prevState => !prevState);
+    setShowFindMeetingForm(prevState => !prevState);
+  }
+
+  const handleShowDeleteMeeting = () => {
+    setShowDeleteMeetingForm(prevState => !prevState);
   }
 
   const handleFindMeetingById = async (meetingId) => {
@@ -65,7 +72,7 @@ function App() {
   const handleMeetingDisplay = async () => {
     setError('');
     setShowMeetingForm(false); // Hide meeting form when showing list
-    setShowFindMeetinigForm(false);
+    setShowFindMeetingForm(false);
 
     try {
       const response = await fetch(MEETINGS_BACKEND_BASE_URL);
@@ -86,6 +93,29 @@ function App() {
       console.error('Error fetching meetings:', err);
       setError('Error fetching meetings. Please check the backend.');
       setShowMeetingList(false);
+    }
+  };
+
+  const handleDeleteMeeting = async (meetingId) => {
+    setError('');
+    setResponseMessage('');
+
+    try {
+      const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.status === 204) {
+        setMeetings(meetings.filter((meeting) => meeting.meeting_id !== meetingId)); // Remove deleted meeting from state
+        setResponseMessage(`Meeting with ID ${meetingId} deleted successfully.`);
+      } else if (response.status === 404) {
+        setError(`Meeting with ID ${meetingId} not found.`);
+      } else {
+        setError(`Failed to delete meeting with status code ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error deleting meeting:', err);
+      setError('Error deleting meeting.');
     }
   };
 
@@ -182,7 +212,7 @@ function App() {
         onCreate={handleCreateMeeting}
         onDisplay={handleMeetingDisplay}
         onFind={handleFindMeeting}
-        onDelete={() => { }}
+        onDelete={handleShowDeleteMeeting}
         onEdit={() => { }}
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
@@ -199,6 +229,8 @@ function App() {
         </>
       )}
       {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
+      {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}
+      {responseMessage && <p>{responseMessage}</p>}
       {error && <p>{error}</p>}
     </div>
   );
