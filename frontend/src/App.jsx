@@ -5,6 +5,7 @@ import ButtonsComponent from './components/ButtonsComponent';
 import ParticipantForm from './components/ParticipantForm';
 import FindMeetingForm from './components/FindMeetingForm';
 import DeleteMeetingForm from './components/DeleteMeetingForm';
+import UpdateMeetingForm from './components/UpdateMeetingForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 
@@ -19,6 +20,7 @@ function App() {
   const [showAttachmentForm, setAttachmentForm] = useState(false)
   const [showFindMeetingForm, setShowFindMeetingForm] = useState(false)
   const [showDeleteMeetingForm, setShowDeleteMeetingForm] = useState(false)
+  const [showUpdateMeetingForm, setShowUpdateMeetingForm] = useState(false)
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -41,6 +43,10 @@ function App() {
 
   const handleShowDeleteMeeting = () => {
     setShowDeleteMeetingForm(prevState => !prevState);
+  }
+
+  const handleShowUpdateMeeting = () => {
+    setShowUpdateMeetingForm(prevState => !prevState);
   }
 
   const handleFindMeetingById = async (meetingId) => {
@@ -213,7 +219,7 @@ function App() {
         onDisplay={handleMeetingDisplay}
         onFind={handleFindMeeting}
         onDelete={handleShowDeleteMeeting}
-        onEdit={() => { }}
+        onEdit={handleShowUpdateMeeting}
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
       {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} onShowParticpants={handleShowParticipants} />}
@@ -230,6 +236,7 @@ function App() {
       )}
       {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
       {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}
+      {showUpdateMeetingForm && <UpdateMeetingForm />}
       {responseMessage && <p>{responseMessage}</p>}
       {error && <p>{error}</p>}
     </div>
