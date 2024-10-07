@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const BACKEND_BASE_URL = "http://localhost:5173/attachments"; // Backend URL for attachments
+const BACKEND_BASE_URL = "http://localhost:5001/attachments"; // Backend URL for attachments
 
 const AddAttachmentForm = ({ meetingId, onSubmit }) => {
   const [attachment, setAttachment] = useState({
