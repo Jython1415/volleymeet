@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MeetingList = ({ meetings, onAddAttachment }) => {
+const MeetingList = ({ meetings, onAddAttachment, onShowParticpants }) => {
     return (
         <table>
             <thead>
@@ -23,6 +23,9 @@ const MeetingList = ({ meetings, onAddAttachment }) => {
                         <td>{meeting.details}</td>
                         <td>
                             <button onClick={() => onAddAttachment(meeting.meeting_id)}>View/Add Attachments</button>
+                        </td>
+                        <td>
+                            <button onClick={() => onShowParticpants(meeting.meeting_id)}>View Participants</button>
                         </td>
                     </tr>
                 ))}
