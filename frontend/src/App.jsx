@@ -4,7 +4,7 @@ import MeetingList from './components/MeetingList';
 import ButtonsComponent from './components/ButtonsComponent';
 import AddAttachmentForm from './components/AddAttachmentForm';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5173/meetings"; // Your backend URL
+const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
 
 function App() {
   const [meetings, setMeetings] = useState([]);
