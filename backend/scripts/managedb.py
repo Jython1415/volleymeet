@@ -1,7 +1,10 @@
 import mysql.connector
 from mysql.connector import Error
 import os
+import logging
 
+# Set up basic logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def create_connection():
     connection = None
@@ -12,10 +15,11 @@ def create_connection():
             password=os.environ["MYSQL_PASSWORD"],
             database=os.environ["MYSQL_DATABASE"],
         )
-        print("Connection to MySQL DB successful")  # TODO make this log
+        logging.info("Connection to MySQL DB successful")
     except Error as e:
-        print(f"The error '{e}' occurred")  # TODO make this log
-
+        logging.error(f"The error '{e}' occurred during connection")
+        raise e
+    
     return connection
 
 
@@ -29,8 +33,9 @@ def execute_query(query, data=None):
         else:
             cursor.execute(query)
         connection.commit()
-        print("Query executed successfully")
-    except Error as e:  # TODO add logging
+        logging.info(f"Query executed successfully: {query}")
+    except Error as e:
+        logging.error(f"Error executing query: {query}. Error: {str(e)}")
         raise e
     finally:
         cursor.close()
@@ -48,9 +53,11 @@ def execute_read_query(query, data=None):
         else:
             cursor.execute(query)
         result = cursor.fetchall()
+        logging.info(f"Read query executed successfully: {query}")
         return result
     except Error as e:
-        print(f"The error '{e}' occurred")
+        logging.error(f"Error executing read query: {query}. Error: {str(e)}")
+        raise e
     finally:
         cursor.close()
         connection.close()
