@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import CreateMeetingForm from './components/CreateMeetingForm';
 import MeetingList from './components/MeetingList';
-import MeetingFiles from './components/MeetingFiles';
 import ButtonsComponent from './components/ButtonsComponent';
 import ParticipantForm from './components/ParticipantForm';
 
@@ -149,6 +148,7 @@ function App() {
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
       {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} onShowParticpants={handleShowParticipants} />}
+      {showAttachmentForm && <MeetingFiles files={attachments} onAddFile={handleAddAttachment} onRemoveFile={handleRemoveAttachment} />}
       {showParticipantForm && (
         <>
           <ParticipantForm meetingId={selectedMeetingId} onSubmit={handleAddParticipant} />
