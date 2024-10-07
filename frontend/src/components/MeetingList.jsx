@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MeetingList = ({ meetings }) => {
+const MeetingList = ({ meetings, onAddAttachment }) => {
     return (
         <table>
             <thead>
@@ -10,6 +10,7 @@ const MeetingList = ({ meetings }) => {
                     <th>Date and Time</th>
                     <th>Location</th>
                     <th>Details</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -20,6 +21,9 @@ const MeetingList = ({ meetings }) => {
                         <td>{meeting.date_time}</td>
                         <td>{meeting.location}</td>
                         <td>{meeting.details}</td>
+                        <td>
+                            <button onClick={() => onAddAttachment(meeting.meeting_id)}>View/Add Attachments</button>
+                        </td>
                     </tr>
                 ))}
             </tbody>
