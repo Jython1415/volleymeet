@@ -3,12 +3,15 @@ import CreateMeetingForm from './components/CreateMeetingForm';
 import MeetingList from './components/MeetingList';
 import MeetingFiles from './components/MeetingFiles';
 import ButtonsComponent from './components/ButtonsComponent';
+import ParticipantForm from './components/ParticipantForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
 
 function App() {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeetingId, setSelectedMeetingId] = useState(null)
+  const [participants, setParticipants] = useState([])
+  const {showParticipantForm, setShowParticipantForm} = useState(false)
   const [attachments, setAttachments] = useState([])
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
@@ -47,6 +50,27 @@ function App() {
       setShowMeetingList(false);
     }
   };
+
+  const handleAddParticipant = (participant) => {
+    setParticipants([...participants, participant])
+  }
+  
+  const handleShowParticipants = async (meeting_id) => {
+    try {
+      const response = await fetch('${MEETINGS_BACKEND_BASE_URL}/${meeting_id') // is this the rightway to reference this?
+      if (response.status ===200) {
+        const data = await response.json()
+        setParticipants(data)
+        setSelectedMeetingId(meeting_id)
+        setShowParticipantForm(true)
+      } else {
+        setError('Failed to fetch participants with status code ${response.status}')
+      }
+    } catch (error) {
+      console.error('Error fetching participants: ', error)
+      setError('Error fetching participants')
+    }
+  }
 
   const handleAddAttachment = async (fileUrl) => {
     if (!selectedMeetingId) return
@@ -125,7 +149,16 @@ function App() {
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
       {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} />}
-      {showAttachmentForm && <MeetingFiles files={attachments} onAddFile={handleAddAttachment} onRemoveFile={handleRemoveAttachment} />}
+      {showParticipantForm && (
+        <>
+          <ParticipantForm meetingId={selectedMeetingId} onSubmit={handleAddParticipant} />
+          <ul>
+            {participants.map((participant) => (
+              <li key={handleAddParticipant.participant_id}>{participant.name} ({participant.email}) </li>
+            ))}
+          </ul>
+        </>
+      )}
       {error && <p>{error}</p>}
     </div>
   );
