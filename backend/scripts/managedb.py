@@ -12,9 +12,9 @@ def create_connection():
             password=os.environ["MYSQL_PASSWORD"],
             database=os.environ["MYSQL_DATABASE"],
         )
-        print("Connection to MySQL DB successful")
+        print("Connection to MySQL DB successful") # TODO make this log
     except Error as e:
-        print(f"The error '{e}' occurred")
+        print(f"The error '{e}' occurred") # TODO make this log
 
     return connection
 
@@ -30,8 +30,8 @@ def execute_query(query, data=None):
             cursor.execute(query)
         connection.commit()
         print("Query executed successfully")
-    except Error as e:
-        print(f"The error '{e}' occurred")
+    except Error as e: # TODO add logging
+        raise e
     finally:
         cursor.close()
         connection.close()
