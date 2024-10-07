@@ -10,7 +10,7 @@ function App() {
   const [meetings, setMeetings] = useState([]);
   const [selectedMeetingId, setSelectedMeetingId] = useState(null)
   const [participants, setParticipants] = useState([])
-  const {showParticipantForm, setShowParticipantForm} = useState(false)
+  const { showParticipantForm, setShowParticipantForm } = useState(false)
   const [attachments, setAttachments] = useState([])
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
@@ -22,7 +22,10 @@ function App() {
     setShowMeetingForm(false);
   };
 
-  const handleCreateMeeting = () => setShowMeetingForm(true);
+  const handleCreateMeeting = () => {
+    setShowMeetingForm(prevState => !prevState);
+  };
+
 
   // Function to handle fetching all meetings from the backend
   const handleMeetingDisplay = async () => {
@@ -35,7 +38,7 @@ function App() {
         const data = await response.json();
         console.log(data)
         setMeetings(data); // Set the fetched meetings in the state
-        setShowMeetingList(true);
+        setShowMeetingList(prevState => !prevState);
       } else if (response.status === 404) {
         setError("No meetings found.");
         setShowMeetingList(false);
@@ -53,11 +56,11 @@ function App() {
   const handleAddParticipant = (participant) => {
     setParticipants([...participants, participant])
   }
-  
+
   const handleShowParticipants = async (meeting_id) => {
     try {
       const response = await fetch('${MEETINGS_BACKEND_BASE_URL}/${meeting_id') // is this the rightway to reference this?
-      if (response.status ===200) {
+      if (response.status === 200) {
         const data = await response.json()
         setParticipants(data)
         setSelectedMeetingId(meeting_id)
