@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import CreateMeetingForm from './components/CreateMeetingForm';
 import MeetingList from './components/MeetingList';
 import ButtonsComponent from './components/ButtonsComponent';
+import AddAttachmentForm from './components/AddAttachmentForm';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
+const MEETINGS_BACKEND_BASE_URL = "http://localhost:5173/meetings"; // Your backend URL
 
 function App() {
   const [meetings, setMeetings] = useState([]);
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
+  const [selectedMeetingId, setSelectedMeetingId] = useState(null)
+  const [showAttachmentForm, setShowAttachmentForm] = useState(false)
   const [error, setError] = useState('');
 
   const createMeeting = (meeting) => {
@@ -44,6 +47,11 @@ function App() {
     }
   };
 
+  const HandleAddAttachment = (meetingId) => {
+    setSelectedMeetingId(meetingId)
+    setShowAttachmentForm(true)
+  }
+
   return (
     <div className="App">
       <ButtonsComponent
@@ -54,7 +62,8 @@ function App() {
         onEdit={() => { }}
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
-      {showMeetingList && <MeetingList meetings={meetings} />}
+      {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={HandleAddAttachment} />}
+      {showAttachmentForm && <AddAttachmentForm meetingId={selectedMeetingId} onSubmit={() => setShowAttachmentForm(false)}/>}
       {error && <p>{error}</p>}
     </div>
   );
