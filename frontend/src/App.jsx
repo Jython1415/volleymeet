@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import CreateMeetingForm from './components/CreateMeetingForm';
 import MeetingList from './components/MeetingList';
+import MeetingFiles from './components/MeetingFiles';
 import ButtonsComponent from './components/ButtonsComponent';
-import AddAttachmentForm from './components/AddAttachmentForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
 
 function App() {
   const [meetings, setMeetings] = useState([]);
+  const [selectedMeetingId, setSelectedMeetingId] = useState(null)
+  const [attachments, setAttachments] = useState([])
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
-  const [selectedMeetingId, setSelectedMeetingId] = useState(null)
-  const [showAttachmentForm, setShowAttachmentForm] = useState(false)
+  const [showAttachmentForm, setAttachmentForm] = useState(false)
   const [error, setError] = useState('');
 
   const createMeeting = (meeting) => {
@@ -47,9 +48,70 @@ function App() {
     }
   };
 
-  const HandleAddAttachment = (meetingId) => {
-    setSelectedMeetingId(meetingId)
-    setShowAttachmentForm(true)
+  const handleAddAttachment = async (fileUrl) => {
+    if (!selectedMeetingId) return
+
+    const newAttachment = {
+      meeting_id: selectedMeetingId,
+      file_url: fileUrl
+    }
+
+    try {
+      const response = await fetch(MEETINGS_BACKEND_BASE_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(newAttachment)
+      });
+
+      if (response.status === 201) {
+        setAttachments([...attachments, fileUrl]); // Add the new attachment to state
+      } else {
+        setError(`Failed to add attachment with status code ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error adding attachment:', err);
+      setError('Error adding attachment.');
+    }
+  }
+
+  const handleRemoveAttachment = async (fileUrlToRemove) => {
+    try {
+      const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${selectedMeetingId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ file_url: fileUrlToRemove })
+      })
+
+      if (response.status === 200) {
+        setAttachments(attachments.filter(file => file !== fileUrlToRemove))
+      } else {
+        setError(`Failed to remove attachment with status code ${response.status}`)
+      }
+    } catch (err) {
+      console.error('Error removing attachment:', err);
+      setError('Error removing attachment.');
+    }
+  };
+
+  const handleShowAttachments = async (meetingId) => {
+    try {
+      const response = await fetch(`${ATTACHMENTS_BACKEND_BASE_URL}/${meetingId}`);
+      if (response.status === 200) {
+        const data = await response.json();
+        setAttachments(data); // Set the fetched attachments in the state
+        setSelectedMeetingId(meetingId);
+        setShowAttachmentForm(true);
+      } else {
+        setError(`Failed to fetch attachments with status code ${response.status}`);
+      }
+    } catch (err) {
+      console.error('Error fetching attachments:', err);
+      setError('Error fetching attachments.');
+    }
   }
 
   return (
@@ -62,8 +124,8 @@ function App() {
         onEdit={() => { }}
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
-      {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={HandleAddAttachment} />}
-      {showAttachmentForm && <AddAttachmentForm meetingId={selectedMeetingId} onSubmit={() => setShowAttachmentForm(false)}/>}
+      {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} />}
+      {showAttachmentForm && <MeetingFiles files={attachments} onAddFile={handleAddAttachment} onRemoveFile={handleRemoveAttachment} />}
       {error && <p>{error}</p>}
     </div>
   );
