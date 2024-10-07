@@ -36,3 +36,58 @@ h1 {
   padding: 20px;
   border-radius: 5px;
 }
+
+/* Layout for Calendar and Participant forms */
+.form-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Space between the forms */
+  margin-top: 20px;
+}
+
+/* Specific styling for the Calendar forms */
+.calendar-section {
+  flex: 1; /* Take up equal space */
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Specific styling for the Participant forms */
+.participant-section {
+  flex: 1; /* Take up equal space */
+  background-color: #f9f9f9;
+  padding: 1rem;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.form-container label {
+  font-weight: bold;
+}
+
+.form-container input, 
+.form-container textarea, 
+.form-container button {
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-container button {
+  background-color: #4CAF50;
+  color: white;
+  cursor: pointer;
+}
+
+.form-container button:hover {
+  background-color: #45a049;
+}
