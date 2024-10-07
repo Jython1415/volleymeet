@@ -40,7 +40,7 @@ def is_valid_date(date_str):
 
 
 if __name__ == "__main__":
-    is_valid, formatted_date = is_valid_date("2024-03-30 3:30 PM")
+    is_valid, formatted_date = is_valid_date("asdf;lkj")
     if is_valid:
         print("Valid date:", formatted_date)
     else:

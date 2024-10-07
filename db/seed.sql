@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS meetings (
     title VARCHAR(2000) NOT NULL,
     details TEXT CHECK (LENGTH(details) <= 10000),
     location VARCHAR(2000),
-    date_time DATETIME NOT NULL
+    date_time CHAR(20) NOT NULL
 );
 
 -- Creating Participants table
@@ -105,13 +105,13 @@ VALUES
         'Team Meeting',
         'Discuss roadmap',
         'Conf Room 1',
-        '2024-10-01 09:00:00'
+        '2024-10-01 09:00'
     ),
     (
         'Client Meeting',
         'Review requirements',
         'Online',
-        '2024-10-02 14:00:00'
+        '2024-10-02 14:00'
     );
 
 -- Insert into Participants
