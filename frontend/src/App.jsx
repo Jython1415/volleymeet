@@ -3,6 +3,7 @@ import CreateMeetingForm from './components/CreateMeetingForm';
 import MeetingList from './components/MeetingList';
 import ButtonsComponent from './components/ButtonsComponent';
 import ParticipantForm from './components/ParticipantForm';
+import FindMeetingForm from './components/FindMeetingForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
 
@@ -15,9 +16,11 @@ function App() {
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
   const [showAttachmentForm, setAttachmentForm] = useState(false)
+  const [showFindMeetingForm, setShowFindMeetinigForm] = useState(false)
   const [error, setError] = useState('');
 
   const createMeeting = (meeting) => {
+    setError('');
     setMeetings([...meetings, meeting]);
     setShowMeetingForm(false);
   };
@@ -26,10 +29,43 @@ function App() {
     setShowMeetingForm(prevState => !prevState);
   };
 
+  const handleFindMeeting = () => {
+    setError('');
+    setShowMeetingForm(false);
+    setShowMeetingList(false);
+    setShowFindMeetinigForm(prevState => !prevState);
+  }
+
+  const handleFindMeetingById = async (meetingId) => {
+    setError('');
+
+    try {
+      const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`);
+      if (response.status === 200) {
+        const meeting = await response.json();
+        console.log(meeting); // Handle the found meeting (display it, save it to state, etc.)
+        setMeetings([meeting]); // Set the fetched meeting as the only meeting in the list
+        setShowMeetingList(true); // Show the meeting list with just this meeting
+        setError("");
+      } else if (response.status === 404) {
+        setError("Meeting not found.");
+        setShowMeetingList(false);
+      } else {
+        setError(`Failed to fetch meeting with status code ${response.status}`);
+        setShowMeetingList(false);
+      }
+    } catch (err) {
+      console.error('Error fetching the meeting:', err);
+      setError('Error fetching the meeting.');
+      setShowMeetingList(false);
+    }
+  };
 
   // Function to handle fetching all meetings from the backend
   const handleMeetingDisplay = async () => {
-    setShowMeetingForm(false); // Hide form when showing list
+    setError('');
+    setShowMeetingForm(false); // Hide meeting form when showing list
+    setShowFindMeetinigForm(false);
 
     try {
       const response = await fetch(MEETINGS_BACKEND_BASE_URL);
@@ -145,7 +181,7 @@ function App() {
       <ButtonsComponent
         onCreate={handleCreateMeeting}
         onDisplay={handleMeetingDisplay}
-        onFind={() => { }}
+        onFind={handleFindMeeting}
         onDelete={() => { }}
         onEdit={() => { }}
       />
@@ -162,6 +198,7 @@ function App() {
           </ul>
         </>
       )}
+      {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
       {error && <p>{error}</p>}
     </div>
   );
