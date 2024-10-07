@@ -22,7 +22,7 @@ def format_date(date_obj):
 def create_meeting(title, date_time, location, details, meeting_id=None):
     # Generate a UUID for the meeting if not provided
     if not meeting_id:
-        meeting_id = generate_uuid()  # TODO
+        meeting_id = generate_uuid()
 
     # Validate the date format
     date_valid, _ = is_valid_date(date_time)
