@@ -148,7 +148,7 @@ function App() {
         onEdit={() => { }}
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
-      {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} />}
+      {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} onShowParticpants={handleShowParticipants} />}
       {showParticipantForm && (
         <>
           <ParticipantForm meetingId={selectedMeetingId} onSubmit={handleAddParticipant} />
