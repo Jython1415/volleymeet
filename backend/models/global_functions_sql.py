@@ -1,11 +1,5 @@
-import uuid, re
+import re
 from datetime import datetime
-from dateutil import parser
-
-
-def generate_uuid():
-    """Generates a UUID."""
-    return str(uuid.uuid4())
 
 
 def is_valid_email(email):
