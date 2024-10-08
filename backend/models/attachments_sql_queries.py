@@ -12,20 +12,25 @@ logging.basicConfig(
 
 # Create an attachment
 def create_attachment(meeting_id, attachment_url, attachment_id=None):
-    # Generate a UUID for the attachment if not provided
-    if not attachment_id:
-        attachment_id = generate_uuid()
-
-    query = """
-    INSERT INTO attachments (attachment_id, meeting_id, attachment_url)
-    VALUES (%s, %s, %s)
-    """
-    data = (attachment_id, meeting_id, attachment_url)
+    # Check if attachment_id is provided
+    if attachment_id:
+        query = """
+        INSERT INTO attachments (attachment_id, meeting_id, attachment_url)
+        VALUES (%s, %s, %s)
+        """
+        data = (attachment_id, meeting_id, attachment_url)
+    else:
+        # Exclude attachment_id from the query to let the database handle it
+        query = """
+        INSERT INTO attachments (meeting_id, attachment_url)
+        VALUES (%s, %s)
+        """
+        data = (meeting_id, attachment_url)
 
     try:
         execute_query(query, data)
         logger.info(
-            f"Created attachment with ID {attachment_id} for meeting {meeting_id}"
+            f"Created attachment {'with provided ID ' + attachment_id if attachment_id else 'with DB-generated ID'} for meeting {meeting_id}"
         )
     except Exception as e:
         logger.error(f"Error creating attachment: {str(e)}")
