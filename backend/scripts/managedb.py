@@ -4,7 +4,10 @@ import os
 import logging
 
 # Set up basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 def create_connection():
     connection = None
@@ -19,7 +22,7 @@ def create_connection():
     except Error as e:
         logging.error(f"The error '{e}' occurred during connection")
         raise e
-    
+
     return connection
 
 
