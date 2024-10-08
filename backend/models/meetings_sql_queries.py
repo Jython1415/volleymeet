@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime
 from scripts.managedb import execute_query, execute_read_query
-from models.global_functions_sql import generate_uuid, is_valid_date
+from models.global_functions_sql import is_valid_date
 
 # Set up logging
 logger = logging.getLogger(__name__)
