@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ParticipantList from './ParticipantList';
 import CreateParticipantForm from './CreateParticipantForm';
 import FindParticipantForm from './FindParticipantForm';
+import DeleteParticipantForm from './DeleteParticipantForm';
 
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
 
@@ -10,6 +11,8 @@ const Participants = () => {
     const [showCreateParticipantForm, setShowCreateParticipantForm] = useState(false);
     const [showParticipantList, setShowParticipantList] = useState(false);
     const [showFindParticipantForm, setShowFindParticipantForm] = useState(false);
+    const [showDeleteParticipantForm, setShowDeleteParticipantForm] = useState(false);
+
 
     const [responseMessage, setResponseMessage] = useState('');
     const [error, setError] = useState('');
@@ -20,6 +23,7 @@ const Participants = () => {
         setShowCreateParticipantForm(false);
         setShowParticipantList(false);
         setShowFindParticipantForm(false);
+        setShowDeleteParticipantForm(false);
         setResponseMessage('');
         setError('');
 
@@ -54,10 +58,30 @@ const Participants = () => {
     }
 
     const handleShowDeleteParticipant = () => {
+        resetFormVisibility();
+        setShowDeleteParticipantForm(true);
     }
 
     const handleShowUpdateParticipant = () => {
     }
+
+    const handleDeleteParticipant = async (participantId) => {
+        try {
+            const response = await fetch(`${PARTICIPANTS_BACKEND_BASE_URL}/${participantId}`, {
+                method: 'DELETE',
+            });
+            if (response.status === 204) {
+                setParticipants(participants.filter((participant) => participant.participant_id !== participantId));
+                setResponseMessage(`Participant with ID ${participantId} deleted successfully.`);
+            } else if (response.status === 404) {
+                setError(`Participant with ID ${participantId} not found.`);
+            } else {
+                setError(`Failed to delete participant with status code ${response.status}`);
+            }
+        } catch (err) {
+            setError('Error deleting participant.');
+        }
+    };
 
     const handleFindParticipantById = async (participantId) => {
         try {
@@ -88,6 +112,7 @@ const Participants = () => {
             {showCreateParticipantForm && <CreateParticipantForm />}
             {showParticipantList && <ParticipantList participants={participants} />}
             {showFindParticipantForm && <FindParticipantForm onFindParticipant={handleFindParticipantById} />}
+            {showDeleteParticipantForm && <DeleteParticipantForm onDeleteParticipant={handleDeleteParticipant} />}
 
             {responseMessage && <p>{responseMessage}</p>}
             {error && <p>{error}</p>}
