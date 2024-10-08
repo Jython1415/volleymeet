@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import ParticipantForm from './ParticipantForm';
-import CalendarForm from './CalendarForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 
@@ -18,8 +16,6 @@ const CreateMeetingForm = ({ onSubmit }) => {
     });
 
     const [responseMessage, setResponseMessage] = useState('');
-    const [participants, setParticipants] = useState([]);
-    const [calendars, setCalendars] = useState([]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -61,21 +57,6 @@ const CreateMeetingForm = ({ onSubmit }) => {
         }
     };
 
-    const handleAddParticipant = (participantData) => {
-        setParticipants([...participants, participantData]);
-        setMeeting({
-            ...meeting,
-            participantIds: [...meeting.participantIds, participantData.participant_id],
-        });
-    };
-
-    const handleAddCalendar = (calendarData) => {
-        setCalendars([...calendars, calendarData]);
-        setMeeting({
-            ...meeting,
-            calendarIds: [...meeting.calendarIds, calendarData.calendar_id],
-        });
-    };
 
     return (
         <div>
@@ -83,7 +64,7 @@ const CreateMeetingForm = ({ onSubmit }) => {
             <h3>Create New Meeting</h3>
             <form onSubmit={handleAddMeeting}>
                 <label>Meeting ID (Optional):</label>
-                <input type="text" name="meeting_id" value={meeting.meeting_id} onChange={handleChange} placeholder="Leave blank to auto-generate"/>
+                <input type="text" name="meeting_id" value={meeting.meeting_id} onChange={handleChange} placeholder="Leave blank to auto-generate" />
 
                 <label>Title:</label>
                 <input type="text" name="title" value={meeting.title} onChange={handleChange} required />
@@ -108,36 +89,6 @@ const CreateMeetingForm = ({ onSubmit }) => {
                 {responseMessage && <p>{responseMessage}</p>} {/* Display response message */}
             </form>
 
-            {/* Participant and Calendar Forms */}
-            <div className="form-container">
-                {/* Participant Section */}
-                <div className="participant-section">
-                    <h3>Add Participant</h3>
-                    <ParticipantForm meetingId={meeting.id} onSubmit={handleAddParticipant} />
-                    <h4>Current Participants</h4>
-                    <ul>
-                        {participants.map(participant => (
-                            <li key={participant.participant_id}>
-                                {participant.name} - {participant.email}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                {/* Calendar Section */}
-                <div className="calendar-section">
-                    <h3>Add Calendar</h3>
-                    <CalendarForm meetingId={meeting.id} onSubmit={handleAddCalendar} />
-                    <h4>Current Calendars</h4>
-                    <ul>
-                        {calendars.map(calendar => (
-                            <li key={calendar.calendar_id}>
-                                {calendar.title} - {calendar.details}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
         </div>
     );
 };
