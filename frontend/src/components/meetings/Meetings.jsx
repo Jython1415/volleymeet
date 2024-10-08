@@ -30,12 +30,6 @@ const Meetings = () => {
         setError('');
     };
 
-    const createMeeting = (meeting) => {
-        resetFormVisibility();
-        setError('');
-        setMeetings([...meetings, meeting]);
-    };
-
     const handleCreateMeeting = () => {
         resetFormVisibility();
         setShowMeetingForm(true);
@@ -122,7 +116,7 @@ const Meetings = () => {
             <button onClick={handleShowDeleteMeeting}>Delete Meeting</button>
             <button onClick={handleShowUpdateMeeting}>Update Meeting</button>
 
-            {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
+            {showMeetingForm && <CreateMeetingForm />}
             {showMeetingList && <MeetingList meetings={meetings} />}
             {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
             {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}

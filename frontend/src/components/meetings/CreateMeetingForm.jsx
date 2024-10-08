@@ -3,7 +3,7 @@ import { useState } from 'react';
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 
 
-const CreateMeetingForm = ({ onSubmit }) => {
+const CreateMeetingForm = () => {
     const [meeting, setMeeting] = useState({
         id: '',
         title: '',
