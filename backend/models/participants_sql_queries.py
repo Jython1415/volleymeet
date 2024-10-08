@@ -1,7 +1,7 @@
 import json
 import logging
 from scripts.managedb import execute_query, execute_read_query
-from models.global_functions_sql import generate_uuid, is_valid_email
+from models.global_functions_sql import is_valid_email
 
 # Set up logging
 logger = logging.getLogger(__name__)
