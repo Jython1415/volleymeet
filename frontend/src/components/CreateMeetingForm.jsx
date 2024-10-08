@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ParticipantForm from './ParticipantForm';
 import CalendarForm from './CalendarForm';
 
