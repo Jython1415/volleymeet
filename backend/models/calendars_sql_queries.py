@@ -12,18 +12,26 @@ logging.basicConfig(
 
 # Create a calendar, including calendar_id in the insert query
 def create_calendar(title, details, calendar_id=None):
-    # Generate a UUID for the calendar if not provided
-    if not calendar_id:
-        calendar_id = generate_uuid()
+    # Check if calendar_id is provided
+    if calendar_id:
+        query = """
+        INSERT INTO calendars (calendar_id, title, details)
+        VALUES (%s, %s, %s)
+        """
+        data = (calendar_id, title, details)
+    else:
+        # Exclude calendar_id from the query to let the database handle it
+        query = """
+        INSERT INTO calendars (title, details)
+        VALUES (%s, %s)
+        """
+        data = (title, details)
 
-    query = """
-    INSERT INTO calendars (calendar_id, title, details)
-    VALUES (%s, %s, %s)
-    """
-    data = (calendar_id, title, details)
     try:
         execute_query(query, data)
-        logger.info(f"Created calendar with ID {calendar_id}")
+        logger.info(
+            f"Created calendar {'with provided ID ' + calendar_id if calendar_id else 'with DB-generated ID'}"
+        )
     except Exception as e:
         logger.error(f"Error creating calendar: {str(e)}")
         raise ValueError(f"Error creating calendar: {str(e)}")
