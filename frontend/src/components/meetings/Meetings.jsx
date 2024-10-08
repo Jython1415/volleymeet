@@ -37,7 +37,6 @@ const Meetings = () => {
 
     const handleFindMeeting = () => {
         resetFormVisibility();
-        setError('');
         setShowFindMeetingForm(true);
     };
 
@@ -52,7 +51,6 @@ const Meetings = () => {
     };
 
     const handleFindMeetingById = async (meetingId) => {
-        setError('');
         try {
             const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`);
             if (response.status === 200) {
@@ -71,7 +69,6 @@ const Meetings = () => {
 
     const handleMeetingDisplay = async () => {
         resetFormVisibility();
-        setError('');
         try {
             const response = await fetch(MEETINGS_BACKEND_BASE_URL);
             if (response.status === 200) {
@@ -89,8 +86,6 @@ const Meetings = () => {
     };
 
     const handleDeleteMeeting = async (meetingId) => {
-        setError('');
-        setResponseMessage('');
         try {
             const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`, {
                 method: 'DELETE',
