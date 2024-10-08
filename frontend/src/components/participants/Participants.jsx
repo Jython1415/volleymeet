@@ -3,6 +3,7 @@ import ParticipantList from './ParticipantList';
 import CreateParticipantForm from './CreateParticipantForm';
 import FindParticipantForm from './FindParticipantForm';
 import DeleteParticipantForm from './DeleteParticipantForm';
+import UpdateParticipantForm from './UpdateParticipantForm';
 
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
 
@@ -12,8 +13,7 @@ const Participants = () => {
     const [showParticipantList, setShowParticipantList] = useState(false);
     const [showFindParticipantForm, setShowFindParticipantForm] = useState(false);
     const [showDeleteParticipantForm, setShowDeleteParticipantForm] = useState(false);
-
-
+    const [showUpdateParticipantForm, setShowUpdateParticipantForm] = useState(false);
     const [responseMessage, setResponseMessage] = useState('');
     const [error, setError] = useState('');
 
@@ -24,6 +24,7 @@ const Participants = () => {
         setShowParticipantList(false);
         setShowFindParticipantForm(false);
         setShowDeleteParticipantForm(false);
+        setShowUpdateParticipantForm(false);
         setResponseMessage('');
         setError('');
 
@@ -63,6 +64,8 @@ const Participants = () => {
     }
 
     const handleShowUpdateParticipant = () => {
+        resetFormVisibility();
+        setShowUpdateParticipantForm(true);
     }
 
     const handleDeleteParticipant = async (participantId) => {
@@ -113,6 +116,7 @@ const Participants = () => {
             {showParticipantList && <ParticipantList participants={participants} />}
             {showFindParticipantForm && <FindParticipantForm onFindParticipant={handleFindParticipantById} />}
             {showDeleteParticipantForm && <DeleteParticipantForm onDeleteParticipant={handleDeleteParticipant} />}
+            {showUpdateParticipantForm && <UpdateParticipantForm />}
 
             {responseMessage && <p>{responseMessage}</p>}
             {error && <p>{error}</p>}
