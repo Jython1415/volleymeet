@@ -12,9 +12,6 @@ logging.basicConfig(
 
 # Create a participant, including participant_id in the insert query
 def create_participant(name, email, participant_id=None):
-    if not participant_id:
-        participant_id = generate_uuid()
-
     if not is_valid_email(email):
         logger.error(f"Invalid email address: {email}")
         raise ValueError("Invalid email address")
