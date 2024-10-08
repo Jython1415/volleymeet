@@ -30,7 +30,7 @@ const CreateMeetingForm = ({ onSubmit }) => {
         e.preventDefault();
 
         const meetingData = {
-            meeting_id: meeting.meeting_id || undefined, // Allow meeting_id to be optional
+            ...(meeting.meeting_id && { meeting_id: meeting.meeting_id }), // Allow meeting_id to be optional
             title: meeting.title,
             date_time: meeting.date_time,
             location: meeting.location,
@@ -82,8 +82,8 @@ const CreateMeetingForm = ({ onSubmit }) => {
             {/* Meeting Form */}
             <h3>Create New Meeting</h3>
             <form onSubmit={handleAddMeeting}>
-                <label>Meeting ID:</label>
-                <input type="text" name="meeting_id" value={meeting.meeting_id} onChange={handleChange} />
+                <label>Meeting ID (Optional):</label>
+                <input type="text" name="meeting_id" value={meeting.meeting_id} onChange={handleChange} placeholder="Leave blank to auto-generate"/>
 
                 <label>Title:</label>
                 <input type="text" name="title" value={meeting.title} onChange={handleChange} required />

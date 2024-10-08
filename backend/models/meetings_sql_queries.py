@@ -20,25 +20,32 @@ def format_date(date_obj):
 
 # Create a meeting, including meeting_id in the insert query
 def create_meeting(title, date_time, location, details, meeting_id=None):
-    # Generate a UUID for the meeting if not provided
-    if not meeting_id:
-        meeting_id = generate_uuid()
-
     # Validate the date format
     date_valid, _ = is_valid_date(date_time)
     if not date_valid:
         logger.error(f"Invalid date format: {date_time}")
         raise ValueError("Date is not in a valid format")
 
-    query = """
-    INSERT INTO meetings (meeting_id, title, date_time, location, details)
-    VALUES (%s, %s, %s, %s, %s)
-    """
-    data = (meeting_id, title, date_time, location, details)
+    # Check if meeting_id is provided
+    if meeting_id:
+        query = """
+        INSERT INTO meetings (meeting_id, title, date_time, location, details)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        data = (meeting_id, title, date_time, location, details)
+    else:
+        # Exclude meeting_id from the query to let the database handle it
+        query = """
+        INSERT INTO meetings (title, date_time, location, details)
+        VALUES (%s, %s, %s, %s)
+        """
+        data = (title, date_time, location, details)
 
     try:
         execute_query(query, data)
-        logger.info(f"Created meeting with ID {meeting_id}")
+        logger.info(
+            f"Created meeting {'with provided ID ' + meeting_id if meeting_id else 'with DB-generated ID'}"
+        )
     except Exception as e:
         logger.error(f"Error creating meeting: {str(e)}")
         raise ValueError(f"Error creating meeting: {str(e)}")

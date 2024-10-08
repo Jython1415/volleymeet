@@ -58,6 +58,9 @@ def api_add_meeting():
     date_time = data.get("date_time")
     location = data.get("location")
     details = data.get("details")
+
+    # Meeting ID may not be specified, which results in meeting_id being given
+    # the default value of .get("meeting_id") which is None
     meeting_id = data.get("meeting_id")
 
     logger.info(f"Adding new meeting with title: {title}")
