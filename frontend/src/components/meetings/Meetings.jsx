@@ -10,7 +10,7 @@ const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);
-    const [showMeetingForm, setShowMeetingForm] = useState(false);
+    const [showCreateMeetingForm, setShowCreateMeetingForm] = useState(false);
     const [showMeetingList, setShowMeetingList] = useState(false);
     const [showFindMeetingForm, setShowFindMeetingForm] = useState(false);
     const [showDeleteMeetingForm, setShowDeleteMeetingForm] = useState(false);
@@ -21,7 +21,7 @@ const Meetings = () => {
 
     // Helper function to reset all form visibility states
     const resetFormVisibility = () => {
-        setShowMeetingForm(false);
+        setShowCreateMeetingForm(false);
         setShowMeetingList(false);
         setShowFindMeetingForm(false);
         setShowDeleteMeetingForm(false);
@@ -32,7 +32,7 @@ const Meetings = () => {
 
     const handleCreateMeeting = () => {
         resetFormVisibility();
-        setShowMeetingForm(true);
+        setShowCreateMeetingForm(true);
     };
 
     const handleFindMeeting = () => {
@@ -116,7 +116,7 @@ const Meetings = () => {
             <button onClick={handleShowDeleteMeeting}>Delete Meeting</button>
             <button onClick={handleShowUpdateMeeting}>Update Meeting</button>
 
-            {showMeetingForm && <CreateMeetingForm />}
+            {showCreateMeetingForm && <CreateMeetingForm />}
             {showMeetingList && <MeetingList meetings={meetings} />}
             {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
             {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}

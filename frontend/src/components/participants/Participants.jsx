@@ -1,21 +1,30 @@
 import React, { useState } from 'react';
 import ParticipantList from './ParticipantList';
+import CreateParticipantForm from './CreateParticipantForm';
 
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
 
 const Participants = () => {
     const [participants, setParticipants] = useState([]);
+    const [showCreateParticipantForm, setShowCreateParticipantForm] = useState(false);
     const [showParticipantList, setShowParticipantList] = useState(false);
 
+    const [responseMessage, setResponseMessage] = useState('');
     const [error, setError] = useState('');
-    
+
 
     // Helper function to reset all form visibility states
     const resetFormVisibility = () => {
+        setShowCreateParticipantForm(false);
         setShowParticipantList(false);
     }
 
     const handleCreateParticipant = () => {
+        resetFormVisibility();
+        setShowCreateParticipantForm(true);
+
+        setResponseMessage('');
+        setError('');
     };
 
     const handleParticipantDisplay = async () => {
@@ -55,8 +64,11 @@ const Participants = () => {
             <button onClick={handleShowDeleteParticipant}>Delete Participant</button>
             <button onClick={handleShowUpdateParticipant}>Update Participant</button>
 
+            {showCreateParticipantForm && <CreateParticipantForm />}
             {showParticipantList && <ParticipantList participants={participants} />}
 
+            {responseMessage && <p>{responseMessage}</p>}
+            {error && <p>{error}</p>}
         </div>
     )
 }
