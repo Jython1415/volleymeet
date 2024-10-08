@@ -109,9 +109,9 @@ def get_all_meetings():
         {
             "meeting_id": meeting[0],
             "title": meeting[1],
-            "date_time": format_date(meeting[2]),
+            "details": meeting[2],  # Swapped with date_time
             "location": meeting[3],
-            "details": meeting[4],
+            "date_time": format_date(meeting[4]),  # Swapped with details
         }
         for meeting in meetings
     ]
@@ -131,9 +131,9 @@ def get_meeting_by_id(meeting_id):
         return {
             "meeting_id": meeting[0][0],
             "title": meeting[0][1],
-            "date_time": format_date(meeting[0][2]),
+            "details": meeting[0][2],
             "location": meeting[0][3],
-            "details": meeting[0][4],
+            "date_time": format_date(meeting[0][4]),
         }
     else:
         logger.error(f"Meeting with ID {meeting_id} not found")

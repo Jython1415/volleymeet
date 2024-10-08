@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import CreateMeetingForm from './components/CreateMeetingForm';
 import MeetingList from './components/MeetingList';
 import ButtonsComponent from './components/ButtonsComponent';
-import ParticipantForm from './components/ParticipantForm';
 import FindMeetingForm from './components/FindMeetingForm';
 import DeleteMeetingForm from './components/DeleteMeetingForm';
 import UpdateMeetingForm from './components/UpdateMeetingForm';
@@ -11,42 +10,52 @@ const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 
 function App() {
   const [meetings, setMeetings] = useState([]);
-  const [selectedMeetingId, setSelectedMeetingId] = useState(null)
-  const [participants, setParticipants] = useState([])
-  const { showParticipantForm, setShowParticipantForm } = useState(false)
-  const [attachments, setAttachments] = useState([])
   const [showMeetingForm, setShowMeetingForm] = useState(false);
   const [showMeetingList, setShowMeetingList] = useState(false);
-  const [showAttachmentForm, setAttachmentForm] = useState(false)
   const [showFindMeetingForm, setShowFindMeetingForm] = useState(false)
   const [showDeleteMeetingForm, setShowDeleteMeetingForm] = useState(false)
   const [showUpdateMeetingForm, setShowUpdateMeetingForm] = useState(false)
   const [responseMessage, setResponseMessage] = useState('');
   const [error, setError] = useState('');
 
+
+  // Helper function to reset all form visibility states
+  const resetFormVisibility = () => {
+    setShowMeetingForm(false);
+    setShowMeetingList(false);
+    setShowFindMeetingForm(false);
+    setShowDeleteMeetingForm(false);
+    setShowUpdateMeetingForm(false);
+    setResponseMessage('');
+    setError('');
+  };
+
   const createMeeting = (meeting) => {
+    resetFormVisibility();
     setError('');
     setMeetings([...meetings, meeting]);
     setShowMeetingForm(false);
   };
 
   const handleCreateMeeting = () => {
-    setShowMeetingForm(prevState => !prevState);
+    resetFormVisibility();
+    setShowMeetingForm(true);
   };
 
   const handleFindMeeting = () => {
+    resetFormVisibility();
     setError('');
-    setShowMeetingForm(false);
-    setShowMeetingList(false);
-    setShowFindMeetingForm(prevState => !prevState);
+    setShowFindMeetingForm(true);
   }
 
   const handleShowDeleteMeeting = () => {
-    setShowDeleteMeetingForm(prevState => !prevState);
+    resetFormVisibility();
+    setShowDeleteMeetingForm(true);
   }
 
   const handleShowUpdateMeeting = () => {
-    setShowUpdateMeetingForm(prevState => !prevState);
+    resetFormVisibility();
+    setShowUpdateMeetingForm(true);
   }
 
   const handleFindMeetingById = async (meetingId) => {
@@ -76,9 +85,8 @@ function App() {
 
   // Function to handle fetching all meetings from the backend
   const handleMeetingDisplay = async () => {
+    resetFormVisibility();
     setError('');
-    setShowMeetingForm(false); // Hide meeting form when showing list
-    setShowFindMeetingForm(false);
 
     try {
       const response = await fetch(MEETINGS_BACKEND_BASE_URL);
@@ -87,7 +95,7 @@ function App() {
         const data = await response.json();
         console.log(data)
         setMeetings(data); // Set the fetched meetings in the state
-        setShowMeetingList(prevState => !prevState);
+        setShowMeetingList(true);
       } else if (response.status === 404) {
         setError("No meetings found.");
         setShowMeetingList(false);
@@ -125,92 +133,6 @@ function App() {
     }
   };
 
-  const handleAddParticipant = (participant) => {
-    setParticipants([...participants, participant])
-  }
-
-  const handleShowParticipants = async (meeting_id) => {
-    try {
-      const response = await fetch('${MEETINGS_BACKEND_BASE_URL}/${meeting_id') // is this the rightway to reference this?
-      if (response.status === 200) {
-        const data = await response.json()
-        setParticipants(data)
-        setSelectedMeetingId(meeting_id)
-        setShowParticipantForm(true)
-      } else {
-        setError('Failed to fetch participants with status code ${response.status}')
-      }
-    } catch (error) {
-      console.error('Error fetching participants: ', error)
-      setError('Error fetching participants')
-    }
-  }
-
-  const handleAddAttachment = async (fileUrl) => {
-    if (!selectedMeetingId) return
-
-    const newAttachment = {
-      meeting_id: selectedMeetingId,
-      file_url: fileUrl
-    }
-
-    try {
-      const response = await fetch(MEETINGS_BACKEND_BASE_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newAttachment)
-      });
-
-      if (response.status === 201) {
-        setAttachments([...attachments, fileUrl]); // Add the new attachment to state
-      } else {
-        setError(`Failed to add attachment with status code ${response.status}`);
-      }
-    } catch (err) {
-      console.error('Error adding attachment:', err);
-      setError('Error adding attachment.');
-    }
-  }
-
-  const handleRemoveAttachment = async (fileUrlToRemove) => {
-    try {
-      const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${selectedMeetingId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ file_url: fileUrlToRemove })
-      })
-
-      if (response.status === 200) {
-        setAttachments(attachments.filter(file => file !== fileUrlToRemove))
-      } else {
-        setError(`Failed to remove attachment with status code ${response.status}`)
-      }
-    } catch (err) {
-      console.error('Error removing attachment:', err);
-      setError('Error removing attachment.');
-    }
-  };
-
-  const handleShowAttachments = async (meetingId) => {
-    try {
-      const response = await fetch(`${ATTACHMENTS_BACKEND_BASE_URL}/${meetingId}`);
-      if (response.status === 200) {
-        const data = await response.json();
-        setAttachments(data); // Set the fetched attachments in the state
-        setSelectedMeetingId(meetingId);
-        setShowAttachmentForm(true);
-      } else {
-        setError(`Failed to fetch attachments with status code ${response.status}`);
-      }
-    } catch (err) {
-      console.error('Error fetching attachments:', err);
-      setError('Error fetching attachments.');
-    }
-  }
 
   return (
     <div className="App">
@@ -222,18 +144,7 @@ function App() {
         onEdit={handleShowUpdateMeeting}
       />
       {showMeetingForm && <CreateMeetingForm onSubmit={createMeeting} />}
-      {showMeetingList && <MeetingList meetings={meetings} onAddAttachment={handleShowAttachments} onShowParticpants={handleShowParticipants} />}
-      {showAttachmentForm && <MeetingFiles files={attachments} onAddFile={handleAddAttachment} onRemoveFile={handleRemoveAttachment} />}
-      {showParticipantForm && (
-        <>
-          <ParticipantForm meetingId={selectedMeetingId} onSubmit={handleAddParticipant} />
-          <ul>
-            {participants.map((participant) => (
-              <li key={handleAddParticipant.participant_id}>{participant.name} ({participant.email}) </li>
-            ))}
-          </ul>
-        </>
-      )}
+      {showMeetingList && <MeetingList meetings={meetings} />}
       {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
       {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}
       {showUpdateMeetingForm && <UpdateMeetingForm />}
