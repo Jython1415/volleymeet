@@ -98,13 +98,11 @@ def get_participant_by_id(participant_id):
 
     if participant:
         logger.info(f"Retrieved participant with ID {participant_id}")
-        return (
-            {
-                "participant_id": participant[0][0],
-                "name": participant[0][1],
-                "email": participant[0][2],
-            },
-        )
+        return {
+            "participant_id": participant[0][0],
+            "name": participant[0][1],
+            "email": participant[0][2],
+        }
     else:
         logger.error(f"Participant with ID {participant_id} not found")
         return {"error": f"Participant with ID {participant_id} not found"}

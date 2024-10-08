@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ParticipantList from './ParticipantList';
 import CreateParticipantForm from './CreateParticipantForm';
+import FindParticipantForm from './FindParticipantForm';
 
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
 
@@ -8,6 +9,7 @@ const Participants = () => {
     const [participants, setParticipants] = useState([]);
     const [showCreateParticipantForm, setShowCreateParticipantForm] = useState(false);
     const [showParticipantList, setShowParticipantList] = useState(false);
+    const [showFindParticipantForm, setShowFindParticipantForm] = useState(false);
 
     const [responseMessage, setResponseMessage] = useState('');
     const [error, setError] = useState('');
@@ -17,19 +19,19 @@ const Participants = () => {
     const resetFormVisibility = () => {
         setShowCreateParticipantForm(false);
         setShowParticipantList(false);
+        setShowFindParticipantForm(false);
+        setResponseMessage('');
+        setError('');
+
     }
 
     const handleCreateParticipant = () => {
         resetFormVisibility();
         setShowCreateParticipantForm(true);
-
-        setResponseMessage('');
-        setError('');
     };
 
     const handleParticipantDisplay = async () => {
         resetFormVisibility();
-        setError('');
         try {
             const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL);
             if (response.status === 200) {
@@ -47,6 +49,8 @@ const Participants = () => {
     };
 
     const handleFindParticipant = () => {
+        resetFormVisibility();
+        setShowFindParticipantForm(true);
     }
 
     const handleShowDeleteParticipant = () => {
@@ -54,6 +58,23 @@ const Participants = () => {
 
     const handleShowUpdateParticipant = () => {
     }
+
+    const handleFindParticipantById = async (participantId) => {
+        try {
+            const response = await fetch(`${PARTICIPANTS_BACKEND_BASE_URL}/${participantId}`);
+            if (response.status === 200) {
+                const participant = await response.json();
+                setParticipants([participant]);
+                setShowParticipantList(true);
+            } else if (response.status === 404) {
+                setError("Participant not found.");
+            } else {
+                setError(`Failed to fetch participant with status code ${response.status}`);
+            }
+        } catch (err) {
+            setError('Error fetching the participant.');
+        }
+    };
 
 
     return (
@@ -66,6 +87,7 @@ const Participants = () => {
 
             {showCreateParticipantForm && <CreateParticipantForm />}
             {showParticipantList && <ParticipantList participants={participants} />}
+            {showFindParticipantForm && <FindParticipantForm onFindParticipant={handleFindParticipantById} />}
 
             {responseMessage && <p>{responseMessage}</p>}
             {error && <p>{error}</p>}
