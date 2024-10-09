@@ -12,7 +12,7 @@ const CalendarList = ({ calendars }) => {
             </thead>
             <tbody>
                 {calendars.map((calendar) => (
-                    <tr key={calendar.calendar_id}>
+                    <tr key={calendar.calendar_id} style={{ marginBottom: '20px' }}>
                         <td>{calendar.calendar_id}</td>
                         <td>{calendar.title}</td>
                         <td>{calendar.details}</td>
