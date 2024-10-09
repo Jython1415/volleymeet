@@ -60,10 +60,10 @@ const CreateAttachmentForm = () => {
                 <input type="text" name="attachment_id" value={attachment.attachment_id} onChange={handleChange} placeholder="Leave blank to auto-generate" />
 
                 <label>Meeting ID:</label>
-                <input type="text" name="name" value={attachment.meeting_id} onChange={handleChange} required />
+                <input type="text" name="meeting_id" value={attachment.meeting_id} onChange={handleChange} required />
 
                 <label>Attachment Url:</label>
-                <input type="text" name="email" value={attachment.attachment_url} onChange={handleChange} required />
+                <input type="text" name="attachment_url" value={attachment.attachment_url} onChange={handleChange} required />
 
                 <button type="submit">Submit</button>
                 {responseMessage && <p>{responseMessage}</p>} {/* Display response message */}

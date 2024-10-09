@@ -32,7 +32,7 @@ def test_get_meeting(meeting_id):
 def test_create_meeting_no_uuid():
     meeting_data = {
         "title": "New Meeting",
-        "date_time": "2024-10-10 10:00:00",
+        "date_time": "2024-10-10 10:00 AM",
         "location": "Conference Room",
         "details": "Discussion on project updates",
     }
