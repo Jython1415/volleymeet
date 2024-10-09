@@ -10,8 +10,6 @@ function App() {
   const [showCalendarsPage, setShowCalendarsPage] = useState(false);
   const [showAttachmentsPage, setShowAttachmentsPage] = useState(false);
 
-
-
   const resetComponentsVisibility = () => {
     setShowMeetingsPage(false);
     setShowParticipantsPage(false);
