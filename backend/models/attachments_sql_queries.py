@@ -14,14 +14,14 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
     # Check if attachment_id is provided
     if attachment_id:
         query = """
-        INSERT INTO attachments (attachment_id, meeting_id, attachment_url)
+        INSERT INTO attachments (attachment_id, meeting_id, url)
         VALUES (%s, %s, %s)
         """
         data = (attachment_id, meeting_id, attachment_url)
     else:
         # Exclude attachment_id from the query to let the database handle it
         query = """
-        INSERT INTO attachments (meeting_id, attachment_url)
+        INSERT INTO attachments (meeting_id, url)
         VALUES (%s, %s)
         """
         data = (meeting_id, attachment_url)
@@ -40,7 +40,7 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
 def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
     # Fetch the current attachment data
     query = (
-        "SELECT meeting_id, attachment_url FROM attachments WHERE attachment_id = %s"
+        "SELECT meeting_id, url FROM attachments WHERE attachment_id = %s"
     )
     data = (attachment_id,)
     current_attachment = execute_read_query(query, data)
@@ -61,7 +61,7 @@ def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
     # Update the attachment with the new or existing values
     update_query = """
     UPDATE attachments 
-    SET meeting_id = %s, attachment_url = %s
+    SET meeting_id = %s, url = %s
     WHERE attachment_id = %s
     """
     update_data = (meeting_id, attachment_url, attachment_id)
