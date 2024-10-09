@@ -7,6 +7,7 @@ from models.calendars_sql_queries import (
     get_calendar_by_id,
     delete_calendar,
 )
+from models.meetings_sql_queries import get_meetings_for_calendar
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -95,4 +96,17 @@ def api_delete_calendar(calendar_id):
         return jsonify({"message": "Calendar deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Error deleting calendar with ID {calendar_id}: {str(e)}")
+        abort(404, description=str(e))
+
+# Endpoint to get all meetings for a specific calendar
+@calendar_routes.route("/calendars/<string:calendar_id>/meetings", methods=["GET"])
+def api_get_meetings_for_calendar(calendar_id):
+    """Fetch all meetings for a specific calendar by ID."""
+    logger.info(f"Fetching all meetings for calendar with ID: {calendar_id}")
+    try:
+        meetings = get_meetings_for_calendar(calendar_id)
+        logger.info(f"Successfully fetched meetings for calendar with ID: {calendar_id}")
+        return jsonify(meetings), 200
+    except ValueError as e:
+        logger.error(f"Error fetching meetings for calendar with ID {calendar_id}: {str(e)}")
         abort(404, description=str(e))

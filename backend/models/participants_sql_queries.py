@@ -136,3 +136,31 @@ def cleanup_orphaned_meetings_by_participants():
     except Exception as e:
         logger.error(f"Error cleaning up orphaned meetings: {str(e)}")
         raise ValueError(f"Error cleaning up orphaned meetings: {str(e)}")
+
+# Get participants for a specific meeting
+def get_participants_for_meeting(meeting_id):
+    query = """
+    SELECT participants.participant_id, participants.name, participants.email
+    FROM participants
+    JOIN participating_in
+    ON participants.participant_id = participating_in.participant_id
+    WHERE meeting_id = %s
+    """
+    data = (meeting_id,)
+    participants = execute_read_query(query, data)
+
+    if not participants:
+        logger.info(f"No participants found for meeting with ID {meeting_id}")
+        raise ValueError(f"No participants found for meeting with ID {meeting_id}")
+
+    results = [
+        {
+            "participant_id": participant[0],
+            "name": participant[1],
+            "email": participant[2],
+        }
+        for participant in participants
+    ]
+
+    logger.info(f"Retrieved {len(results)} participants for meeting with ID {meeting_id}")
+    return results
