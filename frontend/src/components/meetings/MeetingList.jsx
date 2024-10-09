@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MeetingList = ({ meetings, participants }) => {
+const MeetingList = ({ meetings, participants, attachments }) => {
     return (
         <table>
             <thead>
@@ -11,6 +11,7 @@ const MeetingList = ({ meetings, participants }) => {
                     <th>Location</th>
                     <th>Details</th>
                     <th>Participants</th>
+                    <th>Attachments</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,7 +29,16 @@ const MeetingList = ({ meetings, participants }) => {
                                     <div key={participant.participant_id}>
                                         {participant.name} ({participant.email})
                                     </div>
-                                ))}
+                            ))}
+                        </td>
+                        <td>
+                            {attachments
+                                .filter(attachments => attachments.meeting_id === meeting.meeting_id)
+                                .map(attachment => (
+                                    <div key={attachment.attachment_id}>
+                                        {attachment.attachment_id} ({attachment.attachment_url})
+                                    </div>
+                            ))}
                         </td>
                     </tr>
                 ))}

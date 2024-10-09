@@ -1,0 +1,4 @@
+MYSQL_ROOT_PASSWORD=dronewithclawiscool
+MYSQL_DATABASE=volleymeet
+MYSQL_USER=appuser
+MYSQL_PASSWORD=firealarmandwaterbottleisthecombo
