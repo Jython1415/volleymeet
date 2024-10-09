@@ -154,6 +154,37 @@ def delete_meeting(meeting_id):
     except Exception as e:
         logger.error(f"Error deleting meeting: {str(e)}")
         raise ValueError(f"Error deleting meeting: {str(e)}")
+    
+def link_participant_to_meeting(meeting_id, participant_id):
+    # Insert a new record into the participating_in table
+    query = """
+    INSERT INTO participating_in (meeting_id, participant_id)
+    VALUES (%s, %s)
+    """
+    data = (meeting_id, participant_id)
+
+    try:
+        execute_query(query, data)
+        logger.info(f"Linked participant {participant_id} to meeting {meeting_id}")
+    except Exception as e:
+        logger.error(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
+        raise ValueError(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
+
+def link_calendar_to_meeting(meeting_id, calendar_id):
+    # Insert a new record into the scheduled_in table
+    query = """
+    INSERT INTO scheduled_in (meeting_id, calendar_id)
+    VALUES (%s, %s)
+    """
+    data = (meeting_id, calendar_id)
+
+    try:
+        execute_query(query, data)
+        logger.info(f"Linked calendar {calendar_id} to meeting {meeting_id}")
+    except Exception as e:
+        logger.error(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
+        raise ValueError(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
+
 
 
 def cleanup_orphaned_participants():

@@ -16,7 +16,7 @@ const MeetingList = ({ meetings, participants, attachments }) => {
             </thead>
             <tbody>
                 {meetings.map((meeting) => (
-                    <tr key={meeting.meeting_id}>
+                    <tr key={meeting.meeting_id} style={{ marginBottom: '20px' }}>
                         <td>{meeting.meeting_id}</td>
                         <td>{meeting.title}</td>
                         <td>{meeting.date_time}</td>
@@ -29,7 +29,7 @@ const MeetingList = ({ meetings, participants, attachments }) => {
                                     <div key={participant.participant_id}>
                                         {participant.name} ({participant.email})
                                     </div>
-                            ))}
+                                ))}
                         </td>
                         <td>
                             {attachments
@@ -38,7 +38,7 @@ const MeetingList = ({ meetings, participants, attachments }) => {
                                     <div key={attachment.attachment_id}>
                                         {attachment.attachment_id} ({attachment.attachment_url})
                                     </div>
-                            ))}
+                                ))}
                         </td>
                     </tr>
                 ))}

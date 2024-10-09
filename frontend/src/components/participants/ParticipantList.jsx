@@ -12,7 +12,7 @@ const ParticipantList = ({ participants }) => {
             </thead>
             <tbody>
                 {participants.map((participant) => (
-                    <tr key={participant.participant_id}>
+                    <tr key={participant.participant_id} style={{ marginBottom: '20px' }}>
                         <td>{participant.participant_id}</td>
                         <td>{participant.name}</td>
                         <td>{participant.email}</td>
