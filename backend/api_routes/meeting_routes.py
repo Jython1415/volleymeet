@@ -9,7 +9,7 @@ from models.meetings_sql_queries import (
     link_participant_to_meeting,
     link_calendar_to_meeting,
 )
-
+from models.participants_sql_queries import get_participants_for_meeting
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -169,3 +169,17 @@ def api_link_calendar_to_meeting(meeting_id, calendar_id):
             f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
         )
         return jsonify({"error": str(e)}), 400
+
+# Endpoint to get all participants for a specific meeting
+@meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])
+def api_get_participants_for_meeting(meeting_id):
+    """Fetch all participants for a specific meeting by ID."""
+    logger.info(f"Fetching participants for meeting with ID: {meeting_id}")
+    participants = get_participants_for_meeting(meeting_id)
+
+    if not participants:
+        logger.info(f"No participants found for meeting with ID {meeting_id}")
+        return jsonify({"message": "No participants found for this meeting"}), 200
+
+    logger.info(f"Successfully fetched participants for meeting with ID: {meeting_id}")
+    return jsonify(participants), 200
