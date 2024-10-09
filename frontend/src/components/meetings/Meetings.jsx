@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CreateMeetingForm from './CreateMeetingForm';
 import MeetingList from './MeetingList';
 import FindMeetingForm from './FindMeetingForm';
@@ -6,6 +6,7 @@ import DeleteMeetingForm from './DeleteMeetingForm';
 import UpdateMeetingForm from './UpdateMeetingForm';
 import LinkParticipantForm from './LinkParticipantForm';
 import LinkCalendarForm from './LinkCalendarForm';
+import MeetingParticipantList from './MeetingParticipantList';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
@@ -13,6 +14,7 @@ const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);
+    const [participantList, setParticipantList] = useState([]);
     const [participants, setParticipants] = useState([]);
     const [attachments, setAttachments] = useState([]);
     const [showCreateMeetingForm, setShowCreateMeetingForm] = useState(false);
@@ -22,6 +24,7 @@ const Meetings = () => {
     const [showUpdateMeetingForm, setShowUpdateMeetingForm] = useState(false);
     const [showLinkParticipantForm, setShowLinkParticipantForm] = useState(false);
     const [showLinkCalendarForm, setShowLinkCalendarForm] = useState(false);
+    const [showParticipantList, setShowParticipantList] = useState(false);
     const [responseMessage, setResponseMessage] = useState('');
     const [error, setError] = useState('');
 
@@ -34,6 +37,7 @@ const Meetings = () => {
         setShowUpdateMeetingForm(false);
         setShowLinkParticipantForm(false);
         setShowLinkCalendarForm(false);
+        setShowParticipantList(false);
         setResponseMessage('');
         setError('');
     };
@@ -77,6 +81,22 @@ const Meetings = () => {
                 setShowMeetingList(true);
                 await handleFetchParticipants();
                 await handleFetchAttachments();
+                try {
+                    const participantsResponse = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}/participants`);
+                    if (participantsResponse.status === 200) {
+                        console.log("Participants found for meeting", meetingId);
+                        console.log(participantsResponse);
+                        const participantsData = await participantsResponse.json();
+                        console.log(participantsData);
+                        setParticipantList(participantsData);
+                    } else if (participantsResponse.status === 404) {
+                        setError("No participants found for this meeting.");
+                    } else {
+                        setError(`Failed to fetch participants with status code ${participantsResponse.status}`);
+                    }
+                } catch (err) {
+                    setError('Error fetching participants.');
+                }
             } else if (response.status === 404) {
                 setError("Meeting not found.");
             } else {
@@ -86,6 +106,20 @@ const Meetings = () => {
             setError('Error fetching the meeting.');
         }
     };
+
+    useEffect(() => {
+        if (showFindMeetingForm && participantList.length > 0) {
+            // Only show the participant list component if we have participant data
+            setShowParticipantList(true);
+        }
+    }, [participantList, showFindMeetingForm]); // This runs whenever participantList is updated
+    
+    useEffect(() => {
+        if (participantList.length > 0) {
+            console.log("Participant list updated: ", participantList);  // Debugging log
+        }
+    }, [participantList]);
+
 
     const handleMeetingDisplay = async () => {
         resetFormVisibility();
@@ -202,6 +236,7 @@ const Meetings = () => {
             {showUpdateMeetingForm && <UpdateMeetingForm />}
             {showLinkParticipantForm && <LinkParticipantForm onLinkParticipant={handleLinkParticipant} />}
             {showLinkCalendarForm && <LinkCalendarForm onLinkCalendar={handleLinkCalendar} />}
+            {showParticipantList && <MeetingParticipantList key={participantList.length} participantList={participantList} />}
             {responseMessage && <p>{responseMessage}</p>}
             {error && <p>{error}</p>}
         </div>
