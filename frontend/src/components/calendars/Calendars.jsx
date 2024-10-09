@@ -4,16 +4,19 @@ import CreateCalendarForm from './CreateCalendarForm';
 import FindCalendarForm from './FindCalendarForm';
 import DeleteCalendarForm from './DeleteCalendarForm';
 import UpdateCalendarForm from './UpdateCalendarForm';
+import CalendarMeetingList from './CalendarMeetingList';
 
 const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars";
 
 const Calendars = () => {
     const [calendars, setCalendars] = useState([]);
+    const [meetings, setMeetings] = useState([]);
     const [showCreateCalendarForm, setShowCreateCalendarForm] = useState(false);
     const [showCalendarList, setShowCalendarList] = useState(false);
     const [showFindCalendarForm, setShowFindCalendarForm] = useState(false);
     const [showDeleteCalendarForm, setShowDeleteCalendarForm] = useState(false);
     const [showUpdateCalendarForm, setShowUpdateCalendarForm] = useState(false);
+    const [showMeetingList, setShowMeetingList] = useState(false);
     const [responseMessage, setResponseMessage] = useState('');
     const [error, setError] = useState('');
 
@@ -25,9 +28,9 @@ const Calendars = () => {
         setShowFindCalendarForm(false);
         setShowDeleteCalendarForm(false);
         setShowUpdateCalendarForm(false);
+        setShowMeetingList(false);
         setResponseMessage('');
         setError('');
-
     }
 
     const handleCreateCalendar = () => {
@@ -93,6 +96,21 @@ const Calendars = () => {
                 const calendar = await response.json();
                 setCalendars([calendar]);
                 setShowCalendarList(true);
+                // Fetch meetings for the calendar
+                try {
+                    const meetingsResponse = await fetch(`${CALENDARS_BACKEND_BASE_URL}/${calendarId}/meetings`);
+                    if (meetingsResponse.status === 200) {
+                        const meetingsData = await meetingsResponse.json();
+                        setMeetings(meetingsData);
+                        setShowMeetingList(true);
+                    } else if (meetingsResponse.status === 404) {
+                        setError("No meetings found for the calendar.");
+                    } else {
+                        setError(`Failed to fetch meetings with status code ${meetingsResponse.status}`);
+                    }
+                } catch (err) {
+                    setError('Error fetching meetings.');
+                }
             } else if (response.status === 404) {
                 setError("Calendar not found.");
             } else {
@@ -117,6 +135,7 @@ const Calendars = () => {
             {showFindCalendarForm && <FindCalendarForm onFindCalendar={handleFindCalendarById} />}
             {showDeleteCalendarForm && <DeleteCalendarForm onDeleteCalendar={handleDeleteCalendar} />}
             {showUpdateCalendarForm && <UpdateCalendarForm />}
+            {showMeetingList && <CalendarMeetingList meetings={meetings} />}
 
             {responseMessage && <p>{responseMessage}</p>}
             {error && <p>{error}</p>}
