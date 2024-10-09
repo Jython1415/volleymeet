@@ -7,9 +7,11 @@ import DeleteMeetingForm from './DeleteMeetingForm';
 import UpdateMeetingForm from './UpdateMeetingForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
+const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);
+    const [participants, setParticipants] =useState([]);
     const [showCreateMeetingForm, setShowCreateMeetingForm] = useState(false);
     const [showMeetingList, setShowMeetingList] = useState(false);
     const [showFindMeetingForm, setShowFindMeetingForm] = useState(false);
@@ -57,6 +59,7 @@ const Meetings = () => {
                 const meeting = await response.json();
                 setMeetings([meeting]);
                 setShowMeetingList(true);
+                await handleFetchParticipants();
             } else if (response.status === 404) {
                 setError("Meeting not found.");
             } else {
@@ -75,6 +78,7 @@ const Meetings = () => {
                 const data = await response.json();
                 setMeetings(data);
                 setShowMeetingList(true);
+                await handleFetchParticipants();
             } else if (response.status === 404) {
                 setError("No meetings found.");
             } else {
@@ -103,6 +107,20 @@ const Meetings = () => {
         }
     };
 
+    const handleFetchParticipants = async () => {
+        try {
+            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL);
+            if (response.status === 200) {
+                const data = await response.json();
+                setParticipants(data);
+            } else {
+                setError(`Failed to fetch participants with status code ${response.status}`);
+            }
+        } catch (err) {
+            setError('Error fetching participants.');
+        }
+    };
+
     return (
         <div>
             <button onClick={handleCreateMeeting}>Create Meeting</button>
@@ -112,7 +130,7 @@ const Meetings = () => {
             <button onClick={handleShowUpdateMeeting}>Update Meeting</button>
 
             {showCreateMeetingForm && <CreateMeetingForm />}
-            {showMeetingList && <MeetingList meetings={meetings} />}
+            {showMeetingList && <MeetingList meetings={meetings} participants={participants}/>}
             {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
             {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}
             {showUpdateMeetingForm && <UpdateMeetingForm />}

@@ -7,6 +7,7 @@ import UpdateParticipantForm from './UpdateParticipantForm';
 
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
 
+
 const Participants = () => {
     const [participants, setParticipants] = useState([]);
     const [showCreateParticipantForm, setShowCreateParticipantForm] = useState(false);
