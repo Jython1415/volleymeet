@@ -8,10 +8,12 @@ import UpdateMeetingForm from './UpdateMeetingForm';
 
 const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
 const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
+const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);
     const [participants, setParticipants] =useState([]);
+    const [attachments, setAttachments] = useState([]);
     const [showCreateMeetingForm, setShowCreateMeetingForm] = useState(false);
     const [showMeetingList, setShowMeetingList] = useState(false);
     const [showFindMeetingForm, setShowFindMeetingForm] = useState(false);
@@ -60,6 +62,7 @@ const Meetings = () => {
                 setMeetings([meeting]);
                 setShowMeetingList(true);
                 await handleFetchParticipants();
+                await handleFetchAttachments();
             } else if (response.status === 404) {
                 setError("Meeting not found.");
             } else {
@@ -79,6 +82,7 @@ const Meetings = () => {
                 setMeetings(data);
                 setShowMeetingList(true);
                 await handleFetchParticipants();
+                await handleFetchAttachments();
             } else if (response.status === 404) {
                 setError("No meetings found.");
             } else {
@@ -121,6 +125,20 @@ const Meetings = () => {
         }
     };
 
+    const handleFetchAttachments = async () => {
+        try {
+            const response = await fetch(ATTACHMENTS_BACKEND_BASE_URL);
+            if (response.status === 200) {
+                const data = await response.json();
+                setAttachments(data);
+            } else {
+                setError(`Failed to fetch participants with status code ${response.status}`);
+            }
+        } catch (err) {
+            setError('Error fetching participants.');
+        }
+    };
+
     return (
         <div>
             <button onClick={handleCreateMeeting}>Create Meeting</button>
@@ -130,7 +148,7 @@ const Meetings = () => {
             <button onClick={handleShowUpdateMeeting}>Update Meeting</button>
 
             {showCreateMeetingForm && <CreateMeetingForm />}
-            {showMeetingList && <MeetingList meetings={meetings} participants={participants}/>}
+            {showMeetingList && <MeetingList meetings={meetings} participants={participants} attachments={attachments}/>}
             {showFindMeetingForm && <FindMeetingForm onFindMeeting={handleFindMeetingById} />}
             {showDeleteMeetingForm && <DeleteMeetingForm onDeleteMeeting={handleDeleteMeeting} />}
             {showUpdateMeetingForm && <UpdateMeetingForm />}
