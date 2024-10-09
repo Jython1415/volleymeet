@@ -199,3 +199,32 @@ def cleanup_orphaned_participants():
     except Exception as e:
         logger.error(f"Error cleaning up orphaned participants: {str(e)}")
         raise ValueError(f"Error cleaning up orphaned participants: {str(e)}")
+
+# Get meetings for a specific calendar
+def get_meetings_for_calendar(calendar_id):
+    query = """
+    SELECT m.meeting_id, m.title, m.details, m.location, m.date_time
+    FROM meetings m
+    JOIN scheduled_in s ON m.meeting_id = s.meeting_id
+    WHERE s.calendar_id = %s
+    """
+    data = (calendar_id,)
+    meetings = execute_read_query(query, data)
+
+    if not meetings:
+        logger.info(f"No meetings found for calendar with ID {calendar_id}")
+        raise ValueError(f"No meetings found for calendar with ID {calendar_id}")
+
+    results = [
+        {
+            "meeting_id": meeting[0],
+            "title": meeting[1],
+            "details": meeting[2],
+            "location": meeting[3],
+            "date_time": format_date(meeting[4]),
+        }
+        for meeting in meetings
+    ]
+
+    logger.info(f"Retrieved {len(results)} meetings for calendar with ID {calendar_id}")
+    return results
