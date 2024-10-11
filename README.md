@@ -30,6 +30,8 @@ npm run dev
 
 ### 2.2.1 Docker Usage
 
+Install Docker.
+
 Build the Docker image (only needed if changes were made to Dockerfile):
 
 ```bash
