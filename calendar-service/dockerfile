@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5001
 
 # Define the command to run the calendar service
-CMD ["python", "calendar_service.py"]
+CMD ["python", "calender_service.py"]

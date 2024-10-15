@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5000
 
 # Define the command to run the meeting service
-CMD ["python", "meeting_service.py"]
+CMD ["python", "meetings_service.py"]
