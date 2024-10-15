@@ -5,3 +5,4 @@ env
 .vscode
 !.gitignore
 !.git/*
+!.github
