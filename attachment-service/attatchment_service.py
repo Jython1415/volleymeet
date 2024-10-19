@@ -1,61 +1,83 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+import logging
+from flask import Blueprint, jsonify, request, abort
+from backend.models.attachments_sql_queries import (
+    create_attachment,
+    update_attachment,
+    get_all_attachments,
+    get_attachment_by_id,
+    delete_attachment,
+)
+from backend.models.meetings_sql_queries import get_meetings_for_calendar
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://attachment_user:attachmentpassword@localhost:3309/attachment_db'
-db = SQLAlchemy(app)
+# Set up logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-class Attachment(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    meeting_id = db.Column(db.Integer)  # Foreign key for Meeting ID
-    url = db.Column(db.String(500))
+# Create a Blueprint for attachment routes
+attachment_routes = Blueprint("attachment_routes", __name__)
 
-db.create_all()
+# Endpoint to get all attachments
+@attachment_routes.route("/attachments", methods=["GET"])
+def api_get_attachments():
+    logger.info("Fetching all attachments")
+    attachments = get_all_attachments()
 
-@app.route('/attachments', methods=['POST'])
-def create_attachment():
-    data = request.json
-    attachment = Attachment(meeting_id=data['meeting_id'], url=data['url'])
-    db.session.add(attachment)
-    db.session.commit()
-    return jsonify({"id": attachment.id}), 201
+    if "error" in attachments:
+        logger.error("No attachments found")
+        abort(404, description=attachments["error"])
 
-@app.route('/attachments/<id>', methods=['GET'])
-def get_attachment(id):
-    attachment = Attachment.query.get(id)
-    if not attachment:
-        return jsonify({'error': 'Attachment not found'}), 404
-    return jsonify({
-        'id': attachment.id,
-        'meeting_id': attachment.meeting_id,
-        'url': attachment.url
-    })
+    logger.info("Successfully fetched attachments")
+    return jsonify(attachments), 200
 
-@app.route('/attachments', methods=['GET'])
-def list_attachments():
-    attachments = Attachment.query.all()
-    return jsonify([{
-        'id': a.id, 'meeting_id': a.meeting_id, 'url': a.url
-    } for a in attachments])
+# Endpoint to get a specific attachment by ID
+@attachment_routes.route("/attachments/<string:attachment_id>", methods=["GET"])
+def api_get_attachment(attachment_id):
+    logger.info(f"Fetching attachment with ID: {attachment_id}")
+    try:
+        attachment = get_attachment_by_id(attachment_id)
+        return jsonify(attachment), 200
+    except ValueError as e:
+        logger.error(f"Error fetching attachment: {str(e)}")
+        abort(404, description=str(e))
 
-@app.route('/attachments/<id>', methods=['PUT'])
-def update_attachment(id):
-    data = request.json
-    attachment = Attachment.query.get(id)
-    if not attachment:
-        return jsonify({'error': 'Attachment not found'}), 404
-    attachment.url = data.get('url', attachment.url)
-    db.session.commit()
-    return jsonify({"message": "Attachment updated successfully"})
+# Endpoint to add a new attachment
+@attachment_routes.route("/attachments", methods=["POST"])
+def api_add_attachment():
+    data = request.get_json()
+    meeting_id = data.get("meeting_id")
+    attachment_url = data.get("attachment_url")
+    attachment_id = data.get("attachment_id")
 
-@app.route('/attachments/<id>', methods=['DELETE'])
-def delete_attachment(id):
-    attachment = Attachment.query.get(id)
-    if not attachment:
-        return jsonify({'error': 'Attachment not found'}), 404
-    db.session.delete(attachment)
-    db.session.commit()
-    return jsonify({"message": "Attachment deleted successfully"})
+    logger.info(f"Adding new attachment for meeting ID: {meeting_id}")
+    try:
+        create_attachment(meeting_id, attachment_url, attachment_id)
+        return jsonify({"message": "Attachment created successfully"}), 201
+    except ValueError as e:
+        logger.error(f"Error creating attachment: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5003)
+# Endpoint to update an existing attachment
+@attachment_routes.route("/attachments/<string:attachment_id>", methods=["PUT"])
+def api_update_attachment(attachment_id):
+    data = request.get_json()
+    meeting_id = data.get("meeting_id")
+    attachment_url = data.get("attachment_url")
+
+    logger.info(f"Updating attachment with ID: {attachment_id}")
+    try:
+        update_attachment(attachment_id, meeting_id, attachment_url)
+        return jsonify({"message": "Attachment updated successfully"}), 200
+    except ValueError as e:
+        logger.error(f"Error updating attachment: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+# Endpoint to delete an attachment by ID
+@attachment_routes.route("/attachments/<string:attachment_id>", methods=["DELETE"])
+def api_delete_attachment(attachment_id):
+    logger.info(f"Deleting attachment with ID: {attachment_id}")
+    try:
+        delete_attachment(attachment_id)
+        return jsonify({"message": "Attachment deleted successfully"}), 204
+    except ValueError as e:
+        logger.error(f"Error deleting attachment: {str(e)}")
+        abort(404, description=str(e))

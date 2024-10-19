@@ -1,64 +1,81 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+import logging
+from flask import Blueprint, jsonify, request, abort
+from models.participants_sql_queries import (
+    create_participant,
+    update_participant,
+    get_all_participants,
+    get_participant_by_id,
+    delete_participant,
+)
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://participant_user:participantpassword@localhost:3308/participant_db'
-db = SQLAlchemy(app)
+# Set up logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-class Participant(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200))
-    email = db.Column(db.String(200))
-    meeting_id = db.Column(db.Integer)  # Foreign key for Meeting ID
+# Create a Blueprint for participant routes
+participant_routes = Blueprint("participant_routes", __name__)
 
-db.create_all()
+# Endpoint to get all participants
+@participant_routes.route("/participants", methods=["GET"])
+def api_get_participants():
+    logger.info("Fetching all participants")
+    participants = get_all_participants()
 
-@app.route('/participants', methods=['POST'])
-def create_participant():
-    data = request.json
-    participant = Participant(name=data['name'], email=data['email'], meeting_id=data['meeting_id'])
-    db.session.add(participant)
-    db.session.commit()
-    return jsonify({"id": participant.id}), 201
+    if "error" in participants:
+        logger.error("No participants found")
+        abort(404, description=participants["error"])
 
-@app.route('/participants/<id>', methods=['GET'])
-def get_participant(id):
-    participant = Participant.query.get(id)
-    if not participant:
-        return jsonify({'error': 'Participant not found'}), 404
-    return jsonify({
-        'id': participant.id,
-        'name': participant.name,
-        'email': participant.email,
-        'meeting_id': participant.meeting_id
-    })
+    return jsonify(participants), 200
 
-@app.route('/participants', methods=['GET'])
-def list_participants():
-    participants = Participant.query.all()
-    return jsonify([{
-        'id': p.id, 'name': p.name, 'email': p.email, 'meeting_id': p.meeting_id
-    } for p in participants])
+# Endpoint to get a specific participant by ID
+@participant_routes.route("/participants/<string:participant_id>", methods=["GET"])
+def api_get_participant(participant_id):
+    logger.info(f"Fetching participant with ID: {participant_id}")
+    try:
+        participant = get_participant_by_id(participant_id)
+        return jsonify(participant), 200
+    except ValueError as e:
+        logger.error(f"Error fetching participant: {str(e)}")
+        abort(404, description=str(e))
 
-@app.route('/participants/<id>', methods=['PUT'])
-def update_participant(id):
-    data = request.json
-    participant = Participant.query.get(id)
-    if not participant:
-        return jsonify({'error': 'Participant not found'}), 404
-    participant.name = data.get('name', participant.name)
-    participant.email = data.get('email', participant.email)
-    db.session.commit()
-    return jsonify({"message": "Participant updated successfully"})
+# Endpoint to add a new participant
+@participant_routes.route("/participants", methods=["POST"])
+def api_add_participant():
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+    participant_id = data.get("participant_id")
 
-@app.route('/participants/<id>', methods=['DELETE'])
-def delete_participant(id):
-    participant = Participant.query.get(id)
-    if not participant:
-        return jsonify({'error': 'Participant not found'}), 404
-    db.session.delete(participant)
-    db.session.commit()
-    return jsonify({"message": "Participant deleted successfully"})
+    logger.info(f"Adding new participant with name: {name}")
+    try:
+        create_participant(name, email, participant_id)
+        return jsonify({"message": "Participant created successfully"}), 201
+    except ValueError as e:
+        logger.error(f"Error creating participant: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5002)
+# Endpoint to update an existing participant
+@participant_routes.route("/participants/<string:participant_id>", methods=["PUT"])
+def api_update_participant(participant_id):
+    data = request.get_json()
+    name = data.get("name")
+    email = data.get("email")
+
+    logger.info(f"Updating participant with ID: {participant_id}")
+    try:
+        update_participant(participant_id, name, email)
+        return jsonify({"message": "Participant updated successfully"}), 200
+    except ValueError as e:
+        logger.error(f"Error updating participant: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+# Endpoint to delete a participant by ID
+@participant_routes.route("/participants/<string:participant_id>", methods=["DELETE"])
+def api_delete_participant(participant_id):
+    logger.info(f"Deleting participant with ID: {participant_id}")
+    try:
+        delete_participant(participant_id)
+        return jsonify({"message": "Participant deleted successfully"}), 204
+    except ValueError as e:
+        logger.error(f"Participant with ID {participant_id} not found")
+        abort(404, description=f"Participant with ID {participant_id} not found")

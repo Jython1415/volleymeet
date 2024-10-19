@@ -1,68 +1,136 @@
-from flask import Flask, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
+import logging
+from flask import Blueprint, jsonify, request, abort
+from backend.models.meetings_sql_queries import (
+    create_meeting,
+    get_all_meetings,
+    get_meeting_by_id,
+    update_meeting,
+    delete_meeting,
+    link_participant_to_meeting,
+    link_calendar_to_meeting,
+)
+from backend.models.participants_sql_queries import get_participants_for_meeting
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://meeting_user:meetingpassword@localhost:3306/meeting_db'
-db = SQLAlchemy(app)
 
-class Meeting(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200))
-    date_time = db.Column(db.String(100))
-    location = db.Column(db.String(200))
-    details = db.Column(db.Text)
+# Set up logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
-db.create_all()
+# Create a Blueprint for meeting routes
+meeting_routes = Blueprint("meeting_routes", __name__)
 
-@app.route('/meetings', methods=['POST'])
-def create_meeting():
-    data = request.json
-    meeting = Meeting(title=data['title'], date_time=data['date_time'], location=data['location'], details=data['details'])
-    db.session.add(meeting)
-    db.session.commit()
-    return jsonify({"id": meeting.id}), 201
+# Endpoint to get all meetings
+@meeting_routes.route("/meetings", methods=["GET"])
+def api_get_meetings():
+    logger.info("Fetching all meetings")
+    meetings = get_all_meetings()
 
-@app.route('/meetings/<id>', methods=['GET'])
-def get_meeting(id):
-    meeting = Meeting.query.get(id)
-    if not meeting:
-        return jsonify({'error': 'Meeting not found'}), 404
-    return jsonify({
-        'id': meeting.id,
-        'title': meeting.title,
-        'date_time': meeting.date_time,
-        'location': meeting.location,
-        'details': meeting.details
-    })
+    if "error" in meetings:
+        logger.error("No meetings found")
+        abort(404, description=meetings["error"])
 
-@app.route('/meetings', methods=['GET'])
-def list_meetings():
-    meetings = Meeting.query.all()
-    return jsonify([{
-        'id': m.id, 'title': m.title, 'date_time': m.date_time, 'location': m.location, 'details': m.details
-    } for m in meetings])
+    return jsonify(meetings), 200
 
-@app.route('/meetings/<id>', methods=['PUT'])
-def update_meeting(id):
-    data = request.json
-    meeting = Meeting.query.get(id)
-    if not meeting:
-        return jsonify({'error': 'Meeting not found'}), 404
-    meeting.title = data.get('title', meeting.title)
-    meeting.date_time = data.get('date_time', meeting.date_time)
-    meeting.location = data.get('location', meeting.location)
-    meeting.details = data.get('details', meeting.details)
-    db.session.commit()
-    return jsonify({"message": "Meeting updated successfully"})
+# Endpoint to get a specific meeting by ID
+@meeting_routes.route("/meetings/<string:meeting_id>", methods=["GET"])
+def api_get_meeting(meeting_id):
+    logger.info(f"Fetching meeting with ID: {meeting_id}")
+    meeting = get_meeting_by_id(meeting_id)
 
-@app.route('/meetings/<id>', methods=['DELETE'])
-def delete_meeting(id):
-    meeting = Meeting.query.get(id)
-    if not meeting:
-        return jsonify({'error': 'Meeting not found'}), 404
-    db.session.delete(meeting)
-    db.session.commit()
-    return jsonify({"message": "Meeting deleted successfully"})
+    if "error" in meeting:
+        logger.error(f"Meeting with ID {meeting_id} not found")
+        abort(404, description=meeting["error"])
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    return jsonify(meeting), 200
+
+# Endpoint to add a new meeting
+@meeting_routes.route("/meetings", methods=["POST"])
+def api_add_meeting():
+    data = request.get_json()
+
+    title = data.get("title")
+    date_time = data.get("date_time")
+    location = data.get("location")
+    details = data.get("details")
+
+    # Meeting ID may not be specified
+    meeting_id = data.get("meeting_id")
+
+    logger.info(f"Adding new meeting with title: {title}")
+    try:
+        create_meeting(title, date_time, location, details, meeting_id)
+        return jsonify({"message": "Meeting created successfully"}), 201
+    except ValueError as e:
+        logger.error(f"Error creating meeting: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+# Endpoint to update an existing meeting
+@meeting_routes.route("/meetings/<string:meeting_id>", methods=["PUT"])
+def api_update_meeting(meeting_id):
+    data = request.get_json()
+
+    title = data.get("title")
+    date_time = data.get("date_time")
+    location = data.get("location")
+    details = data.get("details")
+
+    logger.info(f"Updating meeting with ID: {meeting_id}")
+    try:
+        update_meeting(meeting_id, title, date_time, location, details)
+        return jsonify({"message": "Meeting updated successfully"}), 200
+    except ValueError as e:
+        logger.error(f"Error updating meeting with ID {meeting_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+# Endpoint to delete a meeting by ID
+@meeting_routes.route("/meetings/<string:meeting_id>", methods=["DELETE"])
+def api_delete_meeting(meeting_id):
+    logger.info(f"Deleting meeting with ID: {meeting_id}")
+    try:
+        delete_meeting(meeting_id)
+        return jsonify({"message": "Meeting deleted successfully"}), 204
+    except ValueError as e:
+        logger.error(f"Meeting with ID {meeting_id} not found")
+        abort(404, description=f"Meeting with ID {meeting_id} not found")
+
+# Endpoint to link a meeting and participant
+@meeting_routes.route(
+    "/meetings/<string:meeting_id>/participants/<string:participant_id>",
+    methods=["POST"],
+)
+def api_link_participant_to_meeting(meeting_id, participant_id):
+    logger.info(f"Linking participant {participant_id} to meeting {meeting_id}")
+
+    try:
+        link_participant_to_meeting(meeting_id, participant_id)
+        return jsonify({"message": f"Participant {participant_id} linked to meeting {meeting_id} successfully"}), 201
+    except ValueError as e:
+        logger.error(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+# Endpoint to link a meeting and calendar
+@meeting_routes.route(
+    "/meetings/<string:meeting_id>/calendars/<string:calendar_id>",
+    methods=["POST"],
+)
+def api_link_calendar_to_meeting(meeting_id, calendar_id):
+    logger.info(f"Linking calendar {calendar_id} to meeting {meeting_id}")
+
+    try:
+        link_calendar_to_meeting(meeting_id, calendar_id)
+        return jsonify({"message": f"Calendar {calendar_id} linked to meeting {meeting_id} successfully"}), 201
+    except ValueError as e:
+        logger.error(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 400
+
+# Endpoint to get all participants for a specific meeting
+@meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])
+def api_get_participants_for_meeting(meeting_id):
+    logger.info(f"Fetching participants for meeting with ID: {meeting_id}")
+    participants = get_participants_for_meeting(meeting_id)
+
+    if not participants:
+        logger.info(f"No participants found for meeting with ID {meeting_id}")
+        return jsonify({"message": "No participants found for this meeting"}), 200
+
+    return jsonify(participants), 200
