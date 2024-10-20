@@ -1,6 +1,7 @@
 import logging
+import requests
 from flask import Blueprint, jsonify, request, abort
-from backend.models.meetings_sql_queries import (
+from meeting_service.meetings_sql_queries import ( # import is wrong
     create_meeting,
     get_all_meetings,
     get_meeting_by_id,
@@ -11,6 +12,7 @@ from backend.models.meetings_sql_queries import (
 )
 from backend.models.participants_sql_queries import get_participants_for_meeting
 
+ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5004/attachments"
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -88,6 +90,9 @@ def api_delete_meeting(meeting_id):
     logger.info(f"Deleting meeting with ID: {meeting_id}")
     try:
         delete_meeting(meeting_id)
+        # delete attachments for that meeting (call the attachment service)
+        # make a request to the attachment service to delete all attachments for this meeting
+        requests.delete(f"{ATTACHMENTS_BACKEND_BASE_URL}/meetings/{meeting_id}") # TODO: make sure this is correct
         return jsonify({"message": "Meeting deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Meeting with ID {meeting_id} not found")

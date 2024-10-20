@@ -6,6 +6,7 @@ from attachments_sql_queries import (
     get_all_attachments,
     get_attachment_by_id,
     delete_attachment,
+    delete_attachments_by_meeting,
 )
 from meeting_service.meetings_sql_queries import get_meetings_for_calendar
 
@@ -80,4 +81,15 @@ def api_delete_attachment(attachment_id):
         return jsonify({"message": "Attachment deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Error deleting attachment: {str(e)}")
+        abort(404, description=str(e))
+
+# Endpoint to delete attachments by meeting ID
+@attachment_routes.route("/attachments/meetings/<string:meeting_id>", methods=["DELETE"])
+def api_delete_attachments_by_meeting(meeting_id):
+    logger.info(f"Deleting attachments for meeting with ID: {meeting_id}")
+    try:
+        delete_attachments_by_meeting(meeting_id)
+        return jsonify({"message": "Attachments deleted successfully"}), 204
+    except ValueError as e:
+        logger.error(f"Error deleting attachments: {str(e)}")
         abort(404, description=str(e))

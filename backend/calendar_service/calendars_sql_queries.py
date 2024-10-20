@@ -122,22 +122,6 @@ def delete_calendar(calendar_id):
     try:
         execute_query(query, data)
         logger.info(f"Deleted calendar with ID {calendar_id}")
-        # Clean up orphaned meetings
-        cleanup_orphaned_meetings()
     except Exception as e:
         logger.error(f"Error deleting calendar: {str(e)}")
         raise ValueError(f"Error deleting calendar: {str(e)}")
-
-
-def cleanup_orphaned_meetings():
-    # Find meetings that are not linked to any calendars
-    query = """
-    DELETE FROM meetings
-    WHERE meeting_id NOT IN (SELECT DISTINCT meeting_id FROM scheduled_in)
-    """
-    try:
-        execute_query(query)
-        logger.info("Cleaned up orphaned meetings")
-    except Exception as e:
-        logger.error(f"Error cleaning up orphaned meetings: {str(e)}")
-        raise ValueError(f"Error cleaning up orphaned meetings: {str(e)}")

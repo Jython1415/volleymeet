@@ -76,6 +76,10 @@ def api_delete_calendar(calendar_id):
     logger.info(f"Deleting calendar with ID: {calendar_id}")
     try:
         delete_calendar(calendar_id)
+        # delete any meetings associated with the calendar
+        # get a list of meetings that you need to delete
+        # call the linkage service to get a list of meetings to delete
+        # call the meeting service (just like the FE would) to delete the meetings
         return jsonify({"message": "Calendar deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Error deleting calendar: {str(e)}")
