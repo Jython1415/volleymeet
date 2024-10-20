@@ -39,3 +39,22 @@ services:
       MYSQL_DATABASE: attachment_db
       MYSQL_USER: appuser
       MYSQL_PASSWORD: password
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - frontend-net
+      - backend-net
+    environment:
+      NODE_ENV: development
+
+
+networks:
+  frontend-net:
+    driver: bridge
+  backend-net:
+    driver: bridge
+  db-net:
+    driver: bridge
