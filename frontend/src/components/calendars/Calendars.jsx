@@ -6,7 +6,8 @@ import DeleteCalendarForm from './DeleteCalendarForm';
 import UpdateCalendarForm from './UpdateCalendarForm';
 import CalendarMeetingList from './CalendarMeetingList';
 
-const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars";
+const BASE_URL = "http://localhost:80";
+const CALENDARS_BACKEND_BASE_URL = `${BASE_URL}/calendars`;
 
 const Calendars = () => {
     const [calendars, setCalendars] = useState([]);

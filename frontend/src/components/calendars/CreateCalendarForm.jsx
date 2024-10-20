@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars";
+const BASE_URL = "http://localhost:80";
+const CALENDARS_BACKEND_BASE_URL = `${BASE_URL}/calendars`;
 
 
 const CreateCalendarForm = () => {

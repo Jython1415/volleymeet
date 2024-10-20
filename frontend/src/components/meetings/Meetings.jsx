@@ -8,9 +8,10 @@ import LinkParticipantForm from './LinkParticipantForm';
 import LinkCalendarForm from './LinkCalendarForm';
 import MeetingParticipantList from './MeetingParticipantList';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
-const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
+const BASE_URL = "http://localhost:80";
+const MEETINGS_BACKEND_BASE_URL = `${BASE_URL}/meetings`;
+const PARTICIPANTS_BACKEND_BASE_URL = `${BASE_URL}/participants`;
+const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);

@@ -5,7 +5,8 @@ import FindAttachmentForm from './FindAttachmentForm';
 import DeleteAttachmentForm from './DeleteAttachmentForm';
 import UpdateAttachmentForm from './UpdateAttachmentForm';
 
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
+const BASE_URL = "http://localhost:80";
+const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
 
 const Attachments = () => {
     const [attachments, setAttachments] = useState([]);

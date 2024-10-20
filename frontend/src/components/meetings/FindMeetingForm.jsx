@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"; // Your backend URL
-
 const FindMeetingForm = ({ onFindMeeting }) => {
     const [meetingId, setMeetingId] = useState('');
 

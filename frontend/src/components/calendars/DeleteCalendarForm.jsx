@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars";
-
 const DeleteCalendarForm = ({ onDeleteCalendar }) => {
     const [calendarId, setCalendarId] = useState('');
 
