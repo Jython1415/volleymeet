@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, jsonify, request, abort
-from models.participants_sql_queries import (
+from participants_sql_queries import (
     create_participant,
     update_participant,
     get_all_participants,
