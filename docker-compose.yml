@@ -7,10 +7,10 @@ services:
       - backend-net
       - db-net
     environment:
-      MYSQL_HOST: localhost
-      MYSQL_DATABASE: meeting_db
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: password
+      MYSQL_HOST: meeting-db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   calendar-service:
     build: ./backend/calendar_service
@@ -20,10 +20,10 @@ services:
       - backend-net
       - db-net
     environment:
-      MYSQL_HOST: localhost
-      MYSQL_DATABASE: calendar_db
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: password
+      MYSQL_HOST: calendar-db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   participant-service:
     build: ./backend/participant_service
@@ -33,10 +33,10 @@ services:
       - backend-net
       - db-net
     environment:
-      MYSQL_HOST: localhost
-      MYSQL_DATABASE: participant_db
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: password
+      MYSQL_HOST: participant-db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   attachment-service:
     build: ./backend/attachment_service
@@ -46,10 +46,10 @@ services:
       - backend-net
       - db-net
     environment:
-      MYSQL_HOST: localhost
-      MYSQL_DATABASE: attachment_db
-      MYSQL_USER: appuser
-      MYSQL_PASSWORD: password
+      MYSQL_HOST: attachment-db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
   frontend:
     build: ./frontend
