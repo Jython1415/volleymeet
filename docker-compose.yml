@@ -1,8 +1,8 @@
 services:
   meeting-service:
-    build: ./meeting-service
+    build: ./backend/meeting_service
     ports:
-      - "5000:5000"
+      - "5001:5001"
     networks:
       - backend-net
       - db-net
@@ -13,9 +13,9 @@ services:
       MYSQL_PASSWORD: password
 
   calendar-service:
-    build: ./calendar-service
+    build: ./backend/calendar_service
     ports:
-      - "5001:5001"
+      - "5002:5002"
     networks:
       - backend-net
       - db-net
@@ -26,9 +26,9 @@ services:
       MYSQL_PASSWORD: password
 
   participant-service:
-    build: ./participant-service
+    build: ./backend/participant_service
     ports:
-      - "5002:5002"
+      - "5003:5003"
     networks:
       - backend-net
       - db-net
@@ -39,9 +39,9 @@ services:
       MYSQL_PASSWORD: password
 
   attachment-service:
-    build: ./attachment-service
+    build: ./backend/attachment_service
     ports:
-      - "5003:5003"
+      - "5004:5004"
     networks:
       - backend-net
       - db-net
