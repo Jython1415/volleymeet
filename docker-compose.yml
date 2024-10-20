@@ -4,6 +4,9 @@ services:
     build: ./meeting-service
     ports:
       - "5000:5000"
+    networks:
+      - backend-net
+      - db-net
     environment:
       MYSQL_HOST: localhost
       MYSQL_DATABASE: meeting_db
@@ -14,6 +17,9 @@ services:
     build: ./calendar-service
     ports:
       - "5001:5001"
+    networks:
+      - backend-net
+      - db-net
     environment:
       MYSQL_HOST: localhost
       MYSQL_DATABASE: calendar_db
@@ -24,6 +30,9 @@ services:
     build: ./participant-service
     ports:
       - "5002:5002"
+    networks:
+      - backend-net
+      - db-net
     environment:
       MYSQL_HOST: localhost
       MYSQL_DATABASE: participant_db
@@ -34,6 +43,9 @@ services:
     build: ./attachment-service
     ports:
       - "5003:5003"
+    networks:
+      - backend-net
+      - db-net
     environment:
       MYSQL_HOST: localhost
       MYSQL_DATABASE: attachment_db
