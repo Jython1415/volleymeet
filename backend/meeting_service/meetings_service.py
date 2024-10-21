@@ -114,24 +114,7 @@ def api_delete_meeting(meeting_id):
     methods=["POST"],
 )
 def api_link_participant_to_meeting(meeting_id, participant_id):
-    logger.info(f"Linking participant {participant_id} to meeting {meeting_id}")
-
-    try:
-        link_participant_to_meeting(meeting_id, participant_id)
-        return (
-            jsonify(
-                {
-                    "message": f"Participant {participant_id} linked to meeting {meeting_id} successfully"
-                }
-            ),
-            201,
-        )
-    except ValueError as e:
-        logger.error(
-            f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}"
-        )
-        return jsonify({"error": str(e)}), 400
-
+    pass
 
 # Endpoint to link a meeting and calendar
 @meeting_routes.route(
@@ -139,33 +122,9 @@ def api_link_participant_to_meeting(meeting_id, participant_id):
     methods=["POST"],
 )
 def api_link_calendar_to_meeting(meeting_id, calendar_id):
-    logger.info(f"Linking calendar {calendar_id} to meeting {meeting_id}")
-
-    try:
-        link_calendar_to_meeting(meeting_id, calendar_id)
-        return (
-            jsonify(
-                {
-                    "message": f"Calendar {calendar_id} linked to meeting {meeting_id} successfully"
-                }
-            ),
-            201,
-        )
-    except ValueError as e:
-        logger.error(
-            f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
-        )
-        return jsonify({"error": str(e)}), 400
-
+    pass
 
 # Endpoint to get all participants for a specific meeting
 @meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])
 def api_get_participants_for_meeting(meeting_id):
-    logger.info(f"Fetching participants for meeting with ID: {meeting_id}")
-    participants = get_participants_for_meeting(meeting_id)
-
-    if not participants:
-        logger.info(f"No participants found for meeting with ID {meeting_id}")
-        return jsonify({"message": "No participants found for this meeting"}), 200
-
-    return jsonify(participants), 200
+    pass
