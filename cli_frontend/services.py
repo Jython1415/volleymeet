@@ -5,13 +5,13 @@ BASE_URL = "http://localhost:5001"  # Modify the base URL if backend is hosted e
 # Attachment Services
 def get_all_attachments():
     response = requests.get(f"{BASE_URL}/attachments")
-    # Print the response status and text for debugging
     print(f"Response Status Code: {response.status_code}")
     if response.status_code == 200:
-        return response.json()
+        attachments = response.json()
+        for attachment in attachments:
+            print(attachment)  # Print each attachment on a new line
     else:
         return f"Error fetching attachments: {response.text}"
-    
 
 def get_attachment_by_id(attachment_id):
     response = requests.get(f"{BASE_URL}/attachments/{attachment_id}")
@@ -48,7 +48,9 @@ def delete_attachment(attachment_id):
 def get_all_calendars():
     response = requests.get(f"{BASE_URL}/calendars")
     if response.status_code == 200:
-        return response.json()
+        calendars = response.json()
+        for calendar in calendars:
+            print(calendar)  # Print each calendar on a new line
     else:
         return f"Error fetching calendars: {response.text}"
 
@@ -85,7 +87,9 @@ def delete_calendar(calendar_id):
 def get_meetings_for_calendar(calendar_id):
     response = requests.get(f"{BASE_URL}/calendars/{calendar_id}/meetings")
     if response.status_code == 200:
-        return response.json()
+        meetings = response.json()
+        for meeting in meetings:
+            print(meeting)  # Print each meeting on a new line
     else:
         return f"Error fetching meetings for calendar {calendar_id}: {response.text}"
 
@@ -94,7 +98,9 @@ def get_meetings_for_calendar(calendar_id):
 def get_all_meetings():
     response = requests.get(f"{BASE_URL}/meetings")
     if response.status_code == 200:
-        return response.json()
+        meetings = response.json()
+        for meeting in meetings:
+            print(meeting)  # Print each meeting on a new line
     else:
         return f"Error fetching meetings: {response.text}"
 
@@ -145,7 +151,9 @@ def link_calendar_to_meeting(meeting_id, calendar_id):
 def get_participants_for_meeting(meeting_id):
     response = requests.get(f"{BASE_URL}/meetings/{meeting_id}/participants")
     if response.status_code == 200:
-        return response.json()
+        participants = response.json()
+        for participant in participants:
+            print(participant)  # Print each participant on a new line
     else:
         return f"Error fetching participants for meeting {meeting_id}: {response.text}"
 
@@ -154,7 +162,9 @@ def get_participants_for_meeting(meeting_id):
 def get_all_participants():
     response = requests.get(f"{BASE_URL}/participants")
     if response.status_code == 200:
-        return response.json()
+        participants = response.json()
+        for participant in participants:
+            print(participant)  # Print each participant on a new line
     else:
         return f"Error fetching participants: {response.text}"
 

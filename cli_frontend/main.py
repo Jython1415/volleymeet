@@ -136,7 +136,7 @@ def handle_meetings():
             print(get_meeting_by_id(meeting_id))
         elif choice == "3":
             title = input("Enter Meeting Title: ")
-            date_time = input("Enter Date and Time (YYYY-MM-DDTHH:MM:SS): ")
+            date_time = input("Enter Date and Time (YYYY-MM-DD HH:MM AM/PM): ")
             location = input("Enter Location: ")
             details = input("Enter Details: ")
             meeting_id = input("Enter Meeting ID (optional, leave blank for auto-generated): ")
@@ -146,7 +146,7 @@ def handle_meetings():
         elif choice == "4":
             meeting_id = input("Enter Meeting ID: ")
             title = input("Enter Meeting Title: ")
-            date_time = input("Enter Date and Time (YYYY-MM-DDTHH:MM:SS): ")
+            date_time = input("Enter Date and Time (YYYY-MM-DD HH:MM AM/PM): ")
             location = input("Enter Location: ")
             details = input("Enter Details: ")
             print(update_meeting(meeting_id, title, date_time, location, details))
@@ -201,7 +201,6 @@ def handle_participants():
             print("Invalid option, try again.")
 
 def main():
-    print("Hello World!")  # Test print statement
     while True:
         print_main_menu()
         choice = input("Select an option: ")
