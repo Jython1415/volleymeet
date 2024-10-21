@@ -121,11 +121,16 @@ def update_meeting(meeting_id, title=None, date_time=None, location=None, detail
 # Get all meetings and return as JSON
 def get_all_meetings():
     query = "SELECT * FROM meetings"
-    meetings = execute_read_query(query)
+    
+    try:
+        meetings = execute_read_query(query)
+    except Exception as e:
+        logger.error(f"Error retrieving meetings: {str(e)}")
+        raise ValueError(f"Error retrieving meetings: {str(e)}")
 
     if not meetings:
         logger.info("No meetings found")
-        return {"error": "No meetings found"}
+        return []
 
     results = [
         {
