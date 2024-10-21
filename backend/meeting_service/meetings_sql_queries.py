@@ -1,3 +1,4 @@
+import uuid
 import logging
 from datetime import datetime
 from scripts.managedb import execute_query, execute_read_query
@@ -48,26 +49,19 @@ def create_meeting(title, date_time, location, details, meeting_id=None):
         logger.error(f"Invalid date format: {date_time}")
         raise ValueError("Date is not in a valid format")
 
-    # Check if meeting_id is provided
-    if meeting_id:
-        query = """
-        INSERT INTO meetings (meeting_id, title, date_time, location, details)
-        VALUES (%s, %s, %s, %s, %s)
-        """
-        data = (meeting_id, title, date_time, location, details)
-    else:
-        # Exclude meeting_id from the query to let the database handle it
-        query = """
-        INSERT INTO meetings (title, date_time, location, details)
-        VALUES (%s, %s, %s, %s)
-        """
-        data = (title, date_time, location, details)
+    # Generate a meeting_id if not provided
+    if not meeting_id:
+        meeting_id = str(uuid.uuid4())
+
+    query = """
+    INSERT INTO meetings (meeting_id, title, date_time, location, details)
+    VALUES (%s, %s, %s, %s, %s)
+    """
+    data = (meeting_id, title, date_time, location, details)
 
     try:
         execute_query(query, data)
-        logger.info(
-            f"Created meeting {'with provided ID ' + meeting_id if meeting_id else 'with DB-generated ID'}"
-        )
+        logger.info(f"Created meeting with ID {meeting_id}")
     except Exception as e:
         logger.error(f"Error creating meeting: {str(e)}")
         raise ValueError(f"Error creating meeting: {str(e)}")
