@@ -39,9 +39,7 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
 # Update an attachment by its ID
 def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
     # Fetch the current attachment data
-    query = (
-        "SELECT meeting_id, url FROM attachments WHERE attachment_id = %s"
-    )
+    query = "SELECT meeting_id, url FROM attachments WHERE attachment_id = %s"
     data = (attachment_id,)
     current_attachment = execute_read_query(query, data)
 
@@ -131,6 +129,7 @@ def delete_attachment(attachment_id):
     except Exception as e:
         logger.error(f"Error deleting attachment: {str(e)}")
         raise ValueError(f"Error deleting attachment: {str(e)}")
+
 
 def delete_attachments_by_meeting(meeting_id):
     query = "DELETE FROM attachments WHERE meeting_id = %s"

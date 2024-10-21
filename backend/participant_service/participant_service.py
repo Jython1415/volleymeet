@@ -10,10 +10,13 @@ from participants_sql_queries import (
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # Create a Blueprint for participant routes
 participant_routes = Blueprint("participant_routes", __name__)
+
 
 # Endpoint to get all participants
 @participant_routes.route("/participants", methods=["GET"])
@@ -27,6 +30,7 @@ def api_get_participants():
 
     return jsonify(participants), 200
 
+
 # Endpoint to get a specific participant by ID
 @participant_routes.route("/participants/<string:participant_id>", methods=["GET"])
 def api_get_participant(participant_id):
@@ -37,6 +41,7 @@ def api_get_participant(participant_id):
     except ValueError as e:
         logger.error(f"Error fetching participant: {str(e)}")
         abort(404, description=str(e))
+
 
 # Endpoint to add a new participant
 @participant_routes.route("/participants", methods=["POST"])
@@ -54,6 +59,7 @@ def api_add_participant():
         logger.error(f"Error creating participant: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to update an existing participant
 @participant_routes.route("/participants/<string:participant_id>", methods=["PUT"])
 def api_update_participant(participant_id):
@@ -68,6 +74,7 @@ def api_update_participant(participant_id):
     except ValueError as e:
         logger.error(f"Error updating participant: {str(e)}")
         return jsonify({"error": str(e)}), 400
+
 
 # Endpoint to delete a participant by ID
 @participant_routes.route("/participants/<string:participant_id>", methods=["DELETE"])

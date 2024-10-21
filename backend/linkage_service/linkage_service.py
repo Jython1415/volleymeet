@@ -7,7 +7,9 @@ from linkage_service.linkage_sql_queries import (
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # Create a Blueprint for meeting routes
 meeting_routes = Blueprint("meeting_routes", __name__)
@@ -21,6 +23,8 @@ meeting_routes = Blueprint("meeting_routes", __name__)
     methods=["GET"],
 )
 def api_get_orphan_meetings_for_calendar(calendar_id):
+    pass
+
 
 # Endpoint to link a meeting and participant
 @meeting_routes.route(
@@ -32,10 +36,20 @@ def api_link_participant_to_meeting(meeting_id, participant_id):
 
     try:
         link_participant_to_meeting(meeting_id, participant_id)
-        return jsonify({"message": f"Participant {participant_id} linked to meeting {meeting_id} successfully"}), 201
+        return (
+            jsonify(
+                {
+                    "message": f"Participant {participant_id} linked to meeting {meeting_id} successfully"
+                }
+            ),
+            201,
+        )
     except ValueError as e:
-        logger.error(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
+        logger.error(
+            f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}"
+        )
         return jsonify({"error": str(e)}), 400
+
 
 # Endpoint to link a meeting and calendar
 @meeting_routes.route(
@@ -47,7 +61,16 @@ def api_link_calendar_to_meeting(meeting_id, calendar_id):
 
     try:
         link_calendar_to_meeting(meeting_id, calendar_id)
-        return jsonify({"message": f"Calendar {calendar_id} linked to meeting {meeting_id} successfully"}), 201
+        return (
+            jsonify(
+                {
+                    "message": f"Calendar {calendar_id} linked to meeting {meeting_id} successfully"
+                }
+            ),
+            201,
+        )
     except ValueError as e:
-        logger.error(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
+        logger.error(
+            f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
+        )
         return jsonify({"error": str(e)}), 400

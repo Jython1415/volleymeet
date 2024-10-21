@@ -1,7 +1,7 @@
 import logging
 import requests
 from flask import Blueprint, jsonify, request, abort
-from meeting_service.meetings_sql_queries import ( # import is wrong
+from meeting_service.meetings_sql_queries import (  # import is wrong
     create_meeting,
     get_all_meetings,
     get_meeting_by_id,
@@ -16,10 +16,13 @@ ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5004/attachments"
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # Create a Blueprint for meeting routes
 meeting_routes = Blueprint("meeting_routes", __name__)
+
 
 # Endpoint to get all meetings
 @meeting_routes.route("/meetings", methods=["GET"])
@@ -33,6 +36,7 @@ def api_get_meetings():
 
     return jsonify(meetings), 200
 
+
 # Endpoint to get a specific meeting by ID
 @meeting_routes.route("/meetings/<string:meeting_id>", methods=["GET"])
 def api_get_meeting(meeting_id):
@@ -44,6 +48,7 @@ def api_get_meeting(meeting_id):
         abort(404, description=meeting["error"])
 
     return jsonify(meeting), 200
+
 
 # Endpoint to add a new meeting
 @meeting_routes.route("/meetings", methods=["POST"])
@@ -66,6 +71,7 @@ def api_add_meeting():
         logger.error(f"Error creating meeting: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to update an existing meeting
 @meeting_routes.route("/meetings/<string:meeting_id>", methods=["PUT"])
 def api_update_meeting(meeting_id):
@@ -84,6 +90,7 @@ def api_update_meeting(meeting_id):
         logger.error(f"Error updating meeting with ID {meeting_id}: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to delete a meeting by ID
 @meeting_routes.route("/meetings/<string:meeting_id>", methods=["DELETE"])
 def api_delete_meeting(meeting_id):
@@ -92,11 +99,14 @@ def api_delete_meeting(meeting_id):
         delete_meeting(meeting_id)
         # delete attachments for that meeting (call the attachment service)
         # make a request to the attachment service to delete all attachments for this meeting
-        requests.delete(f"{ATTACHMENTS_BACKEND_BASE_URL}/meetings/{meeting_id}") # TODO: make sure this is correct
+        requests.delete(
+            f"{ATTACHMENTS_BACKEND_BASE_URL}/meetings/{meeting_id}"
+        )  # TODO: make sure this is correct
         return jsonify({"message": "Meeting deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Meeting with ID {meeting_id} not found")
         abort(404, description=f"Meeting with ID {meeting_id} not found")
+
 
 # Endpoint to link a meeting and participant
 @meeting_routes.route(
@@ -108,10 +118,20 @@ def api_link_participant_to_meeting(meeting_id, participant_id):
 
     try:
         link_participant_to_meeting(meeting_id, participant_id)
-        return jsonify({"message": f"Participant {participant_id} linked to meeting {meeting_id} successfully"}), 201
+        return (
+            jsonify(
+                {
+                    "message": f"Participant {participant_id} linked to meeting {meeting_id} successfully"
+                }
+            ),
+            201,
+        )
     except ValueError as e:
-        logger.error(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
+        logger.error(
+            f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}"
+        )
         return jsonify({"error": str(e)}), 400
+
 
 # Endpoint to link a meeting and calendar
 @meeting_routes.route(
@@ -123,10 +143,20 @@ def api_link_calendar_to_meeting(meeting_id, calendar_id):
 
     try:
         link_calendar_to_meeting(meeting_id, calendar_id)
-        return jsonify({"message": f"Calendar {calendar_id} linked to meeting {meeting_id} successfully"}), 201
+        return (
+            jsonify(
+                {
+                    "message": f"Calendar {calendar_id} linked to meeting {meeting_id} successfully"
+                }
+            ),
+            201,
+        )
     except ValueError as e:
-        logger.error(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
+        logger.error(
+            f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
+        )
         return jsonify({"error": str(e)}), 400
+
 
 # Endpoint to get all participants for a specific meeting
 @meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])

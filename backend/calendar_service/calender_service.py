@@ -11,10 +11,13 @@ from backend.models.meetings_sql_queries import get_meetings_for_calendar
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # Create a Blueprint for calendar routes
 calendar_routes = Blueprint("calendar_routes", __name__)
+
 
 # Endpoint to get all calendars
 @calendar_routes.route("/calendars", methods=["GET"])
@@ -28,6 +31,7 @@ def api_get_calendars():
 
     return jsonify(calendars), 200
 
+
 # Endpoint to get a specific calendar by ID
 @calendar_routes.route("/calendars/<string:calendar_id>", methods=["GET"])
 def api_get_calendar(calendar_id):
@@ -38,6 +42,7 @@ def api_get_calendar(calendar_id):
     except ValueError as e:
         logger.error(f"Error fetching calendar: {str(e)}")
         abort(404, description=str(e))
+
 
 # Endpoint to add a new calendar
 @calendar_routes.route("/calendars", methods=["POST"])
@@ -55,6 +60,7 @@ def api_add_calendar():
         logger.error(f"Error creating calendar: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to update an existing calendar
 @calendar_routes.route("/calendars/<string:calendar_id>", methods=["PUT"])
 def api_update_calendar(calendar_id):
@@ -70,6 +76,7 @@ def api_update_calendar(calendar_id):
         logger.error(f"Error updating calendar: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to delete a calendar by ID
 @calendar_routes.route("/calendars/<string:calendar_id>", methods=["DELETE"])
 def api_delete_calendar(calendar_id):
@@ -84,6 +91,7 @@ def api_delete_calendar(calendar_id):
     except ValueError as e:
         logger.error(f"Error deleting calendar: {str(e)}")
         abort(404, description=str(e))
+
 
 # Endpoint to get all meetings for a specific calendar
 @calendar_routes.route("/calendars/<string:calendar_id>/meetings", methods=["GET"])

@@ -12,10 +12,13 @@ from meeting_service.meetings_sql_queries import get_meetings_for_calendar
 
 # Set up logging
 logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 # Create a Blueprint for attachment routes
 attachment_routes = Blueprint("attachment_routes", __name__)
+
 
 # Endpoint to get all attachments
 @attachment_routes.route("/attachments", methods=["GET"])
@@ -30,6 +33,7 @@ def api_get_attachments():
     logger.info("Successfully fetched attachments")
     return jsonify(attachments), 200
 
+
 # Endpoint to get a specific attachment by ID
 @attachment_routes.route("/attachments/<string:attachment_id>", methods=["GET"])
 def api_get_attachment(attachment_id):
@@ -40,6 +44,7 @@ def api_get_attachment(attachment_id):
     except ValueError as e:
         logger.error(f"Error fetching attachment: {str(e)}")
         abort(404, description=str(e))
+
 
 # Endpoint to add a new attachment
 @attachment_routes.route("/attachments", methods=["POST"])
@@ -57,6 +62,7 @@ def api_add_attachment():
         logger.error(f"Error creating attachment: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to update an existing attachment
 @attachment_routes.route("/attachments/<string:attachment_id>", methods=["PUT"])
 def api_update_attachment(attachment_id):
@@ -72,6 +78,7 @@ def api_update_attachment(attachment_id):
         logger.error(f"Error updating attachment: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
+
 # Endpoint to delete an attachment by ID
 @attachment_routes.route("/attachments/<string:attachment_id>", methods=["DELETE"])
 def api_delete_attachment(attachment_id):
@@ -83,8 +90,11 @@ def api_delete_attachment(attachment_id):
         logger.error(f"Error deleting attachment: {str(e)}")
         abort(404, description=str(e))
 
+
 # Endpoint to delete attachments by meeting ID
-@attachment_routes.route("/attachments/meetings/<string:meeting_id>", methods=["DELETE"])
+@attachment_routes.route(
+    "/attachments/meetings/<string:meeting_id>", methods=["DELETE"]
+)
 def api_delete_attachments_by_meeting(meeting_id):
     logger.info(f"Deleting attachments for meeting with ID: {meeting_id}")
     try:

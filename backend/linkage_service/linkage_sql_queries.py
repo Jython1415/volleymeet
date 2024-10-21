@@ -14,7 +14,8 @@ def format_date(date_obj):
     if isinstance(date_obj, datetime):
         return date_obj.isoformat()
     return str(date_obj)
-    
+
+
 def link_participant_to_meeting(meeting_id, participant_id):
     # Insert a new record into the participating_in table
     query = """
@@ -27,8 +28,13 @@ def link_participant_to_meeting(meeting_id, participant_id):
         execute_query(query, data)
         logger.info(f"Linked participant {participant_id} to meeting {meeting_id}")
     except Exception as e:
-        logger.error(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
-        raise ValueError(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
+        logger.error(
+            f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}"
+        )
+        raise ValueError(
+            f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}"
+        )
+
 
 def link_calendar_to_meeting(meeting_id, calendar_id):
     # Insert a new record into the scheduled_in table
@@ -42,5 +48,9 @@ def link_calendar_to_meeting(meeting_id, calendar_id):
         execute_query(query, data)
         logger.info(f"Linked calendar {calendar_id} to meeting {meeting_id}")
     except Exception as e:
-        logger.error(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
-        raise ValueError(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
+        logger.error(
+            f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
+        )
+        raise ValueError(
+            f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
+        )
