@@ -82,10 +82,6 @@ def api_delete_calendar(calendar_id):
     logger.info(f"Deleting calendar with ID: {calendar_id}")
     try:
         delete_calendar(calendar_id)
-        # delete any meetings associated with the calendar
-        # get a list of meetings that you need to delete
-        # call the linkage service to get a list of meetings to delete
-        # call the meeting service (just like the FE would) to delete the meetings
         return jsonify({"message": "Calendar deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Error deleting calendar: {str(e)}")
@@ -95,10 +91,4 @@ def api_delete_calendar(calendar_id):
 # Endpoint to get all meetings for a specific calendar
 @calendar_routes.route("/calendars/<string:calendar_id>/meetings", methods=["GET"])
 def api_get_meetings_for_calendar(calendar_id):
-    logger.info(f"Fetching all meetings for calendar with ID: {calendar_id}")
-    try:
-        meetings = get_meetings_for_calendar(calendar_id)
-        return jsonify(meetings), 200
-    except ValueError as e:
-        logger.error(f"Error fetching meetings for calendar: {str(e)}")
-        abort(404, description=str(e))
+    pass

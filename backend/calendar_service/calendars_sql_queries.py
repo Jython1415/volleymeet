@@ -1,3 +1,4 @@
+import uuid
 import logging
 from scripts.managedb import execute_query, execute_read_query
 
@@ -10,26 +11,19 @@ logging.basicConfig(
 
 # Create a calendar, including calendar_id in the insert query
 def create_calendar(title, details, calendar_id=None):
-    # Check if calendar_id is provided
-    if calendar_id:
-        query = """
-        INSERT INTO calendars (calendar_id, title, details)
-        VALUES (%s, %s, %s)
-        """
-        data = (calendar_id, title, details)
-    else:
-        # Exclude calendar_id from the query to let the database handle it
-        query = """
-        INSERT INTO calendars (title, details)
-        VALUES (%s, %s)
-        """
-        data = (title, details)
+    # Generate a new UUID if calendar_id is not provided
+    if not calendar_id:
+        calendar_id = str(uuid.uuid4())
+
+    query = """
+    INSERT INTO calendars (calendar_id, title, details)
+    VALUES (%s, %s, %s)
+    """
+    data = (calendar_id, title, details)
 
     try:
         execute_query(query, data)
-        logger.info(
-            f"Created calendar {'with provided ID ' + calendar_id if calendar_id else 'with DB-generated ID'}"
-        )
+        logger.info(f"Created calendar with ID {calendar_id}")
     except Exception as e:
         logger.error(f"Error creating calendar: {str(e)}")
         raise ValueError(f"Error creating calendar: {str(e)}")
@@ -37,21 +31,16 @@ def create_calendar(title, details, calendar_id=None):
 
 # Update a calendar by its ID
 def update_calendar(calendar_id, title=None, details=None):
-    # Fetch the current calendar data
-    query = "SELECT title, details FROM calendars WHERE calendar_id = %s"
-    data = (calendar_id,)
-    current_calendar = execute_read_query(query, data)
-
-    if not current_calendar:
-        logger.error(f"Calendar with ID {calendar_id} not found")
-        raise ValueError(f"Calendar with ID {calendar_id} not found")
-
-    # Get the current values
-    current_title, current_details = current_calendar[0]
+    # Fetch the current calendar data using get_calendar_by_id function
+    try:
+        current_calendar = get_calendar_by_id(calendar_id)
+    except ValueError as e:
+        logger.error(f"Error finding calendar with ID {calendar_id}: {str(e)}")
+        raise ValueError(f"Error finding calendar with ID {calendar_id}")
 
     # Use the current value if the new value is None
-    title = title if title is not None else current_title
-    details = details if details is not None else current_details
+    title = title if title is not None else current_calendar["title"]
+    details = details if details is not None else current_calendar["details"]
 
     # Update the calendar with the new or existing values
     update_query = """
@@ -62,10 +51,7 @@ def update_calendar(calendar_id, title=None, details=None):
     update_data = (title, details, calendar_id)
 
     try:
-        affected_rows = execute_query(update_query, update_data)
-        if affected_rows == 0:
-            logger.error(f"No calendar found with ID {calendar_id} to update")
-            raise ValueError(f"No calendar found with ID: {calendar_id}")
+        execute_query(update_query, update_data)
         logger.info(f"Updated calendar with ID {calendar_id}")
     except Exception as e:
         logger.error(f"Error updating calendar: {str(e)}")
@@ -75,11 +61,16 @@ def update_calendar(calendar_id, title=None, details=None):
 # Get all calendars and return as formatted JSON
 def get_all_calendars():
     query = "SELECT * FROM calendars"
-    calendars = execute_read_query(query)
+    
+    try:
+        calendars = execute_read_query(query)
+    except Exception as e:
+        logger.error(f"Error retrieving calendars: {str(e)}")
+        raise ValueError(f"Error retrieving calendars: {str(e)}")
 
     if not calendars:
         logger.info("No calendars found")
-        return {"error": "No calendars found"}
+        return []
 
     results = [
         {
@@ -98,7 +89,12 @@ def get_all_calendars():
 def get_calendar_by_id(calendar_id):
     query = "SELECT * FROM calendars WHERE calendar_id = %s"
     data = (calendar_id,)
-    calendar = execute_read_query(query, data)
+
+    try:
+        calendar = execute_read_query(query, data)
+    except Exception as e:
+        logger.error(f"Error retrieving calendar with ID {calendar_id}: {str(e)}")
+        raise ValueError(f"Error retrieving calendar with ID {calendar_id}: {str(e)}")
 
     if calendar:
         logger.info(f"Retrieved calendar with ID {calendar_id}")
