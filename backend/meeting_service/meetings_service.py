@@ -1,16 +1,13 @@
 import logging
 import requests
 from flask import Blueprint, jsonify, request, abort
-from meeting_service.meetings_sql_queries import (  # import is wrong
+from meetings_sql_queries import (
     create_meeting,
     get_all_meetings,
     get_meeting_by_id,
     update_meeting,
     delete_meeting,
-    link_participant_to_meeting,
-    link_calendar_to_meeting,
 )
-from backend.models.participants_sql_queries import get_participants_for_meeting
 
 ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5004/attachments"
 
