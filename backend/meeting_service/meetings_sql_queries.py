@@ -151,7 +151,16 @@ def get_all_meetings():
 def get_meeting_by_id(meeting_id):
     query = "SELECT * FROM meetings WHERE meeting_id = %s"
     data = (meeting_id,)
-    meeting = execute_read_query(query, data)
+
+    try:
+        meeting = execute_read_query(query, data)
+    except Exception as e:
+        logger.error(f"Error retrieving meeting with ID {meeting_id}: {str(e)}")
+        raise ValueError(f"Error retrieving meeting with ID {meeting_id}: {str(e)}")
+
+    if len(meeting) > 1:
+        logger.error(f"Multiple meetings found with ID {meeting_id}")
+        raise ValueError(f"Multiple meetings found with ID {meeting_id}")
 
     if meeting:
         logger.info(f"Retrieved meeting with ID {meeting_id}")
@@ -164,8 +173,7 @@ def get_meeting_by_id(meeting_id):
         }
     else:
         logger.error(f"Meeting with ID {meeting_id} not found")
-        return {"error": f"Meeting with ID {meeting_id} not found"}
-
+        raise ValueError(f"Meeting with ID {meeting_id} not found")
 
 # Delete a meeting by its ID
 def delete_meeting(meeting_id):

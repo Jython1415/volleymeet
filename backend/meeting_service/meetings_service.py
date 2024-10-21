@@ -37,13 +37,12 @@ def api_get_meetings():
 @meeting_routes.route("/meetings/<string:meeting_id>", methods=["GET"])
 def api_get_meeting(meeting_id):
     logger.info(f"Fetching meeting with ID: {meeting_id}")
-    meeting = get_meeting_by_id(meeting_id)
-
-    if "error" in meeting:
-        logger.error(f"Meeting with ID {meeting_id} not found")
-        abort(404, description=meeting["error"])
-
-    return jsonify(meeting), 200
+    try:
+        meeting = get_meeting_by_id(meeting_id)
+        return jsonify(meeting), 200
+    except ValueError as e:
+        logger.error(f"Error fetching meeting with ID {meeting_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 404
 
 
 # Endpoint to add a new meeting
