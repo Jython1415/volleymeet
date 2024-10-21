@@ -69,30 +69,22 @@ def create_meeting(title, date_time, location, details, meeting_id=None):
 
 # Update a meeting by its ID
 def update_meeting(meeting_id, title=None, date_time=None, location=None, details=None):
-    # Fetch the current meeting data
-    query = (
-        "SELECT title, date_time, location, details FROM meetings WHERE meeting_id = %s"
-    )
-    data = (meeting_id,)
-    current_meeting = execute_read_query(query, data)
-
-    if not current_meeting:
-        logger.error(f"Meeting with ID {meeting_id} not found")
-        raise ValueError(f"Meeting with ID {meeting_id} not found")
-
-    # Get the current values
-    current_title, current_date_time, current_location, current_details = (
-        current_meeting[0]
-    )
+    # Fetch the current meeting data using get_meeting_by_id
+    try:
+        current_meeting = get_meeting_by_id(meeting_id)
+    except ValueError as e:
+        logger.error(str(e))
+        raise ValueError(f"Meeting with ID {meeting_id} not found: {str(e)}")
 
     # Use the current value if the new value is None
-    title = title if title is not None else current_title
-    date_time = date_time if date_time is not None else current_date_time
-    location = location if location is not None else current_location
-    details = details if details is not None else current_details
+    title = title if title is not None else current_meeting["title"]
+    date_time = date_time if date_time is not None else current_meeting["date_time"]
+    location = location if location is not None else current_meeting["location"]
+    details = details if details is not None else current_meeting["details"]
 
     # Validate the new or existing date format
-    if not is_valid_date(date_time):
+    date_valid, _ = is_valid_date(date_time)
+    if not date_valid:
         logger.error(f"Invalid date format: {date_time}")
         raise ValueError("Date is not in a valid format")
 
