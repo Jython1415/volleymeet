@@ -22,13 +22,12 @@ participant_routes = Blueprint("participant_routes", __name__)
 @participant_routes.route("/participants", methods=["GET"])
 def api_get_participants():
     logger.info("Fetching all participants")
-    participants = get_all_participants()
-
-    if "error" in participants:
-        logger.error("No participants found")
-        abort(404, description=participants["error"])
-
-    return jsonify(participants), 200
+    try:
+        participants = get_all_participants()
+        return jsonify(participants), 200
+    except ValueError as e:
+        logger.error(f"Error fetching participants: {str(e)}")
+        abort(404, description=str(e))
 
 
 # Endpoint to get a specific participant by ID

@@ -75,11 +75,15 @@ def update_participant(participant_id, name=None, email=None):
 # Get all participants and return as formatted JSON
 def get_all_participants():
     query = "SELECT * FROM participants"
-    participants = execute_read_query(query)
+    try:
+        participants = execute_read_query(query)
+    except Exception as e:
+        logger.error(f"Error retrieving participants: {str(e)}")
+        raise ValueError(f"Error retrieving participants: {str(e)}")
 
     if not participants:
         logger.info("No participants found")
-        return {"error": "No participants found"}
+        return []
 
     results = [
         {
