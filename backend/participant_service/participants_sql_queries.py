@@ -1,4 +1,5 @@
 import re
+import uuid
 import logging
 from scripts.managedb import execute_query, execute_read_query
 
@@ -19,6 +20,9 @@ def create_participant(name, email, participant_id=None):
     if not is_valid_email(email):
         logger.error(f"Invalid email address: {email}")
         raise ValueError("Invalid email address")
+
+    if participant_id is None:
+        participant_id = str(uuid.uuid4())
 
     query = """
     INSERT INTO participants (participant_id, name, email)
