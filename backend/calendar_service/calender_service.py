@@ -82,6 +82,11 @@ def api_delete_calendar(calendar_id):
     logger.info(f"Deleting calendar with ID: {calendar_id}")
     try:
         delete_calendar(calendar_id)
+        # TODO: find meetings that were orphaned by this deletion
+        # - implement this in the linkage service
+        # - call that route here
+        # TODO: delete the meetings that were orphaned
+        # - call the meetings service to delete them
         return jsonify({"message": "Calendar deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Error deleting calendar: {str(e)}")
@@ -91,4 +96,11 @@ def api_delete_calendar(calendar_id):
 # Endpoint to get all meetings for a specific calendar
 @calendar_routes.route("/calendars/<string:calendar_id>/meetings", methods=["GET"])
 def api_get_meetings_for_calendar(calendar_id):
+    # TODO: find meetings for a calendar
+    # - implement this in the linkage service
+    # - call that route here
+    # TODO: find the details of the meetings
+    # - call the meetings service to get the details
+    # TODO: return the details of the meetings in the format required
+    # - check the previous implementation for the format
     pass
