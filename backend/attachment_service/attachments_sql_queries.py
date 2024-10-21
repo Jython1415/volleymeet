@@ -132,7 +132,7 @@ def delete_attachment(attachment_id):
         logger.error(f"Error deleting attachment: {str(e)}")
         raise ValueError(f"Error deleting attachment: {str(e)}")
 
-def delete_attach_by_meeting(meeting_id):
+def delete_attachments_by_meeting(meeting_id):
     query = "DELETE FROM attachments WHERE meeting_id = %s"
     data = (meeting_id,)
 

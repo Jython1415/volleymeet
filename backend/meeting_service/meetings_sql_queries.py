@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime
 from scripts.managedb import execute_query, execute_read_query
@@ -149,82 +148,6 @@ def delete_meeting(meeting_id):
     try:
         execute_query(query, data)
         logger.info(f"Deleted meeting with ID {meeting_id}")
-        # Clean up orphaned participants
-        cleanup_orphaned_participants()
     except Exception as e:
         logger.error(f"Error deleting meeting: {str(e)}")
         raise ValueError(f"Error deleting meeting: {str(e)}")
-    
-def link_participant_to_meeting(meeting_id, participant_id):
-    # Insert a new record into the participating_in table
-    query = """
-    INSERT INTO participating_in (meeting_id, participant_id)
-    VALUES (%s, %s)
-    """
-    data = (meeting_id, participant_id)
-
-    try:
-        execute_query(query, data)
-        logger.info(f"Linked participant {participant_id} to meeting {meeting_id}")
-    except Exception as e:
-        logger.error(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
-        raise ValueError(f"Error linking participant {participant_id} to meeting {meeting_id}: {str(e)}")
-
-def link_calendar_to_meeting(meeting_id, calendar_id):
-    # Insert a new record into the scheduled_in table
-    query = """
-    INSERT INTO scheduled_in (meeting_id, calendar_id)
-    VALUES (%s, %s)
-    """
-    data = (meeting_id, calendar_id)
-
-    try:
-        execute_query(query, data)
-        logger.info(f"Linked calendar {calendar_id} to meeting {meeting_id}")
-    except Exception as e:
-        logger.error(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
-        raise ValueError(f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}")
-
-
-
-def cleanup_orphaned_participants():
-    # Find participants who are not linked to any meetings
-    query = """
-    DELETE FROM participants
-    WHERE participant_id NOT IN (SELECT DISTINCT participant_id FROM participating_in)
-    """
-    try:
-        execute_query(query)
-        logger.info("Cleaned up orphaned participants")
-    except Exception as e:
-        logger.error(f"Error cleaning up orphaned participants: {str(e)}")
-        raise ValueError(f"Error cleaning up orphaned participants: {str(e)}")
-
-# Get meetings for a specific calendar
-def get_meetings_for_calendar(calendar_id):
-    query = """
-    SELECT m.meeting_id, m.title, m.details, m.location, m.date_time
-    FROM meetings m
-    JOIN scheduled_in s ON m.meeting_id = s.meeting_id
-    WHERE s.calendar_id = %s
-    """
-    data = (calendar_id,)
-    meetings = execute_read_query(query, data)
-
-    if not meetings:
-        logger.info(f"No meetings found for calendar with ID {calendar_id}")
-        raise ValueError(f"No meetings found for calendar with ID {calendar_id}")
-
-    results = [
-        {
-            "meeting_id": meeting[0],
-            "title": meeting[1],
-            "details": meeting[2],
-            "location": meeting[3],
-            "date_time": format_date(meeting[4]),
-        }
-        for meeting in meetings
-    ]
-
-    logger.info(f"Retrieved {len(results)} meetings for calendar with ID {calendar_id}")
-    return results
