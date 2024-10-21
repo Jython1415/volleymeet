@@ -81,6 +81,12 @@ def api_delete_participant(participant_id):
     logger.info(f"Deleting participant with ID: {participant_id}")
     try:
         delete_participant(participant_id)
+        
+        # TODO: Delete meetings that were orphaned by this deletion
+        # - Implement the logic for this in the linkage service
+        #   - The linkage service will have to call the meeting service to do this
+        # - Call the linkage service to delete orphaned meetings
+        
         return jsonify({"message": "Participant deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Participant with ID {participant_id} not found")
