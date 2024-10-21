@@ -1,7 +1,0 @@
-black
-flask
-Flask-Cors
-mysql-connector-python
-pipreqs
-python_dateutil
-Requests
