@@ -1,12 +1,17 @@
+import re
 import logging
 from scripts.managedb import execute_query, execute_read_query
-from models.global_functions_sql import is_valid_email
 
 # Set up logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
+
+def is_valid_email(email):
+    """Validates an email address using a regex."""
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email) is not None
 
 
 # Create a participant, including participant_id in the insert query
