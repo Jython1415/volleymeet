@@ -8,7 +8,6 @@ from attachments_sql_queries import (
     delete_attachment,
     delete_attachments_by_meeting,
 )
-from meeting_service.meetings_sql_queries import get_meetings_for_calendar
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -24,14 +23,13 @@ attachment_routes = Blueprint("attachment_routes", __name__)
 @attachment_routes.route("/attachments", methods=["GET"])
 def api_get_attachments():
     logger.info("Fetching all attachments")
-    attachments = get_all_attachments()
-
-    if "error" in attachments:
-        logger.error("No attachments found")
-        abort(404, description=attachments["error"])
-
-    logger.info("Successfully fetched attachments")
-    return jsonify(attachments), 200
+    try:
+        attachments = get_all_attachments()
+        logger.info("Successfully fetched attachments")
+        return jsonify(attachments), 200
+    except ValueError as e:
+        logger.error(f"Error fetching attachments: {str(e)}")
+        abort(404, description=str(e))
 
 
 # Endpoint to get a specific attachment by ID

@@ -1,3 +1,4 @@
+import uuid
 import logging
 from scripts.managedb import execute_query, execute_read_query
 
@@ -10,25 +11,20 @@ logging.basicConfig(
 
 # Create an attachment
 def create_attachment(meeting_id, attachment_url, attachment_id=None):
-    # Check if attachment_id is provided
-    if attachment_id:
-        query = """
-        INSERT INTO attachments (attachment_id, meeting_id, url)
-        VALUES (%s, %s, %s)
-        """
-        data = (attachment_id, meeting_id, attachment_url)
-    else:
-        # Exclude attachment_id from the query to let the database handle it
-        query = """
-        INSERT INTO attachments (meeting_id, url)
-        VALUES (%s, %s)
-        """
-        data = (meeting_id, attachment_url)
+    # Generate a new UUID if attachment_id is not provided
+    if not attachment_id:
+        attachment_id = str(uuid.uuid4())
+
+    query = """
+    INSERT INTO attachments (attachment_id, meeting_id, url)
+    VALUES (%s, %s, %s)
+    """
+    data = (attachment_id, meeting_id, attachment_url)
 
     try:
         execute_query(query, data)
         logger.info(
-            f"Created attachment {'with provided ID ' + attachment_id if attachment_id else 'with DB-generated ID'} for meeting {meeting_id}"
+            f"Created attachment with ID {attachment_id} for meeting {meeting_id}"
         )
     except Exception as e:
         logger.error(f"Error creating attachment: {str(e)}")
@@ -37,23 +33,16 @@ def create_attachment(meeting_id, attachment_url, attachment_id=None):
 
 # Update an attachment by its ID
 def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
-    # Fetch the current attachment data
-    query = "SELECT meeting_id, url FROM attachments WHERE attachment_id = %s"
-    data = (attachment_id,)
-    current_attachment = execute_read_query(query, data)
-
-    if not current_attachment:
-        logger.error(f"Attachment with ID {attachment_id} not found")
-        raise ValueError(f"Attachment with ID {attachment_id} not found")
-
-    # Get the current values
-    current_meeting_id, current_attachment_url = current_attachment[0]
+    # Fetch the current attachment data using get_attachment_by_id
+    try:
+        current_attachment = get_attachment_by_id(attachment_id)
+    except ValueError as e:
+        logger.error(str(e))
+        raise ValueError(f"Error updating attachment, attachment could not be retrieved: {str(e)}")
 
     # Use the current value if the new value is None
-    meeting_id = meeting_id if meeting_id is not None else current_meeting_id
-    attachment_url = (
-        attachment_url if attachment_url is not None else current_attachment_url
-    )
+    meeting_id = meeting_id if meeting_id is not None else current_attachment["meeting_id"]
+    attachment_url = attachment_url if attachment_url is not None else current_attachment["attachment_url"]
 
     # Update the attachment with the new or existing values
     update_query = """
@@ -64,10 +53,7 @@ def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
     update_data = (meeting_id, attachment_url, attachment_id)
 
     try:
-        affected_rows = execute_query(update_query, update_data)
-        if affected_rows == 0:
-            logger.error(f"No attachment found with ID {attachment_id} to update")
-            raise ValueError(f"No attachment found with ID: {attachment_id}")
+        execute_query(update_query, update_data)
         logger.info(f"Updated attachment with ID {attachment_id}")
     except Exception as e:
         logger.error(f"Error updating attachment: {str(e)}")
@@ -77,11 +63,16 @@ def update_attachment(attachment_id, meeting_id=None, attachment_url=None):
 # Get all attachments and return as formatted JSON
 def get_all_attachments():
     query = "SELECT * FROM attachments"
-    attachments = execute_read_query(query)
+    
+    try:
+        attachments = execute_read_query(query)
+    except Exception as e:
+        logger.error(f"Error retrieving attachments: {str(e)}")
+        raise ValueError(f"Error retrieving attachments: {str(e)}")
 
     if not attachments:
         logger.info("No attachments found")
-        return {"error": "No attachments found"}
+        return []
 
     results = [
         {
@@ -100,7 +91,15 @@ def get_all_attachments():
 def get_attachment_by_id(attachment_id):
     query = "SELECT * FROM attachments WHERE attachment_id = %s"
     data = (attachment_id,)
-    attachment = execute_read_query(query, data)
+    try:
+        attachment = execute_read_query(query, data)
+    except Exception as e:
+        logger.error(f"Error retrieving attachment: {str(e)}")
+        raise ValueError(f"Error retrieving attachment: {str(e)}")
+
+    if len(attachment) > 1:
+        logger.error(f"Multiple attachments found with ID {attachment_id}")
+        raise ValueError(f"Multiple attachments found with ID {attachment_id}")
 
     if attachment:
         logger.info(f"Retrieved attachment with ID {attachment_id}")
@@ -112,7 +111,6 @@ def get_attachment_by_id(attachment_id):
     else:
         logger.error(f"Attachment with ID {attachment_id} not found")
         raise ValueError(f"Attachment with ID {attachment_id} not found")
-
 
 # Delete an attachment by its ID
 def delete_attachment(attachment_id):
