@@ -25,13 +25,12 @@ meeting_routes = Blueprint("meeting_routes", __name__)
 @meeting_routes.route("/meetings", methods=["GET"])
 def api_get_meetings():
     logger.info("Fetching all meetings")
-    meetings = get_all_meetings()
-
-    if "error" in meetings:
-        logger.error("No meetings found")
-        abort(404, description=meetings["error"])
-
-    return jsonify(meetings), 200
+    try:
+        meetings = get_all_meetings()
+        return jsonify(meetings), 200
+    except ValueError as e:
+        logger.error(f"Error fetching meetings: {str(e)}")
+        return jsonify({"error": str(e)}), 400
 
 
 # Endpoint to get a specific meeting by ID
