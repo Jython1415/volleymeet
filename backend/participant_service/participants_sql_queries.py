@@ -102,18 +102,27 @@ def get_all_participants():
 def get_participant_by_id(participant_id):
     query = "SELECT * FROM participants WHERE participant_id = %s"
     data = (participant_id,)
-    participant = execute_read_query(query, data)
+    
+    try:
+        participant = execute_read_query(query, data)
+    except Exception as e:
+        logger.error(f"Error retrieving participant: {str(e)}")
+        raise ValueError(f"Error retrieving participant: {str(e)}")
 
-    if participant:
-        logger.info(f"Retrieved participant with ID {participant_id}")
-        return {
-            "participant_id": participant[0][0],
-            "name": participant[0][1],
-            "email": participant[0][2],
-        }
-    else:
+    if not participant:
         logger.error(f"Participant with ID {participant_id} not found")
         return {"error": f"Participant with ID {participant_id} not found"}
+
+    if len(participant) > 1:
+        logger.error(f"Multiple participants found with ID {participant_id}")
+        raise ValueError(f"Multiple participants found with ID {participant_id}")
+
+    logger.info(f"Retrieved participant with ID {participant_id}")
+    return {
+        "participant_id": participant[0][0],
+        "name": participant[0][1],
+        "email": participant[0][2],
+    }
 
 
 # Delete a participant by their ID
