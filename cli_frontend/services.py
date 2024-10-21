@@ -1,14 +1,17 @@
 import requests
 
-BASE_URL = "http://localhost:5000"  # Modify the base URL if backend is hosted elsewhere
+BASE_URL = "http://localhost:5001"  # Modify the base URL if backend is hosted elsewhere
 
 # Attachment Services
 def get_all_attachments():
     response = requests.get(f"{BASE_URL}/attachments")
+    # Print the response status and text for debugging
+    print(f"Response Status Code: {response.status_code}")
     if response.status_code == 200:
         return response.json()
     else:
         return f"Error fetching attachments: {response.text}"
+    
 
 def get_attachment_by_id(attachment_id):
     response = requests.get(f"{BASE_URL}/attachments/{attachment_id}")
