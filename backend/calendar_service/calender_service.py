@@ -1,13 +1,12 @@
 import logging
 from flask import Blueprint, jsonify, request, abort
-from backend.models.calendars_sql_queries import (
+from calendars_sql_queries import (
     create_calendar,
     update_calendar,
     get_all_calendars,
     get_calendar_by_id,
     delete_calendar,
 )
-from backend.models.meetings_sql_queries import get_meetings_for_calendar
 
 # Set up logging
 logger = logging.getLogger(__name__)

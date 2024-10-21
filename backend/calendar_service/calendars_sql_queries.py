@@ -1,4 +1,3 @@
-import json
 import logging
 from scripts.managedb import execute_query, execute_read_query
 
