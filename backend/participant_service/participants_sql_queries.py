@@ -39,17 +39,15 @@ def create_participant(name, email, participant_id=None):
 
 # Update a participant by their ID
 def update_participant(participant_id, name=None, email=None):
-    # Fetch the current participant data
-    query = "SELECT name, email FROM participants WHERE participant_id = %s"
-    data = (participant_id,)
-    current_participant = execute_read_query(query, data)
-
-    if not current_participant:
-        logger.error(f"Participant with ID {participant_id} not found")
-        raise ValueError(f"Participant with ID {participant_id} not found")
+    # Fetch the current participant data using get_participant_by_id
+    try:
+        current_participant = get_participant_by_id(participant_id)
+    except ValueError as e:
+        raise ValueError(str(e))
 
     # Get the current values
-    current_name, current_email = current_participant[0]
+    current_name = current_participant["name"]
+    current_email = current_participant["email"]
 
     # Use the current value if the new value is None
     name = name if name is not None else current_name
