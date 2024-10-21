@@ -89,6 +89,18 @@ def api_delete_meeting(meeting_id):
     logger.info(f"Deleting meeting with ID: {meeting_id}")
     try:
         delete_meeting(meeting_id)
+        
+        # TODO: Delete attachments linked to this meeting
+        # - call the attachment service
+        # TODO: Delete participants orphaned by this deletion
+        # - implement the orphan deletion logic in the linkage service
+        # - expose an endpoint in the linkage service to delete orphaned participants
+        # - call the linkage service
+        # TODO: Delete calendars orphaned by this deletion
+        # - implement the orphan deletion logic in the linkage service
+        # - expose an endpoint in the linkage service to delete orphaned calendars
+        # - call the linkage service
+        
         return jsonify({"message": "Meeting deleted successfully"}), 204
     except ValueError as e:
         logger.error(f"Meeting with ID {meeting_id} not found")
@@ -101,6 +113,7 @@ def api_delete_meeting(meeting_id):
     methods=["POST"],
 )
 def api_link_participant_to_meeting(meeting_id, participant_id):
+    # TODO: Reroute this request to the linkage service
     pass
 
 # Endpoint to link a meeting and calendar
@@ -109,9 +122,19 @@ def api_link_participant_to_meeting(meeting_id, participant_id):
     methods=["POST"],
 )
 def api_link_calendar_to_meeting(meeting_id, calendar_id):
+    # TODO: Reroute this request to the linkage service
     pass
 
 # Endpoint to get all participants for a specific meeting
 @meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])
 def api_get_participants_for_meeting(meeting_id):
+    # TODO: Find all participants linked to this meeting
+    # - implement the logic in the linkage service
+    # - expose an endpoint in the linkage service to get all participants linked to a meeting
+    # - call the linkage service
+    # TODO: Get the participants' details
+    # - call the participant service
+    # TODO: Return the participants' details in the expected format
+    # - check the expected format by referencing the previous implementation
+    # - return the participants' details in the expected format
     pass
