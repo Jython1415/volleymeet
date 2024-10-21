@@ -14,18 +14,6 @@ logging.basicConfig(
 # Create a Blueprint for meeting routes
 meeting_routes = Blueprint("meeting_routes", __name__)
 
-# End point to get the meetings associated with a calendar
-
-
-# End point to get the meetings associated with a calendar that would be orphaned otherwise
-@meeting_routes.route(
-    "/calendars/<string:calendar_id>/meetings",
-    methods=["GET"],
-)
-def api_get_orphan_meetings_for_calendar(calendar_id):
-    pass
-
-
 # Endpoint to link a meeting and participant
 @meeting_routes.route(
     "/meetings/<string:meeting_id>/participants/<string:participant_id>",
