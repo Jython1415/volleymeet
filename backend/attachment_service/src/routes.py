@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, jsonify, request, abort
-from attachments_sql_queries import (
+from queries import (
     create_attachment,
     update_attachment,
     get_all_attachments,
@@ -16,11 +16,10 @@ logging.basicConfig(
 )
 
 # Create a Blueprint for attachment routes
-attachment_routes = Blueprint("attachment_routes", __name__)
-
+routes = Blueprint("attachment_routes", __name__, url_prefix='/')
 
 # Endpoint to get all attachments
-@attachment_routes.route("/attachments", methods=["GET"])
+@routes.route("/attachments", methods=["GET"])
 def api_get_attachments():
     logger.info("Fetching all attachments")
     try:
@@ -33,7 +32,7 @@ def api_get_attachments():
 
 
 # Endpoint to get a specific attachment by ID
-@attachment_routes.route("/attachments/<string:attachment_id>", methods=["GET"])
+@routes.route("/attachments/<string:attachment_id>", methods=["GET"])
 def api_get_attachment(attachment_id):
     logger.info(f"Fetching attachment with ID: {attachment_id}")
     try:
@@ -45,7 +44,7 @@ def api_get_attachment(attachment_id):
 
 
 # Endpoint to add a new attachment
-@attachment_routes.route("/attachments", methods=["POST"])
+@routes.route("/attachments", methods=["POST"])
 def api_add_attachment():
     data = request.get_json()
     meeting_id = data.get("meeting_id")
@@ -62,7 +61,7 @@ def api_add_attachment():
 
 
 # Endpoint to update an existing attachment
-@attachment_routes.route("/attachments/<string:attachment_id>", methods=["PUT"])
+@routes.route("/attachments/<string:attachment_id>", methods=["PUT"])
 def api_update_attachment(attachment_id):
     data = request.get_json()
     meeting_id = data.get("meeting_id")
@@ -78,7 +77,7 @@ def api_update_attachment(attachment_id):
 
 
 # Endpoint to delete an attachment by ID
-@attachment_routes.route("/attachments/<string:attachment_id>", methods=["DELETE"])
+@routes.route("/attachments/<string:attachment_id>", methods=["DELETE"])
 def api_delete_attachment(attachment_id):
     logger.info(f"Deleting attachment with ID: {attachment_id}")
     try:
@@ -90,7 +89,7 @@ def api_delete_attachment(attachment_id):
 
 
 # Endpoint to delete attachments by meeting ID
-@attachment_routes.route(
+@routes.route(
     "/attachments/meetings/<string:meeting_id>", methods=["DELETE"]
 )
 def api_delete_attachments_by_meeting(meeting_id):

@@ -1,6 +1,6 @@
 import uuid
 import logging
-from managedb import execute_query, execute_read_query
+from db_connection import execute_query, execute_read_query
 
 # Set up logging
 logger = logging.getLogger(__name__)
