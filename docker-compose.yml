@@ -2,7 +2,7 @@ services:
   attachment-service:
     build: ./backend/attachment_service
     ports:
-      - "5004:5004"
+      - "5001:5001"
     networks:
       - backend-net
       - db-net
@@ -28,7 +28,7 @@ services:
   linkage-service:
     build: ./backend/linkage_service
     ports:
-      - "5005:5005"
+      - "5003:5003"
     networks:
       - backend-net
       - db-net
@@ -41,7 +41,7 @@ services:
   meeting-service:
     build: ./backend/meeting_service
     ports:
-      - "5001:5001"
+      - "5004:5004"
     networks:
       - backend-net
       - db-net
@@ -54,7 +54,7 @@ services:
   participant-service:
     build: ./backend/participant_service
     ports:
-      - "5003:5003"
+      - "5005:5005"
     networks:
       - backend-net
       - db-net
