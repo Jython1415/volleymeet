@@ -5,7 +5,7 @@ services:
       - "5001:5001"
     depends_on:
       - db
-      - rabbitmq
+      - message_broker
     environment:
       MYSQL_HOST: db
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -48,17 +48,14 @@ services:
       - backend-net
     tty: true
 
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: rabbitmq
+  message_broker:
+    build: ./message_broker
     ports:
-      - "5672:5672" # AMQP port for message broker
+      - "5672:5672" # Default AMQP RabbitMQ port
       - "15672:15672" # Management UI port
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbituser # TODO: Replace with password using environment variables
-      RABBITMQ_DEFAULT_PASS: rabbitpassword # TODO: Replace with password using environment variables
     networks:
       - backend-net
+      - db-net
 
 networks:
   cli-frontend-net:
