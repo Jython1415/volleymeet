@@ -1,6 +1,63 @@
 import requests
-
+import json
+import random
+import uuid
+from datetime import datetime, timedelta
 BASE_URL = "http://localhost:5001"  # Modify the base URL if backend is hosted elsewhere
+
+
+# Helper function to create random string
+def random_string(length):
+    return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', k=length))
+
+# Helper function to create invalid email
+def random_invalid_email():
+    return random_string(8)  # No "@" character
+
+# Function to generate batch of meetings, participants, and attachments
+def create_batch(batch_size=500):
+    batch_data = {"meetings": []}
+    
+    for _ in range(batch_size):
+        # Create a new meeting with potential errors
+        meeting = {
+            "meeting_id": str(uuid.uuid4()),
+            "title": random_string(random.randint(20, 2500)),  # Potentially too long
+            "date_time": (datetime.now() + timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d %I:%M %p"),
+            "location": random_string(random.randint(10, 2500)),  # Potentially too long
+            "details": random_string(random.randint(20, 5000))
+        }
+
+        # Create participants
+        participants = []
+        for _ in range(random.randint(50, 100)):
+            participant = {
+                "participant_id": str(uuid.uuid4()),
+                "meeting_id": meeting["meeting_id"],
+                "name": random_string(random.randint(5, 650)),  # Potentially too long
+                "email": random_invalid_email() if random.random() < 0.2 else f"{random_string(5)}@example.com"
+            }
+            participants.append(participant)
+
+        # Create attachments
+        attachments = []
+        for _ in range(random.randint(5, 10)):
+            url_prefix = "" if random.random() < 0.2 else "http://example.com/"
+            attachment = {
+                "attachment_id": str(uuid.uuid4()),
+                "meeting_id": meeting["meeting_id"],
+                "url": f"{url_prefix}{random_string(10)}.pdf"
+            }
+            attachments.append(attachment)
+
+        meeting["participants"] = participants
+        meeting["attachments"] = attachments
+        batch_data["meetings"].append(meeting)
+
+    # Save the batch to a JSON file
+    with open("batch_data.json", "w") as file:
+        json.dump(batch_data, file, indent=4)
+    return "Batch of meetings, participants, and attachments created and saved to batch_data.json"
 
 # Attachment Services
 def get_all_attachments():

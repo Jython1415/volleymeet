@@ -1,9 +1,10 @@
+import random
 from services import (
     get_all_attachments, get_attachment_by_id, create_attachment, update_attachment, delete_attachment,
     get_all_calendars, get_calendar_by_id, create_calendar, update_calendar, delete_calendar, get_meetings_for_calendar,
     get_all_meetings, get_meeting_by_id, create_meeting, update_meeting, delete_meeting,
     link_participant_to_meeting, link_calendar_to_meeting, get_participants_for_meeting,
-    get_all_participants, get_participant_by_id, create_participant, update_participant, delete_participant
+    get_all_participants, get_participant_by_id, create_participant, update_participant, delete_participant, create_batch,
 )
 
 def print_main_menu():
@@ -12,6 +13,7 @@ def print_main_menu():
     print("2. Manage Calendars")
     print("3. Manage Meetings")
     print("4. Manage Participants")
+    print("9. Create Batch Request")
     print("0. Exit")
 
 
@@ -58,6 +60,11 @@ def print_participant_menu():
     print("5. Delete Participant")
     print("0. Back to Main Menu")
 
+
+def create_batch_data():
+    print("Creating batch of meetings, participants, and attachments...")
+    result = create_batch(batch_size=random.randint(500, 1000))
+    print(result)
 
 def handle_attachments():
     while True:
@@ -213,6 +220,8 @@ def main():
             handle_meetings()
         elif choice == "4":
             handle_participants()
+        elif choice == "9":
+            create_batch_data()  # New batch creation option
         elif choice == "0":
             print("Exiting...")
             break
