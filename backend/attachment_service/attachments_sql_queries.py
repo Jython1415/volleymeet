@@ -1,6 +1,6 @@
 import uuid
 import logging
-from scripts.managedb import execute_query, execute_read_query
+from managedb import execute_query, execute_read_query
 
 # Set up logging
 logger = logging.getLogger(__name__)
