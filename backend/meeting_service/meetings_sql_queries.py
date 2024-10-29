@@ -173,3 +173,44 @@ def delete_meeting(meeting_id):
     except Exception as e:
         logger.error(f"Error deleting meeting: {str(e)}")
         raise ValueError(f"Error deleting meeting: {str(e)}")
+
+# Get Participant Ids Attending Meeting
+def get_participant_ids_for_meeting(meeting_id):
+    query = "SELECT * FROM linkages WHERE meeting_id = %s"
+    data = (meeting_id,)
+
+    try:
+        participants = execute_read_query(query, data)
+    except Exception as e:
+        logger.error(f"Error retrieving participants for meeting: {str(e)}")
+        raise ValueError(f"Error retrieving participants for meeting: {str(e)}")
+    
+    if not participants:
+        logger.info("No participants found for meeting: {meeting_id}")
+        return []
+    
+    results = [
+        {
+            "participant_id": participant[0],
+        }
+        for participant in participants
+    ]
+
+    logger.info(f"Retrieved participants for meeting: {meeting_id}")
+    return results
+
+# Get participants with participant ids
+def get_participants_for_meeting(participant_ids):
+    try:
+        results = [
+            {
+                participant_service.get_participant_by_id(participant_id)
+            }
+            for participant_id in participant_ids
+        ]
+    except Exception as e:
+        logger.error(f"Error retrieving participants for meeting: {str(e)}")
+        raise ValueError
+    
+    return results
+    

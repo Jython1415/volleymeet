@@ -6,6 +6,8 @@ from meetings_sql_queries import (
     get_meeting_by_id,
     update_meeting,
     delete_meeting,
+    get_participant_ids_for_meeting,
+    get_participants_for_meeting,
 )
 
 # Set up logging
@@ -128,6 +130,14 @@ def api_link_calendar_to_meeting(meeting_id, calendar_id):
 # Endpoint to get all participants for a specific meeting
 @meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])
 def api_get_participants_for_meeting(meeting_id):
+    logger.info(f"Getting participants for meeting: {meeting_id}")
+    try:
+        participant_ids = get_participant_ids_for_meeting(meeting_id)
+        participants = get_participants_for_meeting(participant_ids)
+        return jsonify(participants), 200
+    except ValueError as e:
+        logger.error(f"Error fetching participants for meeting: {str(e)}")
+
     # TODO: Find all participants linked to this meeting
     # - implement the logic in the linkage service
     # - expose an endpoint in the linkage service to get all participants linked to a meeting
@@ -137,4 +147,3 @@ def api_get_participants_for_meeting(meeting_id):
     # TODO: Return the participants' details in the expected format
     # - check the expected format by referencing the previous implementation
     # - return the participants' details in the expected format
-    pass
