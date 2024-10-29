@@ -5,8 +5,7 @@ services:
       - "5001:5001"
     depends_on:
       - db
-    # volumes:
-      # - ./certs:/app/certs # SSL certificates
+      - rabbitmq
     environment:
       MYSQL_HOST: db
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -26,9 +25,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
     volumes:
-      - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql # Seed data
-      # - ./certs:/etc/mysql/certs # SSL certificates for MySQL
-    # command: --ssl-ca=/etc/mysql/certs/ca-cert.pem --ssl-cert=/etc/mysql/certs/server-cert.pem --ssl-key=/etc/mysql/certs/server-key.pem
+      - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     networks:
       - db-net
 
@@ -50,6 +47,18 @@ services:
       - cli-frontend-net
       - backend-net
     tty: true
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # AMQP port for message broker
+      - "15672:15672" # Management UI port
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbituser # TODO: Replace with password using environment variables
+      RABBITMQ_DEFAULT_PASS: rabbitpassword # TODO: Replace with password using environment variables
+    networks:
+      - backend-net
 
 networks:
   cli-frontend-net:
