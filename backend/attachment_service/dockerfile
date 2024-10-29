@@ -14,4 +14,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 5003
 
 # Define the command to run the attachment service
-CMD ["python", "attatchment_service.py"]
+CMD ["python", "attachment_service.py"]
