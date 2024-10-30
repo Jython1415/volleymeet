@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the attachment service will run on
-EXPOSE 5003
+EXPOSE 5001
 
 # Define the command to run the attachment service
 CMD ["python", "src/app.py"]
