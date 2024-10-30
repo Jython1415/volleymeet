@@ -1,4 +1,5 @@
 import logging
+import requests
 from flask import Blueprint, jsonify, request, abort
 from meetings_sql_queries import (
     create_meeting,
@@ -132,9 +133,16 @@ def api_link_calendar_to_meeting(meeting_id, calendar_id):
 def api_get_participants_for_meeting(meeting_id):
     logger.info(f"Getting participants for meeting: {meeting_id}")
     try:
-        participant_ids = get_participant_ids_for_meeting(meeting_id)
-        participants = get_participants_for_meeting(participant_ids)
-        return jsonify(participants), 200
+        participant_ids = requests.get(f"{LINKAGES_URL}/meetings/{meeting_id}/participants")
+
+        results = [
+            {
+                requests.get(f"{PARTICIPANTS_URL}/participants/participant_ids/{participant_id}")
+            }
+            for participant_id in participant_ids
+        ]
+        
+        return jsonify(results), 200
     except ValueError as e:
         logger.error(f"Error fetching participants for meeting: {str(e)}")
 

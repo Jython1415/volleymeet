@@ -54,3 +54,19 @@ def link_calendar_to_meeting(meeting_id, calendar_id):
         raise ValueError(
             f"Error linking calendar {calendar_id} to meeting {meeting_id}: {str(e)}"
         )
+    
+def get_participants_from_meeting_id(meeting_id):
+    query = """GET * FROM participating_in WHERE meeting_id = %s"""
+    data = (meeting_id,)
+
+    try:
+        participant_ids = execute_query(query, data)
+        logger.info(f"Retrieved participants with meeting {meeting_id}")
+    except Exception as e:
+        logger.error(
+            f"Error retrieving participants from meeting {meeting_id}: {str(e)}"
+        )
+
+    return participant_ids
+    
+
