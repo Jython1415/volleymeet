@@ -32,7 +32,7 @@ def api_get_attachments():
 
 
 # Endpoint to get a specific attachment by ID
-@routes.route("/attachments/<string:attachment_id>", methods=["GET"])
+@routes.route("/<string:attachment_id>", methods=["GET"])
 def api_get_attachment(attachment_id):
     logger.info(f"Fetching attachment with ID: {attachment_id}")
     try:
@@ -44,7 +44,7 @@ def api_get_attachment(attachment_id):
 
 
 # Endpoint to add a new attachment
-@routes.route("/attachments", methods=["POST"])
+@routes.route("", methods=["POST"])
 def api_add_attachment():
     data = request.get_json()
     meeting_id = data.get("meeting_id")
@@ -61,7 +61,7 @@ def api_add_attachment():
 
 
 # Endpoint to update an existing attachment
-@routes.route("/attachments/<string:attachment_id>", methods=["PUT"])
+@routes.route("/<string:attachment_id>", methods=["PUT"])
 def api_update_attachment(attachment_id):
     data = request.get_json()
     meeting_id = data.get("meeting_id")
@@ -77,7 +77,7 @@ def api_update_attachment(attachment_id):
 
 
 # Endpoint to delete an attachment by ID
-@routes.route("/attachments/<string:attachment_id>", methods=["DELETE"])
+@routes.route("/<string:attachment_id>", methods=["DELETE"])
 def api_delete_attachment(attachment_id):
     logger.info(f"Deleting attachment with ID: {attachment_id}")
     try:
@@ -90,7 +90,7 @@ def api_delete_attachment(attachment_id):
 
 # Endpoint to delete attachments by meeting ID
 @routes.route(
-    "/attachments/meetings/<string:meeting_id>", methods=["DELETE"]
+    "/meetings/<string:meeting_id>", methods=["DELETE"]
 )
 def api_delete_attachments_by_meeting(meeting_id):
     logger.info(f"Deleting attachments for meeting with ID: {meeting_id}")
