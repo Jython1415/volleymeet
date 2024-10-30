@@ -57,6 +57,13 @@ services:
       - backend-net
       - db-net
 
+  consumer:
+    build: ./event_consumers
+    depends_on:
+      - message_broker
+    networks:
+      - backend-net
+
 networks:
   cli-frontend-net:
     driver: bridge
