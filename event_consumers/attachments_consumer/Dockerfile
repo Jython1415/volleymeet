@@ -17,4 +17,4 @@ COPY . /app/
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
 # Run the consumer script
-CMD ["python", "start_consumers.py"]
+CMD ["python", "start_consumer.py"]

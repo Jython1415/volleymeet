@@ -57,8 +57,22 @@ services:
       - backend-net
       - db-net
 
-  consumer:
-    build: ./event_consumers
+  meetings_consumer:
+    build: ./event_consumers/meetings_consumer
+    depends_on:
+      - message_broker
+    networks:
+      - backend-net
+
+  attachments_consumer:
+    build: ./event_consumers/attachments_consumer
+    depends_on:
+      - message_broker
+    networks:
+      - backend-net
+
+  participants_consumer:
+    build: ./event_consumers/participants_consumer
     depends_on:
       - message_broker
     networks:

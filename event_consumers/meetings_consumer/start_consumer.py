@@ -33,18 +33,8 @@ def main():
         logger.info(f"Received meeting message: {body}")
         # Process the meeting message here
 
-    def handle_attachment(ch, method, properties, body):
-        logger.info(f"Received attachment message: {body}")
-        # Process the attachment message here
-
-    def handle_participant(ch, method, properties, body):
-        logger.info(f"Received participant message: {body}")
-        # Process the participant message here
-
-    # Set up consumers for each queue
+    # Set up consumers
     channel.basic_consume(queue="meetings", on_message_callback=handle_meeting, auto_ack=True)
-    channel.basic_consume(queue="attachments", on_message_callback=handle_attachment, auto_ack=True)
-    channel.basic_consume(queue="participants", on_message_callback=handle_participant, auto_ack=True)
 
     logger.info("Waiting for messages. To exit press CTRL+C")
 
