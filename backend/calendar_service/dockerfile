@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the calendar service will run on
-EXPOSE 5001
+EXPOSE 5002
 
 # Define the command to run the calendar service
-CMD ["python", "calender_service.py"]
+CMD ["python", "src/app.py"]
