@@ -38,12 +38,10 @@ def create_batch(batch_size=500, invalid_percentage=20):
         title = random_string(random.randint(20, 2500)) if is_invalid else random_string(random.randint(20, 200))
         if len(title) > 2000:
             invalid_counts["invalid_meeting_title"] += 1
-            logging.info("Invalid Meeting Title: Title exceeds 2000 characters.")
 
         location = random_string(random.randint(10, 2500)) if is_invalid else random_string(random.randint(10, 200))
         if len(location) > 2000:
             invalid_counts["invalid_meeting_location"] += 1
-            logging.info("Invalid Meeting Location: Location exceeds 2000 characters.")
 
         meeting = {
             "meeting_id": str(uuid.uuid4()),
@@ -59,13 +57,11 @@ def create_batch(batch_size=500, invalid_percentage=20):
             name = random_string(random.randint(5, 650)) if is_invalid and random.random() < 0.2 else random_string(random.randint(5, 50))
             if len(name) > 600:
                 invalid_counts["invalid_participant_name"] += 1
-                logging.info("Invalid Participant Name: Name exceeds 600 characters.")
 
             email = random_invalid_email() if is_invalid and random.random() < 0.2 else f"{random_string(5)}@example.com"
             if "@" not in email:
                 invalid_counts["invalid_participant_email"] += 1
-                logging.info("Invalid Participant Email: Email format is invalid (missing '@').")
-
+                
             participant = {
                 "participant_id": str(uuid.uuid4()),
                 "meeting_id": meeting["meeting_id"],
@@ -81,7 +77,6 @@ def create_batch(batch_size=500, invalid_percentage=20):
             url = f"{url_prefix}{random_string(10)}.pdf"
             if not url.startswith("http"):
                 invalid_counts["invalid_attachment_url"] += 1
-                logging.info("Invalid Attachment URL: URL does not start with 'http' or 'https'.")
 
             attachment = {
                 "attachment_id": str(uuid.uuid4()),
@@ -94,10 +89,14 @@ def create_batch(batch_size=500, invalid_percentage=20):
         meeting["attachments"] = attachments
         batch_data["meetings"].append(meeting)
 
-    # Log the count of each invalid type
+    # Log the count of each invalid type at the end of processing
+    logging.info("Batch Processing Complete")
     logging.info("Invalid Data Summary:")
-    for key, count in invalid_counts.items():
-        logging.info(f"{key}: {count}")
+    logging.info(f"Invalid Meetings (Title): {invalid_counts['invalid_meeting_title']}")
+    logging.info(f"Invalid Meetings (Location): {invalid_counts['invalid_meeting_location']}")
+    logging.info(f"Invalid Participants (Name): {invalid_counts['invalid_participant_name']}")
+    logging.info(f"Invalid Participants (Email): {invalid_counts['invalid_participant_email']}")
+    logging.info(f"Invalid Attachments (URL): {invalid_counts['invalid_attachment_url']}")
 
     # Log a sample of the data (first two meetings) for examination
     logging.info("Sample Batch Data (first 2 meetings):")
@@ -107,22 +106,51 @@ def create_batch(batch_size=500, invalid_percentage=20):
 
 # New function to send batch data as HTTP requests
 def send_batch_data(batch_data):
+    success_counts = {
+        "meetings": 0,
+        "participants": 0,
+        "attachments": 0
+    }
+    failure_counts = {
+        "meetings": 0,
+        "participants": 0,
+        "attachments": 0
+    }
+
+    # Process each meeting in the batch data
     for meeting in batch_data["meetings"]:
         # Send meeting
         meeting_response = requests.post(f"{BASE_URL}/meetings", json=meeting)
-        logging.info(f"Meeting Response: {meeting_response.status_code}, {meeting_response.text}")
+        if meeting_response.status_code == 201:
+            success_counts["meetings"] += 1
+        else:
+            failure_counts["meetings"] += 1
 
-        # Send participants
+        # Send participants for the meeting
         for participant in meeting["participants"]:
             participant_response = requests.post(f"{BASE_URL}/participants", json=participant)
-            logging.info(f"Participant Response: {participant_response.status_code}, {participant_response.text}")
+            if participant_response.status_code == 201:
+                success_counts["participants"] += 1
+            else:
+                failure_counts["participants"] += 1
 
-        # Send attachments
+        # Send attachments for the meeting
         for attachment in meeting["attachments"]:
             attachment_response = requests.post(f"{BASE_URL}/attachments", json=attachment)
-            logging.info(f"Attachment Response: {attachment_response.status_code}, {attachment_response.text}")
-    
+            if attachment_response.status_code == 201:
+                success_counts["attachments"] += 1
+            else:
+                failure_counts["attachments"] += 1
+
+    # Log summary of successful and failed requests at the end
+    logging.info("Batch Sending Complete")
+    logging.info("Summary of Batch Results:")
+    logging.info(f"Meetings - Success: {success_counts['meetings']}, Failures: {failure_counts['meetings']}")
+    logging.info(f"Participants - Success: {success_counts['participants']}, Failures: {failure_counts['participants']}")
+    logging.info(f"Attachments - Success: {success_counts['attachments']}, Failures: {failure_counts['attachments']}")
+
     return "Batch data sent successfully."
+
 
 
 # Attachment Services
