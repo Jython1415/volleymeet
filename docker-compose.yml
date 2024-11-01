@@ -142,7 +142,10 @@ services:
   cli_frontend:
     build: ./cli_frontend
     depends_on:
-      - backend
+      - attachment-service
+      - calendar-service
+      - meeting-service
+      - participant-service
     networks:
       - cli-frontend-net
       - backend-net
