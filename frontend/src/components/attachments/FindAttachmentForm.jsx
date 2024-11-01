@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001"; // Your backend URL
+
 const FindAttachmentForm = ({ onFindAttachment }) => {
     const [attachmentId, setAttachmentId] = useState('');
 

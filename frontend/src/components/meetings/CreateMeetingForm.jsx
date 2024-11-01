@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const BASE_URL = "http://localhost:80";
 const MEETINGS_BACKEND_BASE_URL = `${BASE_URL}/meetings`;
+const MEETINGS_BACKEND_BASE_URL = "http://localhost:5004";
 
 
 const CreateMeetingForm = () => {

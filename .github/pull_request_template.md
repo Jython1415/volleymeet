@@ -1,0 +1,5 @@
+- [ ] Explain what this PR does
+  - *explanation goes here*
+- [ ] Documentation updated (if needed)
+- [ ] Code reviewed by someone else on the team
+- [ ] PR is ready and can be merged (do not check this until all other boxes are checked)

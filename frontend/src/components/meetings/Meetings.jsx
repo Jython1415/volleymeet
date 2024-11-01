@@ -12,6 +12,9 @@ const BASE_URL = "http://localhost:80";
 const MEETINGS_BACKEND_BASE_URL = `${BASE_URL}/meetings`;
 const PARTICIPANTS_BACKEND_BASE_URL = `${BASE_URL}/participants`;
 const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
+const MEETINGS_BACKEND_BASE_URL = "http://localhost:5004";
+const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
+const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);
@@ -75,7 +78,9 @@ const Meetings = () => {
 
     const handleFindMeetingById = async (meetingId) => {
         try {
-            const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`);
+            const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const meeting = await response.json();
                 setMeetings([meeting]);
@@ -83,7 +88,9 @@ const Meetings = () => {
                 await handleFetchParticipants();
                 await handleFetchAttachments();
                 try {
-                    const participantsResponse = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}/participants`);
+                    const participantsResponse = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}/participants`, {
+                        method: 'GET',
+                    });
                     if (participantsResponse.status === 200) {
                         console.log("Participants found for meeting", meetingId);
                         console.log(participantsResponse);
@@ -125,7 +132,9 @@ const Meetings = () => {
     const handleMeetingDisplay = async () => {
         resetFormVisibility();
         try {
-            const response = await fetch(MEETINGS_BACKEND_BASE_URL);
+            const response = await fetch(MEETINGS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setMeetings(data);
@@ -162,7 +171,9 @@ const Meetings = () => {
 
     const handleFetchParticipants = async () => {
         try {
-            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL);
+            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setParticipants(data);
@@ -176,7 +187,9 @@ const Meetings = () => {
 
     const handleFetchAttachments = async () => {
         try {
-            const response = await fetch(ATTACHMENTS_BACKEND_BASE_URL);
+            const response = await fetch(ATTACHMENTS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setAttachments(data);
