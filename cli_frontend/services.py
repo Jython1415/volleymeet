@@ -1,10 +1,13 @@
-import requests
 import json
 import random
 import uuid
+import logging
 from datetime import datetime, timedelta
+import requests
+
 BASE_URL = "http://localhost:5001"  # Modify the base URL if backend is hosted elsewhere
 
+logging.basicConfig(level=logging.INFO)
 
 # Helper function to create random string
 def random_string(length):
@@ -15,38 +18,75 @@ def random_invalid_email():
     return random_string(8)  # No "@" character
 
 # Function to generate batch of meetings, participants, and attachments
-def create_batch(batch_size=500):
+def create_batch(batch_size=500, invalid_percentage=20):
     batch_data = {"meetings": []}
-    
-    for _ in range(batch_size):
-        # Create a new meeting with potential errors
+    num_invalid_meetings = int((invalid_percentage / 100) * batch_size)
+
+    # Counters for invalid data
+    invalid_counts = {
+        "invalid_meeting_title": 0,
+        "invalid_meeting_location": 0,
+        "invalid_participant_name": 0,
+        "invalid_participant_email": 0,
+        "invalid_attachment_url": 0,
+    }
+
+    for i in range(batch_size):
+        is_invalid = i < num_invalid_meetings  # Control invalid entries
+
+        # Create a new meeting with potential invalid fields
+        title = random_string(random.randint(20, 2500)) if is_invalid else random_string(random.randint(20, 200))
+        if len(title) > 2000:
+            invalid_counts["invalid_meeting_title"] += 1
+            logging.info("Invalid Meeting Title: Title exceeds 2000 characters.")
+
+        location = random_string(random.randint(10, 2500)) if is_invalid else random_string(random.randint(10, 200))
+        if len(location) > 2000:
+            invalid_counts["invalid_meeting_location"] += 1
+            logging.info("Invalid Meeting Location: Location exceeds 2000 characters.")
+
         meeting = {
             "meeting_id": str(uuid.uuid4()),
-            "title": random_string(random.randint(20, 2500)),  # Potentially too long
+            "title": title,
             "date_time": (datetime.now() + timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d %I:%M %p"),
-            "location": random_string(random.randint(10, 2500)),  # Potentially too long
+            "location": location,
             "details": random_string(random.randint(20, 5000))
         }
 
         # Create participants
         participants = []
         for _ in range(random.randint(50, 100)):
+            name = random_string(random.randint(5, 650)) if is_invalid and random.random() < 0.2 else random_string(random.randint(5, 50))
+            if len(name) > 600:
+                invalid_counts["invalid_participant_name"] += 1
+                logging.info("Invalid Participant Name: Name exceeds 600 characters.")
+
+            email = random_invalid_email() if is_invalid and random.random() < 0.2 else f"{random_string(5)}@example.com"
+            if "@" not in email:
+                invalid_counts["invalid_participant_email"] += 1
+                logging.info("Invalid Participant Email: Email format is invalid (missing '@').")
+
             participant = {
                 "participant_id": str(uuid.uuid4()),
                 "meeting_id": meeting["meeting_id"],
-                "name": random_string(random.randint(5, 650)),  # Potentially too long
-                "email": random_invalid_email() if random.random() < 0.2 else f"{random_string(5)}@example.com"
+                "name": name,
+                "email": email
             }
             participants.append(participant)
 
         # Create attachments
         attachments = []
         for _ in range(random.randint(5, 10)):
-            url_prefix = "" if random.random() < 0.2 else "http://example.com/"
+            url_prefix = "" if is_invalid and random.random() < 0.2 else "http://example.com/"
+            url = f"{url_prefix}{random_string(10)}.pdf"
+            if not url.startswith("http"):
+                invalid_counts["invalid_attachment_url"] += 1
+                logging.info("Invalid Attachment URL: URL does not start with 'http' or 'https'.")
+
             attachment = {
                 "attachment_id": str(uuid.uuid4()),
                 "meeting_id": meeting["meeting_id"],
-                "url": f"{url_prefix}{random_string(10)}.pdf"
+                "url": url
             }
             attachments.append(attachment)
 
@@ -54,10 +94,36 @@ def create_batch(batch_size=500):
         meeting["attachments"] = attachments
         batch_data["meetings"].append(meeting)
 
-    # Save the batch to a JSON file
-    with open("batch_data.json", "w") as file:
-        json.dump(batch_data, file, indent=4)
-    return "Batch of meetings, participants, and attachments created and saved to batch_data.json"
+    # Log the count of each invalid type
+    logging.info("Invalid Data Summary:")
+    for key, count in invalid_counts.items():
+        logging.info(f"{key}: {count}")
+
+    # Log a sample of the data (first two meetings) for examination
+    logging.info("Sample Batch Data (first 2 meetings):")
+    logging.info(json.dumps(batch_data["meetings"][:2], indent=4))
+
+    return batch_data
+
+# New function to send batch data as HTTP requests
+def send_batch_data(batch_data):
+    for meeting in batch_data["meetings"]:
+        # Send meeting
+        meeting_response = requests.post(f"{BASE_URL}/meetings", json=meeting)
+        logging.info(f"Meeting Response: {meeting_response.status_code}, {meeting_response.text}")
+
+        # Send participants
+        for participant in meeting["participants"]:
+            participant_response = requests.post(f"{BASE_URL}/participants", json=participant)
+            logging.info(f"Participant Response: {participant_response.status_code}, {participant_response.text}")
+
+        # Send attachments
+        for attachment in meeting["attachments"]:
+            attachment_response = requests.post(f"{BASE_URL}/attachments", json=attachment)
+            logging.info(f"Attachment Response: {attachment_response.status_code}, {attachment_response.text}")
+    
+    return "Batch data sent successfully."
+
 
 # Attachment Services
 def get_all_attachments():

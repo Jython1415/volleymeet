@@ -4,7 +4,7 @@ from services import (
     get_all_calendars, get_calendar_by_id, create_calendar, update_calendar, delete_calendar, get_meetings_for_calendar,
     get_all_meetings, get_meeting_by_id, create_meeting, update_meeting, delete_meeting,
     link_participant_to_meeting, link_calendar_to_meeting, get_participants_for_meeting,
-    get_all_participants, get_participant_by_id, create_participant, update_participant, delete_participant, create_batch,
+    get_all_participants, get_participant_by_id, create_participant, update_participant, delete_participant, create_batch, send_batch_data
 )
 
 def print_main_menu():
@@ -207,6 +207,14 @@ def handle_participants():
         else:
             print("Invalid option, try again.")
 
+
+def create_and_send_batch_data():
+    print("Creating and sending batch of meetings, participants, and attachments...")
+    batch_data = create_batch(batch_size=random.randint(500, 1000), invalid_percentage=20)
+    result = send_batch_data(batch_data)
+    print(result)
+
+# Update main function to include the new batch sending option
 def main():
     while True:
         print_main_menu()
@@ -221,7 +229,7 @@ def main():
         elif choice == "4":
             handle_participants()
         elif choice == "9":
-            create_batch_data()  # New batch creation option
+            create_and_send_batch_data()  # Updated to create and send the batch
         elif choice == "0":
             print("Exiting...")
             break
