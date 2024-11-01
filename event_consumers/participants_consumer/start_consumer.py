@@ -3,12 +3,16 @@ import pika
 import sys
 import os
 import logging
+import requests
 
 # Set up logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
+PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants"
+
 
 def main():
     connected = False
@@ -31,7 +35,10 @@ def main():
     # Callback functions
     def handle_participant(ch, method, properties, body):
         logger.info(f"Received participant message: {body}")
-        # Process the participant message here
+
+        # TODO: Create a participant in the backend using a POST HTTP request with the body
+
+
 
     # Set up consumer
     channel.basic_consume(queue="participants", on_message_callback=handle_participant, auto_ack=True)

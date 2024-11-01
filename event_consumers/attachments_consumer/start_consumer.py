@@ -3,12 +3,15 @@ import pika
 import sys
 import os
 import logging
+import requests
 
 # Set up logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
+ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments"
 
 def main():
     connected = False
@@ -31,7 +34,8 @@ def main():
     # Callback function
     def handle_attachment(ch, method, properties, body):
         logger.info(f"Received attachment message: {body}")
-        # Process the attachment message here
+        
+        # TODO: Create an attachment in the backend using a POST HTTP request
 
     # Set up consumer
     channel.basic_consume(queue="attachments", on_message_callback=handle_attachment, auto_ack=True)

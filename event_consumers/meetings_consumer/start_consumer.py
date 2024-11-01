@@ -3,12 +3,15 @@ import pika
 import sys
 import os
 import logging
+import requests
 
 # Set up logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
+
+MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"
 
 def main():
     connected = False
@@ -31,7 +34,16 @@ def main():
     # Callback functions for each queue
     def handle_meeting(ch, method, properties, body):
         logger.info(f"Received meeting message: {body}")
-        # Process the meeting message here
+        
+        # TODO: Extract only meeting data
+        # TODO: Extract only participant data
+        # TODO: Extract only attachments data
+
+        # TODO: Send a POST request to meetings api gateway route to create a meeting in the backend
+
+        # TODO: Send a message to attachments queue with only the attachments data
+        # TODO: Send a message to participants queue with only the participants data
+
 
     # Set up consumers
     channel.basic_consume(queue="meetings", on_message_callback=handle_meeting, auto_ack=True)
