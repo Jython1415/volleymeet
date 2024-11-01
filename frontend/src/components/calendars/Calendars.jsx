@@ -6,7 +6,7 @@ import DeleteCalendarForm from './DeleteCalendarForm';
 import UpdateCalendarForm from './UpdateCalendarForm';
 import CalendarMeetingList from './CalendarMeetingList';
 
-const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars";
+const CALENDARS_BACKEND_BASE_URL = "http://localhost:5002";
 
 const Calendars = () => {
     const [calendars, setCalendars] = useState([]);
@@ -41,7 +41,9 @@ const Calendars = () => {
     const handleCalendarDisplay = async () => {
         resetFormVisibility();
         try {
-            const response = await fetch(CALENDARS_BACKEND_BASE_URL);
+            const response = await fetch(CALENDARS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setCalendars(data);

@@ -5,7 +5,7 @@ import FindParticipantForm from './FindParticipantForm';
 import DeleteParticipantForm from './DeleteParticipantForm';
 import UpdateParticipantForm from './UpdateParticipantForm';
 
-const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
+const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
 
 
 const Participants = () => {
@@ -39,7 +39,9 @@ const Participants = () => {
     const handleParticipantDisplay = async () => {
         resetFormVisibility();
         try {
-            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL);
+            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setParticipants(data);
@@ -89,7 +91,9 @@ const Participants = () => {
 
     const handleFindParticipantById = async (participantId) => {
         try {
-            const response = await fetch(`${PARTICIPANTS_BACKEND_BASE_URL}/${participantId}`);
+            const response = await fetch(`${PARTICIPANTS_BACKEND_BASE_URL}/${participantId}`, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const participant = await response.json();
                 setParticipants([participant]);
