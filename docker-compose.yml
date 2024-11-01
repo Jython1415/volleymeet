@@ -139,8 +139,18 @@ services:
     environment:
       NODE_ENV: development
 
+  cli_frontend:
+    build: ./cli_frontend
+    depends_on:
+      - backend
+    networks:
+      - cli-frontend-net
+      - backend-net
+    tty: true
 
 networks:
+  cli-frontend-net:
+    driver: bridge
   frontend-net:
     driver: bridge
   backend-net:
