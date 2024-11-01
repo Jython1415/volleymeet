@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
+const MEETINGS_BACKEND_BASE_URL = "http://localhost:5004";
 
 const UpdateMeetingForm = () => {
     const [meeting, setMeeting] = useState({

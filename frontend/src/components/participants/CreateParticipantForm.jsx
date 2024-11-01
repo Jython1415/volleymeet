@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
+const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
 
 
 const CreateParticipantForm = () => {

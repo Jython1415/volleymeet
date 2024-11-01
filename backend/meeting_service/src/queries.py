@@ -1,7 +1,7 @@
 import uuid
 import logging
 from datetime import datetime
-from scripts.managedb import execute_query, execute_read_query
+from db_connection import execute_query, execute_read_query
 
 # Set up logging
 logger = logging.getLogger(__name__)

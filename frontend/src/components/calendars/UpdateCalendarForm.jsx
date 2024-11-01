@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars";
+const CALENDARS_BACKEND_BASE_URL = "http://localhost:5002";
 
 const UpdateCalendarForm = () => {
     const [calendar, setCalendar] = useState({

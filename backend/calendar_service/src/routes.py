@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, jsonify, request, abort
-from calendars_sql_queries import (
+from queries import (
     create_calendar,
     update_calendar,
     get_all_calendars,
@@ -15,24 +15,23 @@ logging.basicConfig(
 )
 
 # Create a Blueprint for calendar routes
-calendar_routes = Blueprint("calendar_routes", __name__)
+routes = Blueprint("calendar_routes", __name__, url_prefix="/")
 
 
 # Endpoint to get all calendars
-@calendar_routes.route("/calendars", methods=["GET"])
+@routes.route("", methods=["GET"])
 def api_get_calendars():
     logger.info("Fetching all calendars")
-    calendars = get_all_calendars()
-
-    if "error" in calendars:
-        logger.error("No calendars found")
-        abort(404, description=calendars["error"])
-
-    return jsonify(calendars), 200
+    try:
+        calendars = get_all_calendars()
+        return jsonify(calendars), 200
+    except ValueError as e:
+        logger.error(f"Error fetching calendars: {str(e)}")
+        abort(404, description=str(e))
 
 
 # Endpoint to get a specific calendar by ID
-@calendar_routes.route("/calendars/<string:calendar_id>", methods=["GET"])
+@routes.route("/<string:calendar_id>", methods=["GET"])
 def api_get_calendar(calendar_id):
     logger.info(f"Fetching calendar with ID: {calendar_id}")
     try:
@@ -44,7 +43,7 @@ def api_get_calendar(calendar_id):
 
 
 # Endpoint to add a new calendar
-@calendar_routes.route("/calendars", methods=["POST"])
+@routes.route("", methods=["POST"])
 def api_add_calendar():
     data = request.get_json()
     title = data.get("title")
@@ -61,7 +60,7 @@ def api_add_calendar():
 
 
 # Endpoint to update an existing calendar
-@calendar_routes.route("/calendars/<string:calendar_id>", methods=["PUT"])
+@routes.route("/<string:calendar_id>", methods=["PUT"])
 def api_update_calendar(calendar_id):
     data = request.get_json()
     title = data.get("title")
@@ -77,7 +76,7 @@ def api_update_calendar(calendar_id):
 
 
 # Endpoint to delete a calendar by ID
-@calendar_routes.route("/calendars/<string:calendar_id>", methods=["DELETE"])
+@routes.route("/<string:calendar_id>", methods=["DELETE"])
 def api_delete_calendar(calendar_id):
     logger.info(f"Deleting calendar with ID: {calendar_id}")
     try:
@@ -94,7 +93,7 @@ def api_delete_calendar(calendar_id):
 
 
 # Endpoint to get all meetings for a specific calendar
-@calendar_routes.route("/calendars/<string:calendar_id>/meetings", methods=["GET"])
+@routes.route("/<string:calendar_id>/meetings", methods=["GET"])
 def api_get_meetings_for_calendar(calendar_id):
     # TODO: find meetings for a calendar
     # - implement this in the linkage service
