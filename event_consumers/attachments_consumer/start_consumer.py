@@ -35,7 +35,24 @@ def main():
     def handle_attachment(ch, method, properties, body):
         logger.info(f"Received attachment message: {body}")
         
-        # TODO: Create an attachment in the backend using a POST HTTP request
+        # Extract attachment details
+        attachment_data = {
+            "meeting_id" = body.get("meeting_id")
+            "attachment_url" = body.get("attachment_url")
+            "attachment_id" = body.get("attachment_id")
+        }
+
+        # Send POST request to participants backend to create a participant
+        try:
+            response = requests.post(
+                ATTACHMENTS_BACKEND_BASE_URL,
+                json=participant_data
+            )
+            response.raise_for_status()
+            logger.info(f"Attachment created successfully in backend: {response.json()}")
+        except requests.RequestException as e:
+            logger.error(f"Failed to create attachment in backend: {e}")
+            return
 
     # Set up consumer
     channel.basic_consume(queue="attachments", on_message_callback=handle_attachment, auto_ack=True)

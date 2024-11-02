@@ -36,7 +36,28 @@ def main():
     def handle_participant(ch, method, properties, body):
         logger.info(f"Received participant message: {body}")
 
-        # TODO: Create a participant in the backend using a POST HTTP request with the body
+        # Extract participants details
+        name = body.get("name")
+        email = body.get("email")
+        participant_id = body.get("participant_id")
+
+        participant_data = {
+            "name" = name,
+            "email" = email,
+            "participant_id" = participant_id
+        }
+
+        # Send POST request to participants backend to create a participant
+        try:
+            response = requests.post(
+                PARTICIPANTS_BACKEND_BASE_URL,
+                json=participant_data
+            )
+            response.raise_for_status()
+            logger.info(f"Participant created successfully in backend: {response.json()}")
+        except requests.RequestException as e:
+            logger.error(f"Failed to create participant in backend: {e}")
+            return
 
 
 
