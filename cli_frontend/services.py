@@ -32,14 +32,14 @@ def create_batch(batch_size=500, invalid_percentage=20):
     }
 
     for i in range(batch_size):
-        is_invalid = i < num_invalid_meetings  # Control invalid entries
+        is_meeting_invalid = i < num_invalid_meetings  # Ensures only 20% of meetings are marked invalid
 
         # Create a new meeting with potential invalid fields
-        title = random_string(random.randint(20, 2500)) if is_invalid else random_string(random.randint(20, 200))
+        title = random_string(random.randint(20, 2500)) if is_meeting_invalid else random_string(random.randint(20, 200))
         if len(title) > 2000:
             invalid_counts["invalid_meeting_title"] += 1
 
-        location = random_string(random.randint(10, 2500)) if is_invalid else random_string(random.randint(10, 200))
+        location = random_string(random.randint(10, 2500)) if is_meeting_invalid else random_string(random.randint(10, 200))
         if len(location) > 2000:
             invalid_counts["invalid_meeting_location"] += 1
 
@@ -51,17 +51,25 @@ def create_batch(batch_size=500, invalid_percentage=20):
             "details": random_string(random.randint(20, 5000))
         }
 
-        # Create participants
+        # Calculate number of invalid participants and attachments within each meeting
+        num_participants = random.randint(50, 100)
+        num_invalid_participants = int((invalid_percentage / 100) * num_participants)
+        num_attachments = random.randint(5, 10)
+        num_invalid_attachments = int((invalid_percentage / 100) * num_attachments)
+
+        # Create participants with a controlled amount of invalid data
         participants = []
-        for _ in range(random.randint(50, 100)):
-            name = random_string(random.randint(5, 650)) if is_invalid and random.random() < 0.2 else random_string(random.randint(5, 50))
+        for j in range(num_participants):
+            is_participant_invalid = j < num_invalid_participants  # Controls percentage of invalid participants
+            
+            name = random_string(random.randint(5, 650)) if is_participant_invalid else random_string(random.randint(5, 50))
             if len(name) > 600:
                 invalid_counts["invalid_participant_name"] += 1
 
-            email = random_invalid_email() if is_invalid and random.random() < 0.2 else f"{random_string(5)}@example.com"
+            email = random_invalid_email() if is_participant_invalid else f"{random_string(5)}@example.com"
             if "@" not in email:
                 invalid_counts["invalid_participant_email"] += 1
-                
+
             participant = {
                 "participant_id": str(uuid.uuid4()),
                 "meeting_id": meeting["meeting_id"],
@@ -70,10 +78,12 @@ def create_batch(batch_size=500, invalid_percentage=20):
             }
             participants.append(participant)
 
-        # Create attachments
+        # Create attachments with a controlled amount of invalid data
         attachments = []
-        for _ in range(random.randint(5, 10)):
-            url_prefix = "" if is_invalid and random.random() < 0.2 else "http://example.com/"
+        for k in range(num_attachments):
+            is_attachment_invalid = k < num_invalid_attachments  # Controls percentage of invalid attachments
+
+            url_prefix = "" if is_attachment_invalid else "http://example.com/"
             url = f"{url_prefix}{random_string(10)}.pdf"
             if not url.startswith("http"):
                 invalid_counts["invalid_attachment_url"] += 1
@@ -97,10 +107,6 @@ def create_batch(batch_size=500, invalid_percentage=20):
     logging.info(f"Invalid Participants (Name): {invalid_counts['invalid_participant_name']}")
     logging.info(f"Invalid Participants (Email): {invalid_counts['invalid_participant_email']}")
     logging.info(f"Invalid Attachments (URL): {invalid_counts['invalid_attachment_url']}")
-
-    # Log a sample of the data (first two meetings) for examination
-    logging.info("Sample Batch Data (first 2 meetings):")
-    logging.info(json.dumps(batch_data["meetings"][:2], indent=4))
 
     return batch_data
 
