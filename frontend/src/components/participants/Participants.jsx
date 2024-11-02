@@ -7,7 +7,7 @@ import UpdateParticipantForm from './UpdateParticipantForm';
 
 const BASE_URL = "http://localhost:80";
 const PARTICIPANTS_BACKEND_BASE_URL = `${BASE_URL}/participants`;
-
+// const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
 
 const Participants = () => {
     const [participants, setParticipants] = useState([]);
@@ -40,7 +40,9 @@ const Participants = () => {
     const handleParticipantDisplay = async () => {
         resetFormVisibility();
         try {
-            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL);
+            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setParticipants(data);
@@ -90,7 +92,9 @@ const Participants = () => {
 
     const handleFindParticipantById = async (participantId) => {
         try {
-            const response = await fetch(`${PARTICIPANTS_BACKEND_BASE_URL}/${participantId}`);
+            const response = await fetch(`${PARTICIPANTS_BACKEND_BASE_URL}/${participantId}`, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const participant = await response.json();
                 setParticipants([participant]);

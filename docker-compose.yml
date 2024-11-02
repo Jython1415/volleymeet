@@ -1,34 +1,131 @@
 services:
-  backend:
-    build: ./backend
+  attachment-service:
+    build: ./backend/attachment_service
     ports:
       - "5001:5001"
-    depends_on:
-      - db
-    # volumes:
-      # - ./certs:/app/certs # SSL certificates
-    environment:
-      MYSQL_HOST: db
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     networks:
       - backend-net
       - db-net
+    environment:
+      MYSQL_HOST: ${ATTACHMENT_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
-  db:
+  calendar-service:
+    build: ./backend/calendar_service
+    ports:
+      - "5002:5002"
+    networks:
+      - backend-net
+      - db-net
+    environment:
+      MYSQL_HOST: ${CALENDAR_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  linkage-service:
+    build: ./backend/linkage_service
+    ports:
+      - "5003:5003"
+    networks:
+      - backend-net
+      - db-net
+    environment:
+      MYSQL_HOST: ${LINKAGE_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  meeting-service:
+    build: ./backend/meeting_service
+    ports:
+      - "5004:5004"
+    networks:
+      - backend-net
+      - db-net
+    environment:
+      MYSQL_HOST: ${MEETING_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  participant-service:
+    build: ./backend/participant_service
+    ports:
+      - "5005:5005"
+    networks:
+      - backend-net
+      - db-net
+    environment:
+      MYSQL_HOST: ${PARTICIPANT_HOST}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  attachment-db:
     image: mysql:latest
     environment:
-      MYSQL_HOST: db
+      MYSQL_HOST: ${ATTACHMENT_HOST}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-
     volumes:
-      - ./db/seed.sql:/docker-entrypoint-initdb.d/seed.sql # Seed data
-      # - ./certs:/etc/mysql/certs # SSL certificates for MySQL
-    # command: --ssl-ca=/etc/mysql/certs/ca-cert.pem --ssl-cert=/etc/mysql/certs/server-cert.pem --ssl-key=/etc/mysql/certs/server-key.pem
+      - ./db/attachment-seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    networks:
+      - db-net
+
+  calendar-db:
+    image: mysql:latest
+    environment:
+      MYSQL_HOST: ${CALENDAR_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./db/calendar-seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    networks:
+      - db-net
+
+  linkage-db:
+    image: mysql:latest
+    environment:
+      MYSQL_HOST: ${LINKAGE_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./db/linkage-seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    networks:
+      - db-net
+
+  meeting-db:
+    image: mysql:latest
+    environment:
+      MYSQL_HOST: ${MEETING_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./db/meeting-seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    networks:
+      - db-net
+
+  participant-db:
+    image: mysql:latest
+    environment:
+      MYSQL_HOST: ${PARTICIPANT_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./db/participant-seed.sql:/docker-entrypoint-initdb.d/seed.sql
     networks:
       - db-net
 
@@ -49,13 +146,30 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf # Link to your NGINX config
     depends_on:
-      - backend
+      - attachment-service
+      - calendar-service
+      - meeting-service
+      - participant-service
       - frontend
     networks:
       - frontend-net
       - backend-net
 
+  cli_frontend:
+    build: ./cli_frontend
+    depends_on:
+      - attachment-service
+      - calendar-service
+      - meeting-service
+      - participant-service
+    networks:
+      - cli-frontend-net
+      - backend-net
+    tty: true
+
 networks:
+  cli-frontend-net:
+    driver: bridge
   frontend-net:
     driver: bridge
   backend-net:
