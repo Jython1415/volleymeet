@@ -132,21 +132,27 @@ const Meetings = () => {
     const handleMeetingDisplay = async () => {
         resetFormVisibility();
         try {
+            console.log('Fetching meetings from:', MEETINGS_BACKEND_BASE_URL);
             const response = await fetch(MEETINGS_BACKEND_BASE_URL, {
                 method: 'GET',
             });
             if (response.status === 200) {
+                console.log('Meetings fetched successfully.');
                 const data = await response.json();
+                console.log('Meetings:', data);
                 setMeetings(data);
                 setShowMeetingList(true);
                 await handleFetchParticipants();
                 await handleFetchAttachments();
             } else if (response.status === 404) {
+                console.log('No meetings found.');
                 setError("No meetings found.");
             } else {
+                console.error('Failed to fetch meetings:', response);
                 setError(`Failed to fetch meetings with status code ${response.status}`);
             }
         } catch (err) {
+            console.error('Error fetching meetings:', err);
             setError('Error fetching meetings.');
         }
     };
