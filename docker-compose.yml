@@ -3,17 +3,9 @@ services:
     build: ./backend/attachment_service
     ports:
       - "5001:5001"
-<<<<<<< HEAD
     depends_on:
-      - db
+      - attachment-db
       - message_broker
-    environment:
-      MYSQL_HOST: db
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-=======
->>>>>>> main
     networks:
       - backend-net
       - db-net
@@ -27,6 +19,9 @@ services:
     build: ./backend/calendar_service
     ports:
       - "5002:5002"
+    depends_on:
+      - calendar-db
+      - message_broker
     networks:
       - backend-net
       - db-net
@@ -40,6 +35,9 @@ services:
     build: ./backend/linkage_service
     ports:
       - "5003:5003"
+    depends_on:
+      - linkage-db
+      - message_broker
     networks:
       - backend-net
       - db-net
@@ -53,6 +51,9 @@ services:
     build: ./backend/meeting_service
     ports:
       - "5004:5004"
+    depends_on:
+      - meeting-db
+      - message_broker
     networks:
       - backend-net
       - db-net
@@ -66,6 +67,9 @@ services:
     build: ./backend/participant_service
     ports:
       - "5005:5005"
+    depends_on:
+      - participant-db
+      - message_broker
     networks:
       - backend-net
       - db-net
@@ -161,7 +165,6 @@ services:
       - calendar-service
       - meeting-service
       - participant-service
-      - frontend
     networks:
       - frontend-net
       - backend-net
