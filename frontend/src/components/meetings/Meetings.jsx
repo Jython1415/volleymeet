@@ -12,9 +12,9 @@ const BASE_URL = "http://localhost:80";
 const MEETINGS_BACKEND_BASE_URL = `${BASE_URL}/meetings`;
 const PARTICIPANTS_BACKEND_BASE_URL = `${BASE_URL}/participants`;
 const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5004";
-const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
+// const MEETINGS_BACKEND_BASE_URL = "http://localhost:5004";
+// const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
+// const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);

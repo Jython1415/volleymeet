@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
-
 const DeleteParticipantForm = ({ onDeleteParticipant }) => {
     const [participantId, setParticipantId] = useState('');
 
