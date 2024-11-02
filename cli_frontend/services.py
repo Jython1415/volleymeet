@@ -1,14 +1,36 @@
 import json
+import requests
 import random
 import uuid
 import logging
+import pika
+import time
 from datetime import datetime, timedelta
-import requests
-
 BASE_URL = "http://localhost:5001"  # Modify the base URL if backend is hosted elsewhere
 
 logging.basicConfig(level=logging.INFO)
 
+
+# Function to connect to RabbitMQ
+def connect_to_rabbitmq():
+    connected = False
+    connection = None
+    channel = None
+
+    while not connected:
+        try:
+            credentials = pika.PlainCredentials("rabbituser", "rabbitpassword")
+            parameters = pika.ConnectionParameters("message_broker", 5672, "demo-vhost", credentials)
+            connection = pika.BlockingConnection(parameters)
+            channel = connection.channel()
+            logging.info("Connected to RabbitMQ")
+            connected = True
+        except pika.exceptions.AMQPConnectionError:
+            logging.warning("Connection attempt failed, retrying in 5 seconds...")
+            time.sleep(5)
+    
+    return connection, channel
+    
 # Helper function to create random string
 def random_string(length):
     return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', k=length))
@@ -18,11 +40,13 @@ def random_invalid_email():
     return random_string(8)  # No "@" character
 
 # Function to generate batch of meetings, participants, and attachments
-def create_batch(batch_size=500, invalid_percentage=20):
-    batch_data = {"meetings": []}
+# Function to generate and publish batch messages
+def create_and_send_batch(batch_size=500, invalid_percentage=20):
     num_invalid_meetings = int((invalid_percentage / 100) * batch_size)
 
-    # Counters for invalid data
+    # Connect to RabbitMQ
+    connection, channel = connect_to_rabbitmq()
+
     invalid_counts = {
         "invalid_meeting_title": 0,
         "invalid_meeting_location": 0,
@@ -32,9 +56,9 @@ def create_batch(batch_size=500, invalid_percentage=20):
     }
 
     for i in range(batch_size):
-        is_meeting_invalid = i < num_invalid_meetings  # Ensures only 20% of meetings are marked invalid
+        is_meeting_invalid = i < num_invalid_meetings  # Ensure 20% invalid entries
 
-        # Create a new meeting with potential invalid fields
+        # Create a meeting with potential invalid fields
         title = random_string(random.randint(20, 2500)) if is_meeting_invalid else random_string(random.randint(20, 200))
         if len(title) > 2000:
             invalid_counts["invalid_meeting_title"] += 1
@@ -51,16 +75,9 @@ def create_batch(batch_size=500, invalid_percentage=20):
             "details": random_string(random.randint(20, 5000))
         }
 
-        # Calculate number of invalid participants and attachments within each meeting
-        num_participants = random.randint(50, 100)
-        num_invalid_participants = int((invalid_percentage / 100) * num_participants)
-        num_attachments = random.randint(5, 10)
-        num_invalid_attachments = int((invalid_percentage / 100) * num_attachments)
-
-        # Create participants with a controlled amount of invalid data
         participants = []
-        for j in range(num_participants):
-            is_participant_invalid = j < num_invalid_participants  # Controls percentage of invalid participants
+        for j in range(random.randint(50, 100)):
+            is_participant_invalid = j < int(invalid_percentage / 100 * 50)
             
             name = random_string(random.randint(5, 650)) if is_participant_invalid else random_string(random.randint(5, 50))
             if len(name) > 600:
@@ -78,10 +95,9 @@ def create_batch(batch_size=500, invalid_percentage=20):
             }
             participants.append(participant)
 
-        # Create attachments with a controlled amount of invalid data
         attachments = []
-        for k in range(num_attachments):
-            is_attachment_invalid = k < num_invalid_attachments  # Controls percentage of invalid attachments
+        for k in range(random.randint(5, 10)):
+            is_attachment_invalid = k < int(invalid_percentage / 100 * 10)
 
             url_prefix = "" if is_attachment_invalid else "http://example.com/"
             url = f"{url_prefix}{random_string(10)}.pdf"
@@ -95,20 +111,33 @@ def create_batch(batch_size=500, invalid_percentage=20):
             }
             attachments.append(attachment)
 
-        meeting["participants"] = participants
-        meeting["attachments"] = attachments
-        batch_data["meetings"].append(meeting)
+        meeting_message = {
+            "meeting_id": meeting["meeting_id"],
+            "title": meeting["title"],
+            "date_time": meeting["date_time"],
+            "location": meeting["location"],
+            "details": meeting["details"],
+            "participants": participants,
+            "attachments": attachments
+        }
 
-    # Log the count of each invalid type at the end of processing
+        # Publish message to the "meetings" queue
+        message = json.dumps(meeting_message)
+        channel.basic_publish(
+            exchange='',
+            routing_key='meetings',
+            body=message
+        )
+        logging.info(f"Sent message: {meeting_message['meeting_id']}")
+
+    # Log invalid counts
     logging.info("Batch Processing Complete")
     logging.info("Invalid Data Summary:")
-    logging.info(f"Invalid Meetings (Title): {invalid_counts['invalid_meeting_title']}")
-    logging.info(f"Invalid Meetings (Location): {invalid_counts['invalid_meeting_location']}")
-    logging.info(f"Invalid Participants (Name): {invalid_counts['invalid_participant_name']}")
-    logging.info(f"Invalid Participants (Email): {invalid_counts['invalid_participant_email']}")
-    logging.info(f"Invalid Attachments (URL): {invalid_counts['invalid_attachment_url']}")
+    for key, count in invalid_counts.items():
+        logging.info(f"{key}: {count}")
 
-    return batch_data
+    # Close connection to RabbitMQ
+    connection.close()
 
 # New function to send batch data as HTTP requests
 def send_batch_data(batch_data):

@@ -4,7 +4,8 @@ from services import (
     get_all_calendars, get_calendar_by_id, create_calendar, update_calendar, delete_calendar, get_meetings_for_calendar,
     get_all_meetings, get_meeting_by_id, create_meeting, update_meeting, delete_meeting,
     link_participant_to_meeting, link_calendar_to_meeting, get_participants_for_meeting,
-    get_all_participants, get_participant_by_id, create_participant, update_participant, delete_participant, create_batch, send_batch_data
+    get_all_participants, get_participant_by_id, create_participant, update_participant, delete_participant,
+    send_batch_data  
 )
 
 def print_main_menu():
@@ -13,7 +14,7 @@ def print_main_menu():
     print("2. Manage Calendars")
     print("3. Manage Meetings")
     print("4. Manage Participants")
-    print("9. Create Batch Request")
+    print("9. Send Batch Data")
     print("0. Exit")
 
 
@@ -61,10 +62,14 @@ def print_participant_menu():
     print("0. Back to Main Menu")
 
 
-def create_batch_data():
-    print("Creating batch of meetings, participants, and attachments...")
-    result = create_batch(batch_size=random.randint(500, 1000))
+def create_and_send_batch_data():
+    # Generates and sends batch data using send_batch_data directly
+    print("Creating and sending batch of meetings, participants, and attachments...")
+    batch_size = random.randint(500, 1000)
+    invalid_percentage = 20  # Set invalid data percentage
+    result = send_batch_data(batch_size=batch_size, invalid_percentage=invalid_percentage)
     print(result)
+
 
 def handle_attachments():
     while True:
@@ -208,13 +213,7 @@ def handle_participants():
             print("Invalid option, try again.")
 
 
-def create_and_send_batch_data():
-    print("Creating and sending batch of meetings, participants, and attachments...")
-    batch_data = create_batch(batch_size=random.randint(500, 1000), invalid_percentage=20)
-    result = send_batch_data(batch_data)
-    print(result)
-
-# Update main function to include the new batch sending option
+# Main function with batch data option
 def main():
     while True:
         print_main_menu()
@@ -229,11 +228,12 @@ def main():
         elif choice == "4":
             handle_participants()
         elif choice == "9":
-            create_and_send_batch_data()  # Updated to create and send the batch
+            create_and_send_batch_data()  
         elif choice == "0":
             print("Exiting...")
             break
         else:
             print("Invalid option, try again.")
+
 if __name__ == "__main__":
     main()
