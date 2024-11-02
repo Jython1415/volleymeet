@@ -4,6 +4,7 @@ import sys
 import os
 import logging
 import requests
+import json
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -11,7 +12,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings"
+MEETINGS_BACKEND_BASE_URL = "http://localhost:80/meetings"
 
 
 def send_message(json_message, channel):
@@ -43,24 +44,31 @@ def main():
             connected = True  # Mark as connected to proceed
         except pika.exceptions.AMQPConnectionError:
             logger.warning(f"Connection attempt failed, retrying in 5 seconds...")
-            time.sleep(5)
+            time.sleep(10)
 
     # Callback functions for each queue
     def handle_meeting(ch, method, properties, body):
         logger.info(f"Received meeting message: {body}")
 
+        try:
+            # Decode and parse JSON body
+            message_body = json.loads(body.decode("utf-8"))
+        except json.JSONDecodeError:
+            logger.error("Received a message that is not valid JSON.")
+            return
+
         # Extract only participants data
-        participants_data = body.get("participants")
+        participants_data = message_body.get("participants")
 
         # Extract only attachments data
-        attachments_data = body.get("attachments")
+        attachments_data = message_body.get("attachments")
 
         # Extract meeting details
-        title = message.get("title")
-        date_time = message.get("date_time")
-        location = message.get("location")
-        details = message.get("details")
-        meeting_id = message.get("meeting_id")
+        title = message_body.get("title")
+        date_time = message_body.get("date_time")
+        location = message_body.get("location")
+        details = message_body.get("details")
+        meeting_id = message_body.get("meeting_id")
 
         # Prepare meeting data for POST request
         meeting_data = {
@@ -93,12 +101,12 @@ def main():
 
             send_message(participant_info, channel)        
 
-         # Send attachment messages to attachments queue
-         for attachment in attachments_data:
+        # Send attachment messages to attachments queue
+        for attachment in attachments_data:
             attachment_info = {
-                "meeting_id" = attachment.get("meeting_id")
-                "attachment_url" = attachment.get("attachment_url")
-                "attachment_id" = attachment.get("attachment_id")
+                "meeting_id": attachment.get("meeting_id"),
+                "attachment_url": attachment.get("attachment_url"),
+                "attachment_id": attachment.get("attachment_id")
             }
 
             send_message(attachment_info, channel)
@@ -114,7 +122,7 @@ def main():
 
 if __name__ == '__main__':
     try:
-        time.sleep(15)
+        time.sleep(30)
         main()
     except KeyboardInterrupt:
         logger.info('Interrupted by user, exiting...')
