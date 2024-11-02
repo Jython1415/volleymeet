@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
+const BASE_URL = "http://localhost:80";
+const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
+// const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
 
 const UpdateAttachmentForm = () => {
     const [attachment, setAttachment] = useState({
@@ -16,7 +18,7 @@ const UpdateAttachmentForm = () => {
         e.preventDefault();
 
         const attachmentData = {
-            attachment_id: attachment.attachment_id || undefined, // Allow attachment_id to be optional
+            attachment_id: attachment.attachment_id || undefined, // Allow attachment_id to be optional // TODO does this make sense for post??
             meeting_id: attachment.meeting_id,
             attachment_url: attachment.attachment_url,
         };

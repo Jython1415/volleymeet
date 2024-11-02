@@ -5,7 +5,9 @@ import FindAttachmentForm from './FindAttachmentForm';
 import DeleteAttachmentForm from './DeleteAttachmentForm';
 import UpdateAttachmentForm from './UpdateAttachmentForm';
 
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
+const BASE_URL = "http://localhost:80";
+const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
+// const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
 
 const Attachments = () => {
     const [attachments, setAttachments] = useState([]);
@@ -38,8 +40,13 @@ const Attachments = () => {
     const handleAttachmentDisplay = async () => {
         resetFormVisibility();
         try {
-            const response = await fetch(ATTACHMENTS_BACKEND_BASE_URL);
+            // request attachments from the backend ("<base url>/attachments") w/ GET method
+            const response = await fetch(`${ATTACHMENTS_BACKEND_BASE_URL}/attachments`, {
+                method: 'GET',
+            });
             if (response.status === 200) {
+                // log the response to the console
+                console.log(response);
                 const data = await response.json();
                 setAttachments(data);
                 setShowAttachmentList(true);
@@ -88,7 +95,9 @@ const Attachments = () => {
 
     const handleFindAttachmentById = async (attachmentId) => {
         try {
-            const response = await fetch(`${ATTACHMENTS_BACKEND_BASE_URL}/${attachmentId}`);
+            const response = await fetch(`${ATTACHMENTS_BACKEND_BASE_URL}/${attachmentId}`, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const attachment = await response.json();
                 setAttachments([attachment]);

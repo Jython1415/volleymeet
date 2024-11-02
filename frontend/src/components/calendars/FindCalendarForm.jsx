@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-const CALENDARS_BACKEND_BASE_URL = "http://localhost:5001/calendars"; // Your backend URL
-
 const FindCalendarForm = ({ onFindCalendar }) => {
     const [calendarId, setCalendarId] = useState('');
 
