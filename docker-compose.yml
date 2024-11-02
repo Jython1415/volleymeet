@@ -139,6 +139,22 @@ services:
     environment:
       NODE_ENV: development
 
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf # Link to your NGINX config
+    depends_on:
+      - attachment-service
+      - calendar-service
+      - meeting-service
+      - participant-service
+      - frontend
+    networks:
+      - frontend-net
+      - backend-net
+
   cli_frontend:
     build: ./cli_frontend
     depends_on:

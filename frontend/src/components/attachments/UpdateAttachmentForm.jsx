@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
+const BASE_URL = "http://localhost:80";
+const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
+// const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
 
 const UpdateAttachmentForm = () => {
     const [attachment, setAttachment] = useState({
