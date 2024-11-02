@@ -15,7 +15,7 @@ logging.basicConfig(
 MEETINGS_BACKEND_BASE_URL = "http://localhost:80/meetings"
 
 
-def send_message(json_message, channel):
+def send_message_participants(json_message, channel):
     # Convert the message to a JSON string
     message = json.dumps(json_message)
 
@@ -23,6 +23,19 @@ def send_message(json_message, channel):
     channel.basic_publish(
         exchange='',
         routing_key='participants',
+        body=message
+    )
+
+    logger.info(f"Sent message: {message}")
+
+def send_message_attachments(json_message, channel):
+    # Convert the message to a JSON string
+    message = json.dumps(json_message)
+
+    # Publish the message to the "participants" queue
+    channel.basic_publish(
+        exchange='',
+        routing_key='attachments',
         body=message
     )
 
@@ -99,7 +112,7 @@ def main():
                 "participant_id": participant.get("participant_id")
             }
 
-            send_message(participant_info, channel)        
+            send_message_participants(participant_info, channel)        
 
         # Send attachment messages to attachments queue
         for attachment in attachments_data:
@@ -109,7 +122,7 @@ def main():
                 "attachment_id": attachment.get("attachment_id")
             }
 
-            send_message(attachment_info, channel)
+            send_message_attachments(attachment_info, channel)
 
 
     # Set up consumers
