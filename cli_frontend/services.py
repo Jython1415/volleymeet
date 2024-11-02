@@ -1,9 +1,200 @@
+import json
 import requests
+<<<<<<< HEAD
+import random
+import uuid
+import logging
+import pika
+import time
+from datetime import datetime, timedelta
+BASE_URL = "http://localhost:5001"  # Modify the base URL if backend is hosted elsewhere
+=======
 
 ATTACHMENT_BASE_URL = "http://localhost:5001"
 CALENDAR_BASE_URL = "http://localhost:5002"
 MEETING_BASE_URL = "http://localhost:5004"
 PARTICIPANT_BASE_URL = "http://localhost:5005"
+>>>>>>> main
+
+logging.basicConfig(level=logging.INFO)
+
+
+# Function to connect to RabbitMQ
+def connect_to_rabbitmq():
+    connected = False
+    connection = None
+    channel = None
+
+    while not connected:
+        try:
+            credentials = pika.PlainCredentials("rabbituser", "rabbitpassword")
+            parameters = pika.ConnectionParameters("message_broker", 5672, "demo-vhost", credentials)
+            connection = pika.BlockingConnection(parameters)
+            channel = connection.channel()
+            logging.info("Connected to RabbitMQ")
+            connected = True
+        except pika.exceptions.AMQPConnectionError:
+            logging.warning("Connection attempt failed, retrying in 5 seconds...")
+            time.sleep(5)
+    
+    return connection, channel
+    
+# Helper function to create random string
+def random_string(length):
+    return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', k=length))
+
+# Helper function to create invalid email
+def random_invalid_email():
+    return random_string(8)  # No "@" character
+
+# Function to generate batch of meetings, participants, and attachments
+# Function to generate and publish batch messages
+def create_and_send_batch(batch_size=500, invalid_percentage=20):
+    num_invalid_meetings = int((invalid_percentage / 100) * batch_size)
+
+    # Connect to RabbitMQ
+    connection, channel = connect_to_rabbitmq()
+
+    invalid_counts = {
+        "invalid_meeting_title": 0,
+        "invalid_meeting_location": 0,
+        "invalid_participant_name": 0,
+        "invalid_participant_email": 0,
+        "invalid_attachment_url": 0,
+    }
+
+    for i in range(batch_size):
+        is_meeting_invalid = i < num_invalid_meetings  # Ensure 20% invalid entries
+
+        # Create a meeting with potential invalid fields
+        title = random_string(random.randint(20, 2500)) if is_meeting_invalid else random_string(random.randint(20, 200))
+        if len(title) > 2000:
+            invalid_counts["invalid_meeting_title"] += 1
+
+        location = random_string(random.randint(10, 2500)) if is_meeting_invalid else random_string(random.randint(10, 200))
+        if len(location) > 2000:
+            invalid_counts["invalid_meeting_location"] += 1
+
+        meeting = {
+            "meeting_id": str(uuid.uuid4()),
+            "title": title,
+            "date_time": (datetime.now() + timedelta(days=random.randint(1, 30))).strftime("%Y-%m-%d %I:%M %p"),
+            "location": location,
+            "details": random_string(random.randint(20, 5000))
+        }
+
+        participants = []
+        for j in range(random.randint(50, 100)):
+            is_participant_invalid = j < int(invalid_percentage / 100 * 50)
+            
+            name = random_string(random.randint(5, 650)) if is_participant_invalid else random_string(random.randint(5, 50))
+            if len(name) > 600:
+                invalid_counts["invalid_participant_name"] += 1
+
+            email = random_invalid_email() if is_participant_invalid else f"{random_string(5)}@example.com"
+            if "@" not in email:
+                invalid_counts["invalid_participant_email"] += 1
+
+            participant = {
+                "participant_id": str(uuid.uuid4()),
+                "meeting_id": meeting["meeting_id"],
+                "name": name,
+                "email": email
+            }
+            participants.append(participant)
+
+        attachments = []
+        for k in range(random.randint(5, 10)):
+            is_attachment_invalid = k < int(invalid_percentage / 100 * 10)
+
+            url_prefix = "" if is_attachment_invalid else "http://example.com/"
+            url = f"{url_prefix}{random_string(10)}.pdf"
+            if not url.startswith("http"):
+                invalid_counts["invalid_attachment_url"] += 1
+
+            attachment = {
+                "attachment_id": str(uuid.uuid4()),
+                "meeting_id": meeting["meeting_id"],
+                "url": url
+            }
+            attachments.append(attachment)
+
+        meeting_message = {
+            "meeting_id": meeting["meeting_id"],
+            "title": meeting["title"],
+            "date_time": meeting["date_time"],
+            "location": meeting["location"],
+            "details": meeting["details"],
+            "participants": participants,
+            "attachments": attachments
+        }
+
+        # Publish message to the "meetings" queue
+        message = json.dumps(meeting_message)
+        channel.basic_publish(
+            exchange='',
+            routing_key='meetings',
+            body=message
+        )
+        logging.info(f"Sent message: {meeting_message['meeting_id']}")
+
+    # Log invalid counts
+    logging.info("Batch Processing Complete")
+    logging.info("Invalid Data Summary:")
+    for key, count in invalid_counts.items():
+        logging.info(f"{key}: {count}")
+
+    # Close connection to RabbitMQ
+    connection.close()
+
+# New function to send batch data as HTTP requests
+def send_batch_data(batch_data):
+    success_counts = {
+        "meetings": 0,
+        "participants": 0,
+        "attachments": 0
+    }
+    failure_counts = {
+        "meetings": 0,
+        "participants": 0,
+        "attachments": 0
+    }
+
+    # Process each meeting in the batch data
+    for meeting in batch_data["meetings"]:
+        # Send meeting
+        meeting_response = requests.post(f"{BASE_URL}/meetings", json=meeting)
+        if meeting_response.status_code == 201:
+            success_counts["meetings"] += 1
+        else:
+            failure_counts["meetings"] += 1
+
+        # Send participants for the meeting
+        for participant in meeting["participants"]:
+            participant_response = requests.post(f"{BASE_URL}/participants", json=participant)
+            if participant_response.status_code == 201:
+                success_counts["participants"] += 1
+            else:
+                failure_counts["participants"] += 1
+
+        # Send attachments for the meeting
+        for attachment in meeting["attachments"]:
+            attachment_response = requests.post(f"{BASE_URL}/attachments", json=attachment)
+            if attachment_response.status_code == 201:
+                success_counts["attachments"] += 1
+            else:
+                failure_counts["attachments"] += 1
+
+    # Log summary of successful and failed requests at the end
+    logging.info("Batch Sending Complete")
+    logging.info("Summary of Batch Results:")
+    logging.info(f"Meetings - Success: {success_counts['meetings']}, Failures: {failure_counts['meetings']}")
+    logging.info(f"Participants - Success: {success_counts['participants']}, Failures: {failure_counts['participants']}")
+    logging.info(f"Attachments - Success: {success_counts['attachments']}, Failures: {failure_counts['attachments']}")
+
+    return "Batch data sent successfully."
+
+
 
 # Attachment Services
 def get_all_attachments():
