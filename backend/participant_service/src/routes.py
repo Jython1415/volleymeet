@@ -1,6 +1,6 @@
 import logging
 from flask import Blueprint, jsonify, request, abort
-from participants_sql_queries import (
+from queries import (
     create_participant,
     update_participant,
     get_all_participants,
@@ -15,11 +15,11 @@ logging.basicConfig(
 )
 
 # Create a Blueprint for participant routes
-participant_routes = Blueprint("participant_routes", __name__)
+routes = Blueprint("participant_routes", __name__, url_prefix="/")
 
 
 # Endpoint to get all participants
-@participant_routes.route("/participants", methods=["GET"])
+@routes.route("", methods=["GET"])
 def api_get_participants():
     logger.info("Fetching all participants")
     try:
@@ -31,7 +31,7 @@ def api_get_participants():
 
 
 # Endpoint to get a specific participant by ID
-@participant_routes.route("/participants/<string:participant_id>", methods=["GET"])
+@routes.route("/<string:participant_id>", methods=["GET"])
 def api_get_participant(participant_id):
     logger.info(f"Fetching participant with ID: {participant_id}")
     try:
@@ -43,7 +43,7 @@ def api_get_participant(participant_id):
 
 
 # Endpoint to add a new participant
-@participant_routes.route("/participants", methods=["POST"])
+@routes.route("", methods=["POST"])
 def api_add_participant():
     data = request.get_json()
     name = data.get("name")
@@ -60,7 +60,7 @@ def api_add_participant():
 
 
 # Endpoint to update an existing participant
-@participant_routes.route("/participants/<string:participant_id>", methods=["PUT"])
+@routes.route("/<string:participant_id>", methods=["PUT"])
 def api_update_participant(participant_id):
     data = request.get_json()
     name = data.get("name")
@@ -76,7 +76,7 @@ def api_update_participant(participant_id):
 
 
 # Endpoint to delete a participant by ID
-@participant_routes.route("/participants/<string:participant_id>", methods=["DELETE"])
+@routes.route("/<string:participant_id>", methods=["DELETE"])
 def api_delete_participant(participant_id):
     logger.info(f"Deleting participant with ID: {participant_id}")
     try:

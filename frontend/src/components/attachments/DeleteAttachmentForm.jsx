@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
-
 const DeleteAttachmentForm = ({ onDeleteAttachment }) => {
     const [attachmentId, setAttachmentId] = useState('');
 

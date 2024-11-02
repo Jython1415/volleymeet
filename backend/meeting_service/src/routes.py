@@ -1,7 +1,7 @@
 import logging
 import requests
 from flask import Blueprint, jsonify, request, abort
-from meetings_sql_queries import (
+from queries import (
     create_meeting,
     get_all_meetings,
     get_meeting_by_id,
@@ -18,11 +18,11 @@ logging.basicConfig(
 )
 
 # Create a Blueprint for meeting routes
-meeting_routes = Blueprint("meeting_routes", __name__)
+routes = Blueprint("meeting_routes", __name__, url_prefix="/")
 
 
 # Endpoint to get all meetings
-@meeting_routes.route("/meetings", methods=["GET"])
+@routes.route("", methods=["GET"])
 def api_get_meetings():
     logger.info("Fetching all meetings")
     try:
@@ -34,7 +34,7 @@ def api_get_meetings():
 
 
 # Endpoint to get a specific meeting by ID
-@meeting_routes.route("/meetings/<string:meeting_id>", methods=["GET"])
+@routes.route("/<string:meeting_id>", methods=["GET"])
 def api_get_meeting(meeting_id):
     logger.info(f"Fetching meeting with ID: {meeting_id}")
     try:
@@ -46,7 +46,7 @@ def api_get_meeting(meeting_id):
 
 
 # Endpoint to add a new meeting
-@meeting_routes.route("/meetings", methods=["POST"])
+@routes.route("", methods=["POST"])
 def api_add_meeting():
     data = request.get_json()
 
@@ -68,7 +68,7 @@ def api_add_meeting():
 
 
 # Endpoint to update an existing meeting
-@meeting_routes.route("/meetings/<string:meeting_id>", methods=["PUT"])
+@routes.route("/<string:meeting_id>", methods=["PUT"])
 def api_update_meeting(meeting_id):
     data = request.get_json()
 
@@ -87,7 +87,7 @@ def api_update_meeting(meeting_id):
 
 
 # Endpoint to delete a meeting by ID
-@meeting_routes.route("/meetings/<string:meeting_id>", methods=["DELETE"])
+@routes.route("/<string:meeting_id>", methods=["DELETE"])
 def api_delete_meeting(meeting_id):
     logger.info(f"Deleting meeting with ID: {meeting_id}")
     try:
@@ -111,8 +111,8 @@ def api_delete_meeting(meeting_id):
 
 
 # Endpoint to link a meeting and participant
-@meeting_routes.route(
-    "/meetings/<string:meeting_id>/participants/<string:participant_id>",
+@routes.route(
+    "/<string:meeting_id>/participants/<string:participant_id>",
     methods=["POST"],
 )
 def api_link_participant_to_meeting(meeting_id, participant_id):
@@ -120,8 +120,8 @@ def api_link_participant_to_meeting(meeting_id, participant_id):
     pass
 
 # Endpoint to link a meeting and calendar
-@meeting_routes.route(
-    "/meetings/<string:meeting_id>/calendars/<string:calendar_id>",
+@routes.route(
+    "/<string:meeting_id>/calendars/<string:calendar_id>",
     methods=["POST"],
 )
 def api_link_calendar_to_meeting(meeting_id, calendar_id):
@@ -129,7 +129,7 @@ def api_link_calendar_to_meeting(meeting_id, calendar_id):
     pass
 
 # Endpoint to get all participants for a specific meeting
-@meeting_routes.route("/meetings/<string:meeting_id>/participants", methods=["GET"])
+@routes.route("/<string:meeting_id>/participants", methods=["GET"])
 def api_get_participants_for_meeting(meeting_id):
     logger.info(f"Getting participants for meeting: {meeting_id}")
     try:

@@ -8,9 +8,13 @@ import LinkParticipantForm from './LinkParticipantForm';
 import LinkCalendarForm from './LinkCalendarForm';
 import MeetingParticipantList from './MeetingParticipantList';
 
-const MEETINGS_BACKEND_BASE_URL = "http://localhost:5001/meetings";
-const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5001/participants";
-const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001/attachments";
+const BASE_URL = "http://localhost:80";
+const MEETINGS_BACKEND_BASE_URL = `${BASE_URL}/meetings`;
+const PARTICIPANTS_BACKEND_BASE_URL = `${BASE_URL}/participants`;
+const ATTACHMENTS_BACKEND_BASE_URL = `${BASE_URL}/attachments`;
+// const MEETINGS_BACKEND_BASE_URL = "http://localhost:5004";
+// const PARTICIPANTS_BACKEND_BASE_URL = "http://localhost:5005";
+// const ATTACHMENTS_BACKEND_BASE_URL = "http://localhost:5001";
 
 const Meetings = () => {
     const [meetings, setMeetings] = useState([]);
@@ -74,7 +78,9 @@ const Meetings = () => {
 
     const handleFindMeetingById = async (meetingId) => {
         try {
-            const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`);
+            const response = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}`, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const meeting = await response.json();
                 setMeetings([meeting]);
@@ -82,7 +88,9 @@ const Meetings = () => {
                 await handleFetchParticipants();
                 await handleFetchAttachments();
                 try {
-                    const participantsResponse = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}/participants`);
+                    const participantsResponse = await fetch(`${MEETINGS_BACKEND_BASE_URL}/${meetingId}/participants`, {
+                        method: 'GET',
+                    });
                     if (participantsResponse.status === 200) {
                         console.log("Participants found for meeting", meetingId);
                         console.log(participantsResponse);
@@ -124,19 +132,27 @@ const Meetings = () => {
     const handleMeetingDisplay = async () => {
         resetFormVisibility();
         try {
-            const response = await fetch(MEETINGS_BACKEND_BASE_URL);
+            console.log('Fetching meetings from:', MEETINGS_BACKEND_BASE_URL);
+            const response = await fetch(MEETINGS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
+                console.log('Meetings fetched successfully.');
                 const data = await response.json();
+                console.log('Meetings:', data);
                 setMeetings(data);
                 setShowMeetingList(true);
                 await handleFetchParticipants();
                 await handleFetchAttachments();
             } else if (response.status === 404) {
+                console.log('No meetings found.');
                 setError("No meetings found.");
             } else {
+                console.error('Failed to fetch meetings:', response);
                 setError(`Failed to fetch meetings with status code ${response.status}`);
             }
         } catch (err) {
+            console.error('Error fetching meetings:', err);
             setError('Error fetching meetings.');
         }
     };
@@ -161,7 +177,9 @@ const Meetings = () => {
 
     const handleFetchParticipants = async () => {
         try {
-            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL);
+            const response = await fetch(PARTICIPANTS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setParticipants(data);
@@ -175,7 +193,9 @@ const Meetings = () => {
 
     const handleFetchAttachments = async () => {
         try {
-            const response = await fetch(ATTACHMENTS_BACKEND_BASE_URL);
+            const response = await fetch(ATTACHMENTS_BACKEND_BASE_URL, {
+                method: 'GET',
+            });
             if (response.status === 200) {
                 const data = await response.json();
                 setAttachments(data);

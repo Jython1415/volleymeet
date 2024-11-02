@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS attachments (
     attachment_id CHAR(36) PRIMARY KEY,
     meeting_id CHAR(36) NOT NULL,
-    url TEXT NOT NULL CHECK (url LIKE 'http%://%'),
+    url TEXT NOT NULL CHECK (url LIKE 'http%://%')
 );
 
 -- Creating Triggers for Auto-generating UUIDs

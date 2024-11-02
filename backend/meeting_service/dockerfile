@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app will run on
-EXPOSE 5000
+EXPOSE 5004
 
 # Define the command to run the meeting service
-CMD ["python", "meetings_service.py"]
+CMD ["python", "src/app.py"]
