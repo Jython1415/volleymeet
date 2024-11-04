@@ -95,7 +95,7 @@ def main():
         # Send POST request to meetings backend to create a meeting
         try:
             response = requests.post(
-                MEETINGS_BACKEND_BASE_URL,
+                url=MEETINGS_BACKEND_BASE_URL,
                 json=meeting_data
             )
             response.raise_for_status()

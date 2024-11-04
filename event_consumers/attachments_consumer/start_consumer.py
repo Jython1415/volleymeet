@@ -53,7 +53,7 @@ def main():
         # Send POST request to participants backend to create a participant
         try:
             response = requests.post(
-                ATTACHMENTS_BACKEND_BASE_URL,
+                url=ATTACHMENTS_BACKEND_BASE_URL,
                 json=participant_data
             )
             response.raise_for_status()
